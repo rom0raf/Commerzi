@@ -35,4 +35,4 @@ Le projet aboutira à plusieurs livrables, notamment :
 Une API pour la gestion des tournées et des données clients.
 Une application mobile prête à l'emploi pour les commerciaux.
 Une documentation complète comprenant l’installation, les tests et l’utilisation du système.
-En résumé, Commerzi propose une solution pratique et technologique pour les entreprises cherchant à améliorer l'efficacité de leurs équipes commerciales sur le terrain, tout en optimisant la gestion des trajets et la prospection de nouveaux clients.
+En résumé, Commerzi propose une solution pratique et technologique pour les entreprises cherchant à améliorer l'efficacité de leurs équipes commerciales sur le terrain, tout en optimisant la gestion des trajets et la prospection de nouveaux clients
