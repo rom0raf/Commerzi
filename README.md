@@ -1,4 +1,4 @@
-# Commerzi
+# Commerzi oui
 
 Le projet "Commerzi" est une application mobile destinée à optimiser la gestion des tournées commerciales. Son objectif principal est de faciliter le travail des commerciaux sur le terrain en leur permettant de planifier, suivre et optimiser leurs visites auprès de leurs clients actuels et potentiels. Elle vise à maximiser l'efficacité des déplacements, tout en simplifiant le démarchage de nouveaux prospects.
 
