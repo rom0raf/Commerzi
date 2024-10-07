@@ -1,38 +1,67 @@
-# Commerzi
+# ![Logo Commerzi](logo-commerzi.png)
 
-Le projet "Commerzi" est une application mobile destinée à optimiser la gestion des tournées commerciales. Son objectif principal est de faciliter le travail des commerciaux sur le terrain en leur permettant de planifier, suivre et optimiser leurs visites auprès de leurs clients actuels et potentiels. Elle vise à maximiser l'efficacité des déplacements, tout en simplifiant le démarchage de nouveaux prospects.
+## Commerzi
 
-## Équipe
+Commerzi est une application mobile innovante conçue pour optimiser la gestion des tournées commerciales. Notre mission est de faciliter le travail des commerciaux sur le terrain en leur fournissant des outils efficaces pour planifier, suivre et améliorer leurs visites auprès des clients actuels et potentiels. Avec Commerzi, maximisez vos déplacements tout en simplifiant le démarchage de nouveaux prospects.
 
-- DENAMIEL Clément
-- ROMA Rafaël
-- SCHARDT Ugo
-- SOLEIL Aurélien
+---
 
-## Contexte du Projet
-Les entreprises qui emploient des commerciaux, notamment dans des secteurs comme l’agroalimentaire, doivent régulièrement envoyer leurs équipes sur le terrain pour visiter des clients, promouvoir des produits et générer des ventes. Ces visites peuvent être organisées sur des zones géographiques étendues et doivent être réalisées de manière optimale pour minimiser les trajets inutiles et maximiser les opportunités de nouvelles affaires.
+## 🚀 Équipe
 
-Commerzi répond à ce besoin en offrant une solution numérique qui intègre des fonctionnalités de planification d'itinéraires, de gestion des clients et prospects, ainsi que de suivi des tournées.
+- **Clément DENAMIEL**
+- **Rafaël ROMA**
+- **Ugo SCHARDT**
+- **Aurélien SOLEIL**
 
-## Objectifs du Projet
-Les objectifs de Commerzi sont :
+---
 
-Optimiser les tournées commerciales : Réduire les distances parcourues en proposant des itinéraires optimisés.
-Faciliter le démarchage de prospects : Aider les commerciaux à identifier et à visiter des prospects proches de leurs trajets.
-Améliorer la gestion des clients : Fournir un outil pour gérer efficacement les informations clients et les organiser selon leurs priorités.
-Fonctionnalités Clés
-Gestion des comptes commerciaux : Chaque utilisateur peut créer et gérer son compte pour accéder aux fonctionnalités de l’application.
-Planification d’itinéraires optimisés : L'application génère des itinéraires optimaux en fonction des visites prévues chez les clients et prospects dans une zone donnée.
-Gestion des clients et prospects : Les commerciaux peuvent ajouter, modifier ou supprimer des clients et prospects, ainsi que consulter des informations détaillées sur chacun.
-Suivi des tournées : L’application permet aux commerciaux de suivre en temps réel l'état de leurs visites, d’enregistrer celles effectuées et de recevoir des alertes lorsqu’ils approchent d’un client ou prospect.
-Consultation des itinéraires passés : Les commerciaux peuvent consulter l’historique de leurs tournées pour analyser les visites réalisées et leur efficacité.
-Aspects Techniques
-L'application Commerzi repose sur une architecture modulaire avec une API backend qui centralise les données et les traitements, ainsi qu'une application mobile pour l’utilisateur final. Elle utilise des technologies modernes, telles que Java pour le développement mobile, une base de données MySQL pour les données clients, et MongoDB pour gérer les informations non structurées comme les historiques de tournées. Les itinéraires sont visualisés à l’aide d’une carte interactive basée sur OpenStreetMap.
+## 📚 Contexte du Projet
 
-## Livrables
-Le projet aboutira à plusieurs livrables, notamment :
+Dans des secteurs tels que l’agroalimentaire, les entreprises doivent régulièrement envoyer leurs équipes pour visiter des clients, promouvoir des produits et générer des ventes. Commerzi répond à ce besoin en offrant une solution numérique qui intègre des fonctionnalités de planification d'itinéraires, de gestion des clients et de suivi des tournées.
 
-Une API pour la gestion des tournées et des données clients.
-Une application mobile prête à l'emploi pour les commerciaux.
-Une documentation complète comprenant l’installation, les tests et l’utilisation du système.
-En résumé, Commerzi propose une solution pratique et technologique pour les entreprises cherchant à améliorer l'efficacité de leurs équipes commerciales sur le terrain, tout en optimisant la gestion des trajets et la prospection de nouveaux clients.
+---
+
+## 🎯 Objectifs du Projet
+
+- **Optimiser les tournées commerciales** : Réduire les distances parcourues grâce à des itinéraires optimisés.
+- **Faciliter le démarchage de prospects** : Identifier et visiter facilement des prospects proches.
+- **Améliorer la gestion des clients** : Offrir un outil complet pour gérer les informations clients et les prioriser.
+
+---
+
+## 🔑 Fonctionnalités Clés
+
+- **Gestion des comptes commerciaux** : Créez et gérez votre compte pour accéder aux fonctionnalités.
+- **Planification d’itinéraires optimisés** : Générez des itinéraires basés sur vos visites prévues.
+- **Gestion des clients et prospects** : Ajoutez, modifiez ou supprimez des clients et prospects, avec des informations détaillées.
+- **Suivi des tournées** : Suivez en temps réel vos visites, enregistrez celles effectuées et recevez des alertes pour les prochaines.
+- **Consultation des itinéraires passés** : Analysez l’historique de vos tournées pour évaluer leur efficacité.
+
+---
+
+## 🛠️ Aspects Techniques
+
+Commerzi repose sur une architecture modulaire comprenant :
+
+- **API Backend** : Centralise les données et les traitements.
+- **Application Mobile** : Développée en Java pour une expérience utilisateur fluide.
+- **Base de Données** : MySQL pour les données clients, MongoDB pour les historiques de tournées.
+- **Carte Interactive** : Visualisation des itinéraires via OpenStreetMap.
+
+---
+
+## 📦 Livrables
+
+Le projet inclura :
+
+- Une API pour la gestion des tournées et des données clients.
+- Une application mobile prête à l'emploi pour les commerciaux.
+- Une documentation complète pour l’installation, les tests et l’utilisation du système.
+
+---
+
+## 💡 Conclusion
+
+Commerzi offre une solution technologique et pratique pour les entreprises souhaitant améliorer l'efficacité de leurs équipes commerciales sur le terrain. Optimisez vos trajets et facilitez la prospection de nouveaux clients grâce à notre application.
+
+---
