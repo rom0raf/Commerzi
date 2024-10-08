@@ -20,6 +20,9 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    - name: Make gradlew executable
+      run: chmod +x commerzi-app/gradlew 
+
     - name: Build with Gradle
       run: ./gradlew build
-      working-directory: commerzi-app 
+      working-directory: commerzi-app
