@@ -45,8 +45,8 @@
         android:id="@+id/btnValidate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/grey"
         android:text="Valider"
-        android:background="@color/gray"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white" />
 
 </LinearLayout>
