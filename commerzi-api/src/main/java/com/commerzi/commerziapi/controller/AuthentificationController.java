@@ -4,6 +4,7 @@
 
 package com.commerzi.commerziapi.controller;
 
+import com.commerzi.commerziapi.database.mysql.MySQLConnection;
 import com.commerzi.commerziapi.model.User;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
 import com.commerzi.commerziapi.service.IAuthentificationService;
@@ -18,16 +19,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class AuthentificationController {
 
+    @Autowired
     private IAuthentificationService authentificationService;
 
-    /**
-     *
-     * @param authentificationService
-     */
     @Autowired
-    public AuthentificationController(IAuthentificationService authentificationService) {
-        this.authentificationService = authentificationService;
-    }
+    private MySQLConnection test;
 
     /**
      *
@@ -37,12 +33,14 @@ public class AuthentificationController {
     public ResponseEntity auth(@RequestBody User user) {
         boolean isAuth = authentificationService.checkUserCredentials(user.getEmail(), user.getPassword());
 
-        user = authentificationService.getUser(user.getEmail());
-        user.setPassword("");
+        User realUser = authentificationService.getUser(user.getEmail());
+        User userCopy = realUser.clone();
+        userCopy.setPassword("");
 
         if (isAuth) {
-            authentificationService.setupSession(user);
-            return ResponseEntity.ok(user);
+            authentificationService.setupSession(realUser);
+            userCopy.setSession(realUser.getSession());
+            return ResponseEntity.ok(userCopy);
         }
 
         return ResponseEntity.badRequest().body("Invalid credentials");

@@ -36,11 +36,24 @@ public class UserDao {
     }
 
     public User getUserBySession(String session) {
+        if (session == null) {
+            throw new IllegalArgumentException("Session cannot be null");
+        }
         for (User user : temporaryUsers) {
-            if (user.getSession().equals(session)) {
+            if (session.equals(user.getSession())) {
                 return user;
             }
         }
         return null;
+    }
+
+
+    public String createUser(User user) {
+        // TODO créer un user id et le donner   à l'utilisateur
+        // TODO en base de données juste récup le dernier id crée
+        temporaryUsers.add(user);
+
+        // TODO return le user id
+        return "User created";
     }
 }

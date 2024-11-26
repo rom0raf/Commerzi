@@ -1,5 +1,8 @@
 package com.commerzi.commerziapi.model;
 
+/**
+ * Classe représentant un utilisateur
+ */
 public class User {
 
     private String userId;
@@ -57,4 +60,17 @@ public class User {
 
     public void setSession(String session) { this.session = session; }
 
+    public User clone() {
+        User cloned = new User();
+
+        cloned.userId = this.userId;
+        cloned.firstName = this.firstName;
+        cloned.lastName = this.lastName;
+        cloned.email = this.email;
+        cloned.password = this.password;
+        cloned.address = this.address;
+        cloned.session = this.session;
+
+        return cloned;
+    }
 }
