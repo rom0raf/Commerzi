@@ -22,9 +22,6 @@ public class AuthentificationController {
     @Autowired
     private IAuthentificationService authentificationService;
 
-    @Autowired
-    private MySQLConnection test;
-
     /**
      *
      * @return
