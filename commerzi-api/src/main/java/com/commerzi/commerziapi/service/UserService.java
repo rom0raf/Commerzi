@@ -1,7 +1,7 @@
 package com.commerzi.commerziapi.service;
 
-import com.commerzi.commerziapi.dao.UserDao;
-import com.commerzi.commerziapi.model.User;
+import com.commerzi.commerziapi.dao.UserRepository;
+import com.commerzi.commerziapi.model.CommerziUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,17 +9,20 @@ import org.springframework.stereotype.Service;
 public class UserService implements IUserService{
 
     @Autowired
-    private UserDao userDao;
+    private UserRepository userRepository;
 
-    public String createUser(User user) {
+    public String createUser(CommerziUser commerziUser) {
         // TODO vérif l'email est unique
         // Verif critère mot de passe si on en a
         // TODO throw une erreur custom qui renvoie un message précis sur l'erreur
-        return userDao.createUser(user);
+        CommerziUser u = userRepository.save(commerziUser);
+        return u.getUserId();
     }
 
     public boolean exists(String email, String password) {
-        return userDao.exists(email, password);
+        CommerziUser commerziUser = userRepository.getUserByEmail(email);
+        return commerziUser != null && commerziUser.getPassword().equals(password);
+
     }
 
 }

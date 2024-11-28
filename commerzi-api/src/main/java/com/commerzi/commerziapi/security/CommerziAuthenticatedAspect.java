@@ -1,6 +1,6 @@
 package com.commerzi.commerziapi.security;
 
-import com.commerzi.commerziapi.model.User;
+import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.service.IAuthentificationService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
  *
  * @see CommerziAuthenticated
  * @see IAuthentificationService
- * @see User
+ * @see CommerziUser
  */
 @Aspect
 @Component
@@ -57,8 +57,8 @@ public class CommerziAuthenticatedAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String session = request.getHeader(AUTHENTIFICATION_HEADER_NAME);
 
-        User user = authentificationService.getUserBySession(session);
-        if (user == null) {
+        CommerziUser commerziUser = authentificationService.getUserBySession(session);
+        if (commerziUser == null) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
 
