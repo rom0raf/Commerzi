@@ -33,9 +33,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @Component
 public class CommerziAuthenticatedAspect {
 
-    /** Nom du header HTTP utilisé pour l'authentification */
-    private final static String AUTHENTIFICATION_HEADER_NAME = "X-Commerzi-Auth";
-
     /** Service d'authentification */
     @Autowired
     private IAuthentificationService authentificationService;
@@ -50,12 +47,15 @@ public class CommerziAuthenticatedAspect {
      *
      * @param joinPoint Le point d'exécution de la méthode interceptée.
      * @return La valeur de retour de la méthode, ou une réponse HTTP 401 si l'utilisateur n'est pas authentifié.
-     * @throws Throwable Si une exception est levée pendant l'exécution de la méthode.
+     * @throws Throwable Si une exception est l evée pendant l'exécution de la méthode.
      */
     @Around("@annotation(com.commerzi.commerziapi.security.CommerziAuthenticated)")
     public Object checkAuthentication(ProceedingJoinPoint joinPoint) throws Throwable {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String session = request.getHeader(AUTHENTIFICATION_HEADER_NAME);
+        String session = Security.getSessionFromSpring();
+
+        if (session == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
 
         CommerziUser commerziUser = authentificationService.getUserBySession(session);
         if (commerziUser == null) {
@@ -64,4 +64,5 @@ public class CommerziAuthenticatedAspect {
 
         return joinPoint.proceed();
     }
+
 }

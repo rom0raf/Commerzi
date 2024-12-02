@@ -15,5 +15,4 @@ public interface UserRepository extends CrudRepository<CommerziUser, String> {
 
     CommerziUser getUserBySession(String session);
 
-
 }

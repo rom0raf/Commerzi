@@ -7,4 +7,10 @@ public interface IUserService {
     String createUser(CommerziUser commerziUser);
 
     boolean exists(String email, String password);
+
+    CommerziUser getUserByEmail(String email);
+
+    void updateUser(CommerziUser commerziUser);
+
+    void deleteUser(CommerziUser user);
 }

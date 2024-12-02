@@ -84,4 +84,17 @@ public class CommerziUser {
 
         return cloned;
     }
+
+    /**
+     * Merge the second user into the current user
+     * @param second
+     */
+    public void merge(CommerziUser second) {
+        setFirstName(second.getFirstName());
+        setLastName(second.getLastName());
+        setEmail(second.getEmail());
+        setPassword(second.getPassword());
+        setAddress(second.getAddress());
+        setSession(second.getSession());
+    }
 }

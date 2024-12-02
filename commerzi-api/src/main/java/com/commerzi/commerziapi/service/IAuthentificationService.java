@@ -6,9 +6,5 @@ public interface IAuthentificationService {
 
     boolean checkUserCredentials(String email, String password);
 
-    void setupSession(CommerziUser commerziUser);
-
-    CommerziUser getUser(String email);
-
     CommerziUser getUserBySession(String session);
 }

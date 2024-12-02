@@ -25,4 +25,15 @@ public class UserService implements IUserService{
 
     }
 
+    public CommerziUser getUserByEmail(String email) {
+        return userRepository.getUserByEmail(email);
+    }
+
+    public void updateUser(CommerziUser commerziUser) {
+        userRepository.save(commerziUser);
+    }
+
+    public void deleteUser(CommerziUser user) {
+        userRepository.delete(user);
+    }
 }

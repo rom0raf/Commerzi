@@ -2,7 +2,6 @@ package com.commerzi.commerziapi.service;
 
 import com.commerzi.commerziapi.dao.UserRepository;
 import com.commerzi.commerziapi.model.CommerziUser;
-import com.commerzi.commerziapi.security.Security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,25 +24,6 @@ public class AuthentificationService implements IAuthentificationService {
         System.out.println("Checking user credentials");
         CommerziUser commerziUser = userRepository.getUserByEmail(email);
         return commerziUser != null && commerziUser.getPassword().equals(password);
-    }
-
-    /**
-     * Set up a new session for the user
-     *
-     */
-    public void setupSession(CommerziUser commerziUser) {
-        commerziUser.setSession(
-            Security.generateRandomSession()
-        );
-    }
-
-    /**
-     * Get user by email
-     * @param email
-     * @return
-     */
-    public CommerziUser getUser(String email) {
-        return userRepository.getUserByEmail(email);
     }
 
     public CommerziUser getUserBySession(String session) {

@@ -6,7 +6,9 @@ package com.commerzi.commerziapi.controller;
 
 import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
+import com.commerzi.commerziapi.security.Security;
 import com.commerzi.commerziapi.service.IAuthentificationService;
+import com.commerzi.commerziapi.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,33 +23,35 @@ public class AuthentificationController {
     @Autowired
     private IAuthentificationService authentificationService;
 
+    @Autowired
+    private IUserService userService;
+
     /**
      *
+     * @param commerziUser
      * @return
      */
     @PostMapping("/")
     public ResponseEntity auth(@RequestBody CommerziUser commerziUser) {
         boolean isAuth = authentificationService.checkUserCredentials(commerziUser.getEmail(), commerziUser.getPassword());
 
-        CommerziUser realCommerziUser = authentificationService.getUser(commerziUser.getEmail());
-        CommerziUser commerziUserCopy = realCommerziUser.clone();
-        commerziUserCopy.setPassword("");
-
-        if (isAuth) {
-            authentificationService.setupSession(realCommerziUser);
-            commerziUserCopy.setSession(realCommerziUser.getSession());
-            return ResponseEntity.ok(commerziUserCopy);
+        if (!isAuth) {
+            return ResponseEntity.badRequest().body("Invalid credentials");
         }
 
-        return ResponseEntity.badRequest().body("Invalid credentials");
+        CommerziUser realCommerziUser = userService.getUserByEmail(commerziUser.getEmail());
+        realCommerziUser.setSession(Security.generateRandomSession());
+        userService.updateUser(realCommerziUser);
+
+        return ResponseEntity.ok(realCommerziUser);
     }
 
     /**
      * Test endpoint to see if the session passed in the header is valid
      */
-    @GetMapping("/test")
+    @GetMapping("/ping")
     @CommerziAuthenticated
-    public ResponseEntity test() {
-        return ResponseEntity.ok("Session is valid");
+    public ResponseEntity ping() {
+        return ResponseEntity.ok("pong");
     }
 }
