@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".MainActivity">
 
     <!-- Title -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Connexion"
+        android:text="@string/connection"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_marginBottom="32dp"
@@ -20,10 +22,10 @@
 
     <!-- Email Input -->
     <EditText
-        android:id="@+id/etEmail"
+        android:id="@+id/emailLoginField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email"
+        android:hint="@string/email"
         android:inputType="textEmailAddress"
         android:drawableStart="@drawable/ic_email"
         android:paddingStart="12dp"
@@ -31,10 +33,10 @@
 
     <!-- Password Input -->
     <EditText
-        android:id="@+id/etPassword"
+        android:id="@+id/passwordLoginField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Mot de passe"
+        android:hint="@string/password"
         android:inputType="textPassword"
         android:drawableStart="@drawable/ic_password"
         android:paddingStart="12dp"
@@ -42,11 +44,22 @@
 
     <!-- Validate Button -->
     <Button
-        android:id="@+id/btnValidate"
+        android:id="@+id/btnValidateLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/grey"
-        android:text="Valider"
+        android:text="@string/validate"
+        android:textColor="@android:color/white"
+        android:paddingStart="12dp"
+        android:layout_marginBottom="32dp"/>
+
+    <!-- Signup Button -->
+    <Button
+        android:id="@+id/btnSignup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/grey"
+        android:text="@string/signup"
         android:textColor="@android:color/white" />
 
 </LinearLayout>

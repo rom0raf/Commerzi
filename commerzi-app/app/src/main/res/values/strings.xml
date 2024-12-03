@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">Commerzi App</string>
+
+    <!-- LOGIN PAGE -->
+    <string name="connection">Connexion</string>
+    <string name="email">Email</string>
+    <string name="password">Mot de passe</string>
+    <string name="validate">Valider</string>
+    <string name="login_email_error_message">Email incorrect</string>
+    <string name="login_password_error_message">Mot de passe incorrect</string>
+    <string name="login_error_message">Impossible de vous connecter, veuillez réessayer</string>
+
+    <!-- SIGN UP PAGE -->
+    <string name="signup">Inscription</string>
+    <string name="firstname">Prénom</string>
+    <string name="lastname">Nom</string>
+    <string name="adress">Adresse</string>
+    <string name="confirmation">Confirmation</string>
+
 </resources>
