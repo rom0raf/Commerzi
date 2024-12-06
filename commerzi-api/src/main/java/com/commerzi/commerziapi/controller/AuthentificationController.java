@@ -4,9 +4,11 @@
 
 package com.commerzi.commerziapi.controller;
 
-import com.commerzi.commerziapi.model.User;
+import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
+import com.commerzi.commerziapi.security.Security;
 import com.commerzi.commerziapi.service.IAuthentificationService;
+import com.commerzi.commerziapi.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,47 +17,41 @@ import org.springframework.web.bind.annotation.*;
  *
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthentificationController {
 
+    @Autowired
     private IAuthentificationService authentificationService;
 
-    /**
-     *
-     * @param authentificationService
-     */
     @Autowired
-    public AuthentificationController(IAuthentificationService authentificationService) {
-        this.authentificationService = authentificationService;
-    }
+    private IUserService userService;
 
     /**
      *
+     * @param commerziUser
      * @return
      */
-    @PostMapping("/auth")
-    public ResponseEntity auth(@RequestBody User user) {
-        boolean isAuth = authentificationService.checkUserCredentials(user.getEmail(), user.getPassword());
+    @PostMapping("/")
+    public ResponseEntity auth(@RequestBody CommerziUser commerziUser) {
+        boolean isAuth = authentificationService.checkUserCredentials(commerziUser.getEmail(), commerziUser.getPassword());
 
-        user = authentificationService.getUser(user.getEmail());
-        user.setPassword("");
-
-        if (isAuth) {
-            authentificationService.setupSession(user);
-            return ResponseEntity.ok(user);
+        if (!isAuth) {
+            return ResponseEntity.badRequest().body("Invalid credentials");
         }
 
-        return ResponseEntity.badRequest().body("Invalid credentials");
+        CommerziUser realCommerziUser = userService.getUserByEmail(commerziUser.getEmail());
+        realCommerziUser.setSession(Security.generateRandomSession());
+        userService.updateUser(realCommerziUser);
+
+        return ResponseEntity.ok(realCommerziUser);
     }
 
     /**
      * Test endpoint to see if the session passed in the header is valid
      */
-    @GetMapping("/test")
+    @GetMapping("/ping")
     @CommerziAuthenticated
-    public ResponseEntity test() {
-        return ResponseEntity.ok("Session is valid");
+    public ResponseEntity ping() {
+        return ResponseEntity.ok("pong");
     }
-
-
 }
