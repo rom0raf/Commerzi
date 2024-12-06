@@ -11,7 +11,7 @@ public class UserService implements IUserService{
     @Autowired
     private UserRepository userRepository;
 
-    public String createUser(CommerziUser commerziUser) {
+    public int createUser(CommerziUser commerziUser) {
         // TODO vérif l'email est unique
         // Verif critère mot de passe si on en a
         // TODO throw une erreur custom qui renvoie un message précis sur l'erreur

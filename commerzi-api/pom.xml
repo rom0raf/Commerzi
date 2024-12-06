@@ -70,7 +70,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- MariaDB JDBC Driver pour la connexion à une base de données MariaDB -->
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>

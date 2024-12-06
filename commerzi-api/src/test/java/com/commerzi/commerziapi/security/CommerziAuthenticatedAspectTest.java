@@ -45,14 +45,12 @@ class CommerziAuthenticatedAspectTest {
     @Test
     void testCheckAuthentication_authenticatedUser() throws Throwable {
         // Arrange
-        // Créez une requête simulée avec un header "AUTHENTIFICATION_HEADER_NAME" valide
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader(Security.AUTHENTIFICATION_HEADER_NAME, VALID_SESSION);
 
-        // Enrobez la requête dans un ServletRequestAttributes et définissez-la dans RequestContextHolder
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        // Comportement attendu du service d'authentification
+        // Comportement attendu du service d authentification
         when(authentificationService.getUserBySession(VALID_SESSION)).thenReturn(commerziUser);
         when(joinPoint.proceed()).thenReturn("success");
 
@@ -68,14 +66,12 @@ class CommerziAuthenticatedAspectTest {
     @Test
     void testCheckAuthentication_unauthenticatedUser() throws Throwable {
         // Arrange
-        // Créez une requête simulée avec un header "AUTHENTIFICATION_HEADER_NAME" invalide
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader(Security.AUTHENTIFICATION_HEADER_NAME, INVALID_SESSION);
 
-        // Enrobez la requête dans un ServletRequestAttributes et définissez-la dans RequestContextHolder
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        // Comportement attendu du service d'authentification
+        // Comportement attendu du service d authentification
         when(authentificationService.getUserBySession(INVALID_SESSION)).thenReturn(null);
 
         // Act
@@ -84,6 +80,6 @@ class CommerziAuthenticatedAspectTest {
         // Assert
         assertEquals(ResponseEntity.status(401).body("Unauthorized"), result);
         verify(authentificationService).getUserBySession(INVALID_SESSION);
-        verify(joinPoint, never()).proceed();  // La méthode joinPoint.proceed() ne doit pas être appelée.
+        verify(joinPoint, never()).proceed();  // La methode joinPoint.proceed() ne doit pas etre appelee.
     }
 }

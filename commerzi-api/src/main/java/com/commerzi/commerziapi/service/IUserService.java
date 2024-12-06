@@ -4,7 +4,7 @@ import com.commerzi.commerziapi.model.CommerziUser;
 
 public interface IUserService {
     
-    String createUser(CommerziUser commerziUser);
+    int createUser(CommerziUser commerziUser);
 
     boolean exists(String email, String password);
 

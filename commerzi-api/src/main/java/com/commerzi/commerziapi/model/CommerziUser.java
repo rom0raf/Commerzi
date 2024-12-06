@@ -1,6 +1,8 @@
 package com.commerzi.commerziapi.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 /**
@@ -9,8 +11,9 @@ import jakarta.persistence.Id;
 @Entity
 public class CommerziUser {
 
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
-    private String userId;
+    private int userId;
 
     private String firstName;
 
@@ -26,7 +29,7 @@ public class CommerziUser {
 
     public CommerziUser() {}
 
-    public CommerziUser(String userId, String firstName, String lastName, String email, String password, String address) {
+    public CommerziUser(int userId, String firstName, String lastName, String email, String password, String address) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -35,7 +38,7 @@ public class CommerziUser {
         this.address = address;
     }
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 

@@ -1,6 +1,5 @@
 package com.commerzi.commerziapi.controller;
 
-import com.commerzi.commerziapi.dao.UserRepository;
 import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
 import com.commerzi.commerziapi.security.Security;
@@ -23,7 +22,7 @@ public class UserController {
     @PostMapping("/")
     public ResponseEntity create(@RequestBody CommerziUser commerziUser) {
         try {
-            String userId = userService.createUser(commerziUser);
+            int userId = userService.createUser(commerziUser);
             return ResponseEntity.ok(userId);
         } catch(Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
