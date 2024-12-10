@@ -3,6 +3,7 @@ package com.commerzi.commerziapi.service;
 import com.commerzi.commerziapi.dao.UserRepository;
 import com.commerzi.commerziapi.exception.UserArgumentException;
 import com.commerzi.commerziapi.model.CommerziUser;
+import com.commerzi.commerziapi.security.HashPassword;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,13 +46,15 @@ public class UserService implements IUserService{
 //            throw new UserArgumentException("Password is too short");
 //        }
 
+        String hashedPassword = HashPassword.hash(commerziUser.getPassword());
+        commerziUser.setPassword(hashedPassword);
         CommerziUser u = userRepository.save(commerziUser);
         return u.getUserId();
     }
 
     public boolean exists(String email, String password) {
         CommerziUser commerziUser = userRepository.getUserByEmail(email);
-        return commerziUser != null && commerziUser.getPassword().equals(password);
+        return commerziUser != null && HashPassword.validateHash(password, commerziUser.getPassword());
 
     }
 
