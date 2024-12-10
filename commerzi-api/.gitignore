@@ -34,3 +34,8 @@ build/
 
 ### Eclipse ###
 .metadata/
+
+/.idea
+
+*.env
+*.properties
