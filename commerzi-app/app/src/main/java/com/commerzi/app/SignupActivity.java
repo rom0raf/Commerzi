@@ -79,8 +79,8 @@ public class SignupActivity extends AppCompatActivity {
             JSONObject requestBody = new JSONObject();
             requestBody.put("email", email);
             requestBody.put("password", password);
-            requestBody.put("firstname", firstname);
-            requestBody.put("lastname", lastname);
+            requestBody.put("firstName", firstname);
+            requestBody.put("lastName", lastname);
             requestBody.put("address", address);
 
             StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL,
