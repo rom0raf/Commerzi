@@ -4,20 +4,31 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String STUB_EMAIL = "user@mail.com";
-    private final String STUB_PASSWORD = "password";
-    private final String API_URL="";
+    private final String API_URL = "http://54.221.60.132:8080/api/auth/";
     EditText txtEmail;
     EditText txtPassword;
     Button btnValidate;
     Button btnSignup;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,19 +47,65 @@ public class MainActivity extends AppCompatActivity {
         String email = txtEmail.getText().toString();
         String password = txtPassword.getText().toString();
 
-        Boolean areCredentialsCorrect = email.equals(STUB_EMAIL) && password.equals(STUB_PASSWORD);
-
-        if (areCredentialsCorrect) {
-            Intent intention = new Intent(MainActivity.this, HomeActivity.class);
-            startActivity(intention);
-        } else if (!email.equals(STUB_EMAIL)){
-            Toast.makeText(this, R.string.login_email_error_message, Toast.LENGTH_LONG)
-                    .show();
-        } else if (!password.equals(STUB_PASSWORD)) {
-            Toast.makeText(this, R.string.login_password_error_message, Toast.LENGTH_LONG)
-                    .show();
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "L'email et le mot de passe ne peuvent pas être vides", Toast.LENGTH_LONG).show();
+            return;
         }
 
+        loginUser(email, password);
+    }
+
+    private void loginUser(String email, String password) {
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        try {
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("email", email);
+            requestBody.put("password", password);
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject jsonResponse = new JSONObject(response);
+                                boolean success = !jsonResponse.getString("userId").isEmpty();
+
+                                if (success) {
+                                    Intent intention = new Intent(MainActivity.this, HomeActivity.class);
+                                    startActivity(intention);
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Identifiants incorrects", Toast.LENGTH_LONG).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Toast.makeText(MainActivity.this, "Response parsing error", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(MainActivity.this, "Impossible de se connecter: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }) {
+
+                @Override
+                public byte[] getBody() {
+                    return requestBody.toString().getBytes();
+                }
+
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+            };
+
+            queue.add(stringRequest);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Request creation error", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void handleSignupButtonClicked(View view) {
