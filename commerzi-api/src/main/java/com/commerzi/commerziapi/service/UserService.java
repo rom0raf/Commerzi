@@ -9,14 +9,27 @@ import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
 
+/**
+ * Service class for managing users in the Commerzi application.
+ */
 @Service
-public class UserService implements IUserService{
+public class UserService implements IUserService {
 
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Pattern for validating email addresses.
+     */
     private static final Pattern EMAIL_VALIDE = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * Creates a new user.
+     *
+     * @param commerziUser the user to create
+     * @return the ID of the created user
+     * @throws UserArgumentException if any user argument is invalid
+     */
     public int createUser(CommerziUser commerziUser) throws UserArgumentException {
 
         if (userRepository.getUserByEmail(commerziUser.getEmail()) != null) {
@@ -41,10 +54,10 @@ public class UserService implements IUserService{
             throw new UserArgumentException("L'addresse est vide");
         }
 
-//         TODO Verif critère mot de passe si on en a
-//        if (commerziUser.getPassword().length() < 8) {
-//            throw new UserArgumentException("Password is too short");
-//        }
+        // TODO Verif critère mot de passe si on en a
+        // if (commerziUser.getPassword().length() < 8) {
+        //     throw new UserArgumentException("Password is too short");
+        // }
 
         String hashedPassword = HashPassword.hash(commerziUser.getPassword());
         commerziUser.setPassword(hashedPassword);
@@ -52,20 +65,42 @@ public class UserService implements IUserService{
         return u.getUserId();
     }
 
+    /**
+     * Checks if a user exists with the given email and password.
+     *
+     * @param email the email of the user
+     * @param password the password of the user
+     * @return true if the user exists, false otherwise
+     */
     public boolean exists(String email, String password) {
         CommerziUser commerziUser = userRepository.getUserByEmail(email);
         return commerziUser != null && HashPassword.validateHash(password, commerziUser.getPassword());
-
     }
 
+    /**
+     * Retrieves a user by their email.
+     *
+     * @param email the email of the user
+     * @return the user with the specified email
+     */
     public CommerziUser getUserByEmail(String email) {
         return userRepository.getUserByEmail(email);
     }
 
+    /**
+     * Updates an existing user.
+     *
+     * @param commerziUser the user to update
+     */
     public void updateUser(CommerziUser commerziUser) {
         userRepository.save(commerziUser);
     }
 
+    /**
+     * Deletes an existing user.
+     *
+     * @param user the user to delete
+     */
     public void deleteUser(CommerziUser user) {
         userRepository.delete(user);
     }

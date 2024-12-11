@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller for managing users in the Commerzi application.
+ */
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -19,6 +22,12 @@ public class UserController {
     @Autowired
     private IAuthentificationService authentificationService;
 
+    /**
+     * Creates a new user.
+     *
+     * @param commerziUser the user to create
+     * @return the response entity with the user ID if successful, or an error message if failed
+     */
     @PostMapping("/")
     public ResponseEntity create(@RequestBody CommerziUser commerziUser) {
         try {
@@ -29,6 +38,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Edits an existing user.
+     *
+     * @param modifiedUser the modified user data
+     * @return the response entity indicating success or failure
+     */
     @PutMapping("/")
     @CommerziAuthenticated
     public ResponseEntity edit(@RequestBody CommerziUser modifiedUser) {
@@ -40,6 +55,11 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Deletes the current user.
+     *
+     * @return the response entity indicating success or failure
+     */
     @DeleteMapping("/")
     @CommerziAuthenticated
     public ResponseEntity delete() {
