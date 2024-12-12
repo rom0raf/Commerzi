@@ -1,7 +1,9 @@
 package com.commerzi.commerziapi.model;
 
+import com.commerzi.commerziapi.address.CheckAddress;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import org.hibernate.annotations.Check;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -148,5 +150,15 @@ public class Customer {
      */
     public void setType(String type) {
         this.type = type;
+    }
+
+
+    public void merge(Customer second) {
+        setName(second.getName());
+        setAddress(second.getAddress());
+        setDescription(second.getDescription());
+        setGpsCoordinates(second.getGpsCoordinates());
+        setContact(second.getContact());
+        setType(second.getType());
     }
 }

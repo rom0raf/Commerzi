@@ -6,6 +6,7 @@ import org.checkerframework.common.aliasing.qual.Unique;
 /**
  * Class representing a user in the Commerzi application.
  */
+@Table(name = "test_users")
 @Entity
 public class CommerziUser {
 
@@ -23,6 +24,8 @@ public class CommerziUser {
     private String password;
 
     private String address;
+
+    private String city;
 
     private String session;
 
@@ -101,6 +104,13 @@ public class CommerziUser {
     }
 
     /**
+     * Gets the city of the user
+     *
+     * @return the city
+     */
+    public String getCity() { return city; }
+
+    /**
      * Gets the session of the user.
      *
      * @return the session
@@ -145,6 +155,13 @@ public class CommerziUser {
     public void setAddress(String address) { this.address = address; }
 
     /**
+     * Sets the city of the user
+     *
+     * @param city the city to set
+     */
+    public void setCity(String city) { this.city = city; }
+
+    /**
      * Sets the session of the user.
      *
      * @param session the session to set
@@ -164,6 +181,7 @@ public class CommerziUser {
         cloned.lastName = this.lastName;
         cloned.email = this.email;
         cloned.password = this.password;
+        cloned.city = this.city;
         cloned.address = this.address;
         cloned.session = this.session;
 
@@ -181,6 +199,7 @@ public class CommerziUser {
         setEmail(second.getEmail());
         setPassword(second.getPassword());
         setAddress(second.getAddress());
+        setCity(second.getCity());
         setSession(second.getSession());
     }
 }

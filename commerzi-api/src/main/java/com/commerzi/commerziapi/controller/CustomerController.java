@@ -3,12 +3,12 @@ package com.commerzi.commerziapi.controller;
 import com.commerzi.commerziapi.dao.CustomerRepository;
 import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
+import com.commerzi.commerziapi.service.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * REST controller for managing customers in the Commerzi application.
@@ -18,7 +18,7 @@ import java.util.Locale;
 public class CustomerController {
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private ICustomerService customerService;
 
     /**
      * Retrieves all customers.
@@ -27,8 +27,9 @@ public class CustomerController {
      */
     @CommerziAuthenticated
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+    public ResponseEntity<List<Customer>> getAllCustomers() {
+        List<Customer> customers = customerService.getAllCustomers();
+        return ResponseEntity.ok(customers);
     }
 
     /**
@@ -38,8 +39,9 @@ public class CustomerController {
      */
     @CommerziAuthenticated
     @GetMapping("/clients")
-    public List<Customer> getClients() {
-        return customerRepository.findByType("client");
+    public ResponseEntity<List<Customer>> getClients() {
+        List<Customer> clients = customerService.getClients();
+        return ResponseEntity.ok(clients);
     }
 
     /**
@@ -50,7 +52,7 @@ public class CustomerController {
     @CommerziAuthenticated
     @GetMapping("/prospects")
     public ResponseEntity<List<Customer>> getProspects() {
-        List<Customer> prospects = customerRepository.findByType("prospect");
+        List<Customer> prospects = customerService.getProspects();
         return ResponseEntity.ok(prospects);
     }
 
@@ -63,7 +65,7 @@ public class CustomerController {
     @CommerziAuthenticated
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getCustomerById(@PathVariable String id) {
-        Customer customer = customerRepository.findById(id).orElse(null);
+        Customer customer = customerService.getCustomerById(id);
         if (customer == null) {
             return ResponseEntity.notFound().build();
         }
@@ -89,19 +91,19 @@ public class CustomerController {
             return null;
         }
 
-        customerRepository.save(customer);
+        customerService.saveCustomer(customer);
         return ResponseEntity.ok(customer);
     }
 
     @CommerziAuthenticated
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
-        Customer existingCustomer = customerRepository.findById(id).orElse(null);
+        Customer existingCustomer = customerService.getCustomerById(id);
         if (existingCustomer == null) {
             return null;
         }
 
-        customerRepository.save(customer);
+        customerService.saveCustomer(customer);
         return ResponseEntity.ok(customer);
     }
 
