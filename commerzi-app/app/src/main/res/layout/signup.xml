@@ -57,14 +57,25 @@
             android:paddingStart="12dp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Adress Input -->
+        <!-- Address Input -->
         <EditText
-            android:id="@+id/adressSignUpField"
+            android:id="@+id/addressSignUpField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/adress"
+            android:hint="@string/address"
             android:inputType="text"
             android:drawableStart="@drawable/ic_home"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- City Input -->
+        <EditText
+            android:id="@+id/citySignUpField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/city"
+            android:inputType="text"
+            android:drawableStart="@drawable/ic_city"
             android:paddingStart="12dp"
             android:layout_marginBottom="16dp"/>
 

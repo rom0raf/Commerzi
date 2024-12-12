@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         String password = txtPassword.getText().toString();
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "L'email et le mot de passe ne peuvent pas être vides", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.email_password_empty, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -75,18 +75,18 @@ public class MainActivity extends AppCompatActivity {
                                     Intent intention = new Intent(MainActivity.this, HomeActivity.class);
                                     startActivity(intention);
                                 } else {
-                                    Toast.makeText(MainActivity.this, "Identifiants incorrects", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(MainActivity.this, R.string.credentials_error, Toast.LENGTH_LONG).show();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                                Toast.makeText(MainActivity.this, "Response parsing error", Toast.LENGTH_LONG).show();
+                                Toast.makeText(MainActivity.this, R.string.response_parsing_error, Toast.LENGTH_LONG).show();
                             }
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(MainActivity.this, "Impossible de se connecter: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, R.string.connection_error + error.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }) {
 
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             queue.add(stringRequest);
         } catch (JSONException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Request creation error", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.request_creation_error, Toast.LENGTH_LONG).show();
         }
     }
 
