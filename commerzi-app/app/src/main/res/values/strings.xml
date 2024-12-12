@@ -26,5 +26,6 @@
     <string name="account_creation_success">Compte créé avec succès</string>
     <string name="error_signup">Signup failed: </string>
     <string name="request_creation_error">Request creation error</string>
+    <string name="unexpected_error">Erreur inattentue</string>
 
 </resources>

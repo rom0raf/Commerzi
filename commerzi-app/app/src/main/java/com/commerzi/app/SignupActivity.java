@@ -100,7 +100,11 @@ public class SignupActivity extends AppCompatActivity {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(SignupActivity.this, R.string.error_signup + error.getMessage(), Toast.LENGTH_LONG).show();
+                            if (error != null && error.networkResponse != null) {
+                                String response = new String(error.networkResponse.data);
+                                Toast.makeText(SignupActivity.this, response.toString(), Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(SignupActivity.this, R.string.unexpected_error, Toast.LENGTH_LONG).show();                            }
                         }
                     }) {
 
