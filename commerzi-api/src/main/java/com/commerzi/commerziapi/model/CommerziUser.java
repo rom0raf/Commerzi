@@ -6,7 +6,6 @@ import org.checkerframework.common.aliasing.qual.Unique;
 /**
  * Class representing a user in the Commerzi application.
  */
-@Table(name = "test_users")
 @Entity
 public class CommerziUser {
 
