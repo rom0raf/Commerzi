@@ -1,0 +1,59 @@
+volumes:
+  mongo_data:
+    name: mongo_data
+  mysql_data:
+    name: mysql_data
+
+networks:
+  commerzi_network:
+    name: commerzi_network
+    ipam:
+      config:
+        - subnet: "172.18.0.0/24"
+
+services:
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: api_commerzi
+    depends_on:
+      - mongodb
+      - mysql
+    ports:
+      - "8080:8080"
+    networks:
+        commerzi_network:
+            ipv4_address: "172.18.0.2"
+
+  mongodb:
+    build:
+      context: ./mongo
+      dockerfile: Dockerfile
+    container_name: mongo_commerzi
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      commerzi_network:
+        ipv4_address: "172.18.0.3"
+
+  mysql:
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    container_name: mysql_commerzi
+    environment:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_DATABASE:
+      MYSQL_USER:
+      MYSQL_PASSWORD:
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      commerzi_network:
+        ipv4_address: "172.18.0.4"

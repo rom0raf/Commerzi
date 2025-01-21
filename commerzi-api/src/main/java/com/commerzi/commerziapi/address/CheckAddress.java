@@ -23,15 +23,14 @@ public class CheckAddress {
 
     }
 
-    private static String callAPI(String address) {
+    private static JOpenCageLatLng callAPI(String address) {
         // call the OpenCage API
         JOpenCageGeocoder jOpenCageGeocoder = new JOpenCageGeocoder(apiKey);
         JOpenCageForwardRequest request = new JOpenCageForwardRequest(address);
         request.setRestrictToCountryCode("fr");
 
         JOpenCageResponse response = jOpenCageGeocoder.forward(request);
-        JOpenCageLatLng firstResultLatLng = response.getFirstPosition();
-        return firstResultLatLng != null ? firstResultLatLng.toString() : null;
+        return response.getFirstPosition();
     }
 
     public static boolean checkAddress(String address) {
@@ -39,11 +38,11 @@ public class CheckAddress {
             return false;
         }
 
-        String coordinates = callAPI(address);
+        JOpenCageLatLng coordinates = callAPI(address);
         return coordinates != null;
     }
 
-    public static String getCoordinates(String address) {
+    public static JOpenCageLatLng getCoordinates(String address) {
         if (address == null || address.isEmpty()) {
             return null;
         }

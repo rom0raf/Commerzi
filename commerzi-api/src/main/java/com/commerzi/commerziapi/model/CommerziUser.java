@@ -1,7 +1,6 @@
 package com.commerzi.commerziapi.model;
 
 import jakarta.persistence.*;
-import org.checkerframework.common.aliasing.qual.Unique;
 
 /**
  * Class representing a user in the Commerzi application.
@@ -17,7 +16,7 @@ public class CommerziUser {
 
     private String lastName;
 
-    @Unique
+    @Column(unique = true)
     private String email;
 
     private String password;
