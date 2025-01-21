@@ -21,7 +21,7 @@ import org.json.JSONObject;
 
 public class SignupActivity extends AppCompatActivity {
 
-    private final String API_URL = "http://54.221.60.132:8080/api/user/";
+    private final String API_URL = "http://57.128.220.88:8080/api/user/";
     Button btnLogin;
     Button btnSignup;
     EditText txtEmail;
