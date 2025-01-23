@@ -26,7 +26,7 @@ public class CustomerController {
      * @return a list of all customers
      */
     @CommerziAuthenticated
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<Customer>> getAllCustomers() {
         List<Customer> customers = customerService.getAllCustomers();
         return ResponseEntity.ok(customers);

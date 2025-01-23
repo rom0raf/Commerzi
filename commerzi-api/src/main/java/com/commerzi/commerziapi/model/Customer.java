@@ -1,9 +1,8 @@
 package com.commerzi.commerziapi.model;
 
-import com.commerzi.commerziapi.address.CheckAddress;
+import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import org.hibernate.annotations.Check;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,8 +20,9 @@ public class Customer {
     private String id;
     private String name;
     private String address;
+    private String city;
     private String description;
-    private String gpsCoordinates;
+    private JOpenCageLatLng gpsCoordinates;
     private Contact contact;
     private String type;
 
@@ -81,6 +81,22 @@ public class Customer {
     }
 
     /**
+     * Gets the city of the customer.
+     * @return the city of the customer
+     */
+    public String getCity() {
+        return city;
+    }
+
+    /**
+     * Sets the city of the customer.
+     * @param city the city to set
+     */
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    /**
      * Gets the description of the customer.
      *
      * @return the description of the customer
@@ -103,7 +119,7 @@ public class Customer {
      *
      * @return the GPS coordinates of the customer
      */
-    public String getGpsCoordinates() {
+    public JOpenCageLatLng getGpsCoordinates() {
         return gpsCoordinates;
     }
 
@@ -112,7 +128,7 @@ public class Customer {
      *
      * @param gpsCoordinates the GPS coordinates to set
      */
-    public void setGpsCoordinates(String gpsCoordinates) {
+    public void setGpsCoordinates(JOpenCageLatLng gpsCoordinates) {
         this.gpsCoordinates = gpsCoordinates;
     }
 
@@ -156,6 +172,7 @@ public class Customer {
     public void merge(Customer second) {
         setName(second.getName());
         setAddress(second.getAddress());
+        setCity(second.getCity());
         setDescription(second.getDescription());
         setGpsCoordinates(second.getGpsCoordinates());
         setContact(second.getContact());

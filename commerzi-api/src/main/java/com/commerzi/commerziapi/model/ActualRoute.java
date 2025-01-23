@@ -1,22 +1,23 @@
 package com.commerzi.commerziapi.model;
 
+import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
 /**
- * Model class representing a journey in the Commerzi application.
+ * Model class representing an itinerary in the Commerzi application.
  */
 @Document(collection = "journeys")
-public class Journey {
+public class ActualRoute {
 
     @Id
     private String id;
     private String date;
     private String userId;
-    private String routeId;
-    private List<GpsCoordinates> path;
+    private String plannedRouteId;
+    private List<JOpenCageLatLng> path;
     private List<Visit> visits;
 
     /**
@@ -79,7 +80,7 @@ public class Journey {
      * @return the route ID associated with the journey
      */
     public String getRouteId() {
-        return routeId;
+        return plannedRouteId;
     }
 
     /**
@@ -88,7 +89,7 @@ public class Journey {
      * @param routeId the route ID to set
      */
     public void setRouteId(String routeId) {
-        this.routeId = routeId;
+        this.plannedRouteId = routeId;
     }
 
     /**
@@ -96,7 +97,7 @@ public class Journey {
      *
      * @return the path of the journey
      */
-    public List<GpsCoordinates> getPath() {
+    public List<JOpenCageLatLng> getPath() {
         return path;
     }
 
@@ -105,7 +106,7 @@ public class Journey {
      *
      * @param path the path to set
      */
-    public void setPath(List<GpsCoordinates> path) {
+    public void setPath(List<JOpenCageLatLng> path) {
         this.path = path;
     }
 

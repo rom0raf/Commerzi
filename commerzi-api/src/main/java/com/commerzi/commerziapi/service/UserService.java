@@ -1,5 +1,6 @@
 package com.commerzi.commerziapi.service;
 
+import com.commerzi.commerziapi.address.CheckAddress;
 import com.commerzi.commerziapi.dao.UserRepository;
 import com.commerzi.commerziapi.exception.UserArgumentException;
 import com.commerzi.commerziapi.model.CommerziUser;
@@ -54,10 +55,13 @@ public class UserService implements IUserService {
             throw new UserArgumentException("L'addresse est vide");
         }
 
-        // TODO Verif critère mot de passe si on en a
-        // if (commerziUser.getPassword().length() < 8) {
-        //     throw new UserArgumentException("Password is too short");
-        // }
+        if (!CheckAddress.checkAddress(commerziUser.getAddress())) {
+            throw new UserArgumentException("L'addresse n'est pas valide");
+        }
+
+        if (commerziUser.getPassword().length() < 8) {
+            throw new UserArgumentException("Password is too short");
+        }
 
         String hashedPassword = HashPassword.hash(commerziUser.getPassword());
         commerziUser.setPassword(hashedPassword);
