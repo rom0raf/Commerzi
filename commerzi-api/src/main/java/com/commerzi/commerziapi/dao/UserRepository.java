@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Classe temporaire avec seulement des users en mémoire
- * TODO: utiliser une base de données
  */
 @Repository
 public interface UserRepository extends CrudRepository<CommerziUser, String> {

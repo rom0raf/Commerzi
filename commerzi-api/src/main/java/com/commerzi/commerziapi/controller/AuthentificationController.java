@@ -1,7 +1,3 @@
-/*
- *
- */
-
 package com.commerzi.commerziapi.controller;
 
 import com.commerzi.commerziapi.model.CommerziUser;
@@ -14,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- *
+ * REST controller for handling authentication in the Commerzi application.
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -27,9 +23,10 @@ public class AuthentificationController {
     private IUserService userService;
 
     /**
+     * Authenticates a user based on their credentials.
      *
-     * @param commerziUser
-     * @return
+     * @param commerziUser the user credentials
+     * @return the response entity with the authenticated user if successful, or an error message if failed
      */
     @PostMapping("/")
     public ResponseEntity auth(@RequestBody CommerziUser commerziUser) {
@@ -47,7 +44,9 @@ public class AuthentificationController {
     }
 
     /**
-     * Test endpoint to see if the session passed in the header is valid
+     * Test endpoint to see if the session passed in the header is valid.
+     *
+     * @return the response entity with "pong" if the session is valid
      */
     @GetMapping("/ping")
     @CommerziAuthenticated
