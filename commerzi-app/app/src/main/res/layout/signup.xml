@@ -24,12 +24,12 @@
             android:layout_marginBottom="32dp"
             android:gravity="center"/>
 
-        <!-- First name input -->
+        <!-- Last name input -->
         <EditText
             android:id="@+id/lastnameSignUpField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/firstname"
+            android:hint="@string/lastname"
             android:inputType="textPersonName"
             android:drawableStart="@drawable/ic_avatar"
             android:paddingStart="12dp"
@@ -40,7 +40,7 @@
             android:id="@+id/firstnameSignUpField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/lastname"
+            android:hint="@string/firstname"
             android:inputType="textPersonName"
             android:drawableStart="@drawable/ic_avatar"
             android:paddingStart="12dp"

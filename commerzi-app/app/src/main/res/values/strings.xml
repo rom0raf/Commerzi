@@ -27,4 +27,14 @@
     <string name="error_signup">Signup failed: </string>
     <string name="request_creation_error">Request creation error</string>
 
+    <!-- EDIT USER PAGE -->
+    <string name="edit_user">Modification du profil</string>
+    
+    <!-- ADD CLIENT / PROSPECT PAGE -->
+    <string name="add_client">Ajout d\'un client / prospect</string>
+    <string name="telephone">Téléphone</string>
+    <string name="company">Entreprise</string>
+    <string name="description">Description</string>
+    <string name="add">Ajouter</string>
+
 </resources>
