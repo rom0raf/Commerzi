@@ -21,7 +21,7 @@ import org.json.JSONObject;
 
 public class SignupActivity extends AppCompatActivity {
 
-    private final String API_URL = "http://54.221.60.132:8080/api/user/";
+    private final String API_URL = "http://57.128.220.88:8080/api/user/";
     Button btnLogin;
     Button btnSignup;
     EditText txtEmail;
@@ -100,7 +100,11 @@ public class SignupActivity extends AppCompatActivity {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(SignupActivity.this, R.string.error_signup + error.getMessage(), Toast.LENGTH_LONG).show();
+                            if (error != null && error.networkResponse != null) {
+                                String response = new String(error.networkResponse.data);
+                                Toast.makeText(SignupActivity.this, response.toString(), Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(SignupActivity.this, R.string.unexpected_error, Toast.LENGTH_LONG).show();                            }
                         }
                     }) {
 

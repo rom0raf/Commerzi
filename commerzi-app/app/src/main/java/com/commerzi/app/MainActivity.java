@@ -23,7 +23,7 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String API_URL = "http://54.221.60.132:8080/api/auth/";
+    private final String API_URL = "http://57.128.220.88:8080/api/auth/";
     EditText txtEmail;
     EditText txtPassword;
     Button btnValidate;
