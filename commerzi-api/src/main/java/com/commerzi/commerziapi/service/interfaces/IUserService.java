@@ -1,4 +1,4 @@
-package com.commerzi.commerziapi.service;
+package com.commerzi.commerziapi.service.interfaces;
 
 import com.commerzi.commerziapi.exception.UserArgumentException;
 import com.commerzi.commerziapi.model.CommerziUser;
@@ -11,7 +11,7 @@ public interface IUserService {
 
     CommerziUser getUserByEmail(String email);
 
-    void updateUser(CommerziUser commerziUser);
+    void updateUser(CommerziUser commerziUser) throws UserArgumentException;
 
     void deleteUser(CommerziUser user);
 }

@@ -4,6 +4,8 @@ import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,7 +19,6 @@ public class ActualRoute {
     private String date;
     private String userId;
     private String plannedRouteId;
-    private List<JOpenCageLatLng> path;
     private List<Visit> visits;
 
     /**
@@ -93,24 +94,6 @@ public class ActualRoute {
     }
 
     /**
-     * Gets the path of the journey as a list of GPS coordinates.
-     *
-     * @return the path of the journey
-     */
-    public List<JOpenCageLatLng> getPath() {
-        return path;
-    }
-
-    /**
-     * Sets the path of the journey as a list of GPS coordinates.
-     *
-     * @param path the path to set
-     */
-    public void setPath(List<JOpenCageLatLng> path) {
-        this.path = path;
-    }
-
-    /**
      * Gets the visits associated with the journey.
      *
      * @return the visits associated with the journey
@@ -127,4 +110,23 @@ public class ActualRoute {
     public void setVisits(List<Visit> visits) {
         this.visits = visits;
     }
+
+    public static ActualRoute fromPlannedRoute(PlannedRoute plannedRoute) {
+        ActualRoute actualRoute = new ActualRoute();
+        actualRoute.setDate(LocalTime.now().toString());
+        actualRoute.setUserId(plannedRoute.getUserId());
+        actualRoute.setRouteId(plannedRoute.getId());
+        actualRoute.setVisits(getVisitFromPlannedRoute(plannedRoute));
+        return actualRoute;
+    }
+
+
+    public static List<Visit> getVisitFromPlannedRoute(PlannedRoute plannedRoute) {
+        List<Visit> visits = new ArrayList<>();
+        for (Customer customer : plannedRoute.getCustomersAndProspects()) {
+            visits.add(new Visit(customer));
+        }
+        return visits;
+    }
+
 }

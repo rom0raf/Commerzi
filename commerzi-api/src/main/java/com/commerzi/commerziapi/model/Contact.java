@@ -3,7 +3,7 @@ package com.commerzi.commerziapi.model;
 /**
  * Model class representing a contact in the Commerzi application.
  */
-class Contact {
+public class Contact {
     private String firstName;
     private String lastName;
     private String phoneNumber;

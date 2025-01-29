@@ -36,6 +36,18 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-core</artifactId>
+			<version>1.37</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-generator-annprocess</artifactId>
+			<version>1.37</version>
+		</dependency>
+
 		<!-- Spring Boot DevTools pour le rechargement automatique en développement -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

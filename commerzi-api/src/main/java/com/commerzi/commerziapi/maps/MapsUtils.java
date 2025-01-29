@@ -5,6 +5,8 @@ import com.commerzi.commerziapi.model.PlannedRoute;
 import com.opencagedata.jopencage.model.JOpenCageLatLng;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class MapsUtils {
 
@@ -55,65 +57,22 @@ public class MapsUtils {
     }
 
     /**
-     * Sorts the points to create the shortest path, starting at the first
-     * point and visiting each point exactly once using the nearest-neighbor heuristic.
-     * This function assumes that all the points are distincts
-     * @param points the array of points to be sorted
-     * @return points sorted to form the shortest possible route
-     * @throws IllegalArgumentException if points is null or has fewer than 2 elements
-     */
-    public static JOpenCageLatLng[] sortPointsByShortestPath(JOpenCageLatLng[] points) {
-        if (points == null || points.length < 2) {
-            throw new IllegalArgumentException("Points cannot be null and must have at least two elements");
-        }
-
-        List<JOpenCageLatLng> sortedPoints = new ArrayList<>();
-        sortedPoints.add(points[0]);
-
-        boolean[] visited = new boolean[points.length];
-        visited[0] = true;
-
-        for (int i = 1; i < points.length; i++) {
-            int lastVisitedIndex = sortedPoints.size() - 1;
-            JOpenCageLatLng currentPoint = sortedPoints.get(lastVisitedIndex);
-
-            double closestDistance = Double.MAX_VALUE;
-            int closestPointIndex = -1;
-
-            for (int j = 0; j < points.length; j++) {
-                if (!visited[j]) {
-                    double distance = distanceBetweenTwoPoints(currentPoint, points[j]);
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestPointIndex = j;
-                    }
-                }
-            }
-
-            sortedPoints.add(points[closestPointIndex]);
-            visited[closestPointIndex] = true;
-        }
-
-        return sortedPoints.toArray(new JOpenCageLatLng[0]);
-    }
-
-    /**
      * Calculates the total distance between a series of points.
      * The total distance is computed by summing the distances between each consecutive pair of points in the array.
      *
-     * @param points an array of JOpenCageLatLng objects representing the points in the route
+     * @param points a list of JOpenCageLatLng objects representing the points in the route
      * @return the total distance as a Double, which is the sum of distances between consecutive points
      * @throws IllegalArgumentException if the points array is null or contains fewer than two points
      */
-    public static Double calcTotalDistanceBetweenPoints(JOpenCageLatLng[] points) {
-        if (points == null || points.length < 2) {
+    public static Double calcTotalDistanceBetweenPoints(List<JOpenCageLatLng> points) {
+        if (points == null || points.size() < 2) {
             throw new IllegalArgumentException("There must be at least two points to calculate distance.");
         }
 
         Double totalDistance = 0.0;
 
-        for (int i = 0; i < points.length - 1; i++) {
-            totalDistance += distanceBetweenTwoPoints(points[i], points[i + 1]);
+        for (int i = 0; i < points.size() - 1; i++) {
+            totalDistance += distanceBetweenTwoPoints(points.get(i), points.get(i + 1));
         }
 
         return totalDistance;
@@ -121,15 +80,20 @@ public class MapsUtils {
 
     /**
      * Builds a full route by ordering customers based on the shortest path starting and ending at the commercial home.
-     * The method first sorts the customers by distance using the nearest-neighbor heuristic to create the optimal route,
-     * and then calculates the total travel distance of the route.
+     * The method first sorts the customers by distance using the nearest-neighbor heuristic (or any custom sorting function)
+     * to create the optimal route, and then calculates the total travel distance of the route.
      *
      * @param commercialHome the starting and ending point for the route, representing the commercial home GPS coordinates
      * @param customers a list of customers whose locations need to be included in the route
+     * @param sortFunction a function that sorts a list of points
      * @return a PlannedRoute object containing the ordered customers and the total travel distance
      * @throws IllegalArgumentException if the customers list is null or empty or if the commercialHome is null
      */
-    public static PlannedRoute buildFullRoute(JOpenCageLatLng commercialHome, List<Customer> customers) {
+    public static PlannedRoute buildFullRoute(
+        JOpenCageLatLng commercialHome,
+        List<Customer> customers,
+        BiFunction<JOpenCageLatLng, List<JOpenCageLatLng>, List<JOpenCageLatLng>> sortFunction
+    ) {
         if (customers == null || customers.isEmpty()) {
             throw new IllegalArgumentException("Customer list cannot be null or empty.");
         }
@@ -143,11 +107,20 @@ public class MapsUtils {
         route.setStartingPoint(commercialHome);
         route.setEndingPoint(commercialHome);
 
-        JOpenCageLatLng[] points = (JOpenCageLatLng[]) customers.stream().map(Customer::getGpsCoordinates).toArray();
-        points = sortPointsByShortestPath(points);
+        List<JOpenCageLatLng> points = customers.stream()
+            .map(Customer::getGpsCoordinates)
+            .toList();
+
+        points = sortFunction.apply(commercialHome, points);
 
         List<Customer> orderedCustomers = new ArrayList<>();
-        Arrays.stream(points).forEach(point -> orderedCustomers.add(customers.stream().filter(c -> c.getGpsCoordinates().equals(point)).findFirst().get()));
+        for (JOpenCageLatLng point : points) {
+            customers.stream()
+                .filter(c -> c.getGpsCoordinates().equals(point))
+                .findFirst()
+                .ifPresent(orderedCustomers::add);
+        }
+
         route.setCustomersAndProspects(orderedCustomers);
 
         route.setTotalDistance(calcTotalDistanceBetweenPoints(points));

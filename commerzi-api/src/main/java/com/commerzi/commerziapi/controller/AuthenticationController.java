@@ -3,8 +3,8 @@ package com.commerzi.commerziapi.controller;
 import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
 import com.commerzi.commerziapi.security.Security;
-import com.commerzi.commerziapi.service.IAuthentificationService;
-import com.commerzi.commerziapi.service.IUserService;
+import com.commerzi.commerziapi.service.interfaces.IAuthentificationService;
+import com.commerzi.commerziapi.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +38,11 @@ public class AuthenticationController {
 
         CommerziUser realCommerziUser = userService.getUserByEmail(commerziUser.getEmail());
         realCommerziUser.setSession(Security.generateRandomSession());
-        userService.updateUser(realCommerziUser);
+        try {
+            userService.updateUser(realCommerziUser);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
         return ResponseEntity.ok(realCommerziUser);
     }

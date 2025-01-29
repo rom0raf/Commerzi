@@ -4,26 +4,20 @@ package com.commerzi.commerziapi.model;
  * Model class representing a visit in the Commerzi application.
  */
 public class Visit {
-    private String type; // "client" or "prospect"
     private String id;
-    private String status; // "visited" or "not-visited"
+    private Customer type; // "client" or "prospect"
+    private EVisitStatus status; // "visited" or "not-visited"
 
-    /**
-     * Gets the type of the visit.
-     *
-     * @return the type of the visit
-     */
-    public String getType() {
-        return type;
-    }
+    private static final int idCounter = 0;
 
-    /**
-     * Sets the type of the visit.
-     *
-     * @param type the type to set
-     */
-    public void setType(String type) {
-        this.type = type;
+    public Visit(Customer customer) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer cannot be null.");
+        }
+
+        this.id = "visit_" + idCounter;
+        this.type = customer;
+        this.status = EVisitStatus.NOT_VISITED;
     }
 
     /**
@@ -45,11 +39,29 @@ public class Visit {
     }
 
     /**
+     * Gets the type of the visit.
+     *
+     * @return the type of the visit
+     */
+    public Customer getType() {
+        return type;
+    }
+
+    /**
+     * Sets the type of the visit.
+     *
+     * @param type the type to set
+     */
+    public void setType(Customer type) {
+        this.type = type;
+    }
+
+    /**
      * Gets the status of the visit.
      *
      * @return the status of the visit
      */
-    public String getStatus() {
+    public EVisitStatus getStatus() {
         return status;
     }
 
@@ -58,7 +70,7 @@ public class Visit {
      *
      * @param status the status to set
      */
-    public void setStatus(String status) {
+    public void setStatus(EVisitStatus status) {
         this.status = status;
     }
 }

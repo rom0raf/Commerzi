@@ -23,31 +23,32 @@ public class CheckAddress {
 
     }
 
-    private static JOpenCageLatLng callAPI(String address) {
+    private static JOpenCageLatLng callAPI(String address, String city) {
         // call the OpenCage API
         JOpenCageGeocoder jOpenCageGeocoder = new JOpenCageGeocoder(apiKey);
-        JOpenCageForwardRequest request = new JOpenCageForwardRequest(address);
+        JOpenCageForwardRequest request = new JOpenCageForwardRequest(address + ", " + city);
         request.setRestrictToCountryCode("fr");
 
         JOpenCageResponse response = jOpenCageGeocoder.forward(request);
         return response.getFirstPosition();
     }
 
-    public static boolean checkAddress(String address) {
-        if (address == null || address.isEmpty()) {
+    public static boolean checkAddress(String address, String city) {
+        if (address == null || address.isEmpty() || city == null || city.isEmpty()) {
             return false;
         }
 
-        JOpenCageLatLng coordinates = callAPI(address);
+
+        JOpenCageLatLng coordinates = callAPI(address, city);
         return coordinates != null;
     }
 
-    public static JOpenCageLatLng getCoordinates(String address) {
+    public static JOpenCageLatLng getCoordinates(String address, String city) {
         if (address == null || address.isEmpty()) {
             return null;
         }
 
-        return callAPI(address);
+        return callAPI(address, city);
     }
 
 

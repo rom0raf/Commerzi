@@ -1,4 +1,4 @@
-package com.commerzi.commerziapi.service;
+package com.commerzi.commerziapi.service.interfaces;
 
 import com.commerzi.commerziapi.model.Customer;
 
@@ -18,8 +18,6 @@ public interface ICustomerService {
 
     Customer updateCustomer(String id, Customer customer);
 
-    boolean deleteCustomer(String id);
-
-    void saveCustomer(Customer customer);
+    Customer deleteCustomer(String id);
 
 }

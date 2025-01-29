@@ -12,9 +12,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "customers")
 public class Customer {
 
-    public static final String CLIENT = "client";
-    public static final String PROSPECT = "prospect";
-
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     private String id;
@@ -24,7 +21,8 @@ public class Customer {
     private String description;
     private JOpenCageLatLng gpsCoordinates;
     private Contact contact;
-    private String type;
+    private ECustomerType type;
+    private String userId;
 
     /**
      * Gets the ID of the customer.
@@ -155,7 +153,7 @@ public class Customer {
      *
      * @return the type of the customer
      */
-    public String getType() {
+    public ECustomerType getType() {
         return type;
     }
 
@@ -164,10 +162,27 @@ public class Customer {
      *
      * @param type the type to set
      */
-    public void setType(String type) {
+    public void setType(ECustomerType type) {
         this.type = type;
     }
 
+    /**
+     * Gets the user ID associated with the customer.
+     *
+     * @return the user ID associated with the customer
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Sets the user ID associated with the customer.
+     *
+     * @param userId the user ID to set
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public void merge(Customer second) {
         setName(second.getName());
@@ -177,5 +192,6 @@ public class Customer {
         setGpsCoordinates(second.getGpsCoordinates());
         setContact(second.getContact());
         setType(second.getType());
+        setUserId(second.getUserId());
     }
 }

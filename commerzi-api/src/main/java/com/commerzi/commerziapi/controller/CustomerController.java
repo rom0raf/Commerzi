@@ -1,9 +1,9 @@
 package com.commerzi.commerziapi.controller;
 
-import com.commerzi.commerziapi.dao.CustomerRepository;
 import com.commerzi.commerziapi.model.Customer;
+import com.commerzi.commerziapi.model.ECustomerType;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
-import com.commerzi.commerziapi.service.ICustomerService;
+import com.commerzi.commerziapi.service.interfaces.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -81,17 +81,21 @@ public class CustomerController {
      */
     @CommerziAuthenticated
     @PostMapping("/")
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity createCustomer(@RequestBody Customer customer) {
 
-        String customerType = customer.getType().toLowerCase();
+        ECustomerType customerType = customer.getType();
 
-        if (Customer.CLIENT.equals(customerType) || Customer.PROSPECT.equals(customerType)) {
+        if (ECustomerType.client.equals(customerType) || ECustomerType.prospect.equals(customerType)) {
             customer.setType(customerType);
         } else {
             return null;
         }
 
-        customerService.saveCustomer(customer);
+        try {
+            customerService.createCustomer(customer);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
         return ResponseEntity.ok(customer);
     }
 
@@ -103,8 +107,19 @@ public class CustomerController {
             return null;
         }
 
-        customerService.saveCustomer(customer);
+        customerService.createCustomer(customer);
         return ResponseEntity.ok(customer);
+    }
+
+    @CommerziAuthenticated
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Customer> deleteCustomer(@PathVariable String id) {
+        if (id == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Customer result = customerService.deleteCustomer(id);
+        return ResponseEntity.ok(result);
     }
 
     /**

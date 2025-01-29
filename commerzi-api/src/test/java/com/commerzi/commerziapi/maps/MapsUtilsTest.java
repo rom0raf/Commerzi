@@ -1,16 +1,18 @@
 package com.commerzi.commerziapi.maps;
 
 import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 class MapsUtilsTest {
 
-    private static ArrayList<JOpenCageLatLng> points = new ArrayList<>() {{
+    public static ArrayList<JOpenCageLatLng> points = new ArrayList<>() {{
         // Toulouse
         add(new JOpenCageLatLng() {{
             setLat(43.6047);
@@ -80,46 +82,4 @@ class MapsUtilsTest {
         }
     }
 
-    @Test
-    void testSortPointsByShortestPath_basic() {
-        JOpenCageLatLng[] pointsToSort = new JOpenCageLatLng[]{
-            points.get(0), // Toulouse
-            points.get(2), // Nîmes
-            points.get(1)  // Montpellier
-        };
-
-        JOpenCageLatLng[] sortedPoints = MapsUtils.sortPointsByShortestPath(pointsToSort);
-
-        assertEquals(points.get(0), sortedPoints[0]); // Toulouse
-        assertEquals(points.get(1), sortedPoints[1]); // Montpellier
-        assertEquals(points.get(2), sortedPoints[2]); // Nîmes
-    }
-
-    @Test
-    void testSortPointsByShortestPath_complete() {
-        JOpenCageLatLng[] sortedPoints = MapsUtils.sortPointsByShortestPath(points.toArray(new JOpenCageLatLng[0]));
-
-        assertEquals(points.get(0), sortedPoints[0]); // Toulouse
-        assertEquals(points.get(6), sortedPoints[1]); // Albi
-        assertEquals(points.get(4), sortedPoints[2]); // Carcasonne
-        assertEquals(points.get(5), sortedPoints[3]); // Bézier
-        assertEquals(points.get(1), sortedPoints[4]); // Montpellier
-        assertEquals(points.get(2), sortedPoints[5]); // Nimes
-        assertEquals(points.get(3), sortedPoints[6]); // Perpignan
-        assertEquals(points.get(7), sortedPoints[7]); // Tarbes
-    }
-
-    @Test
-    void testSortPointsByShortestPath_nullPoints() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            MapsUtils.sortPointsByShortestPath(null);
-        });
-    }
-
-    @Test
-    void testSortPointsByShortestPath_fewerThanTwoPoints() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            MapsUtils.sortPointsByShortestPath(new JOpenCageLatLng[]{points.get(0)});
-        });
-    }
 }

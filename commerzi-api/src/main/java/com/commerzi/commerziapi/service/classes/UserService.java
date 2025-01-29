@@ -1,10 +1,11 @@
-package com.commerzi.commerziapi.service;
+package com.commerzi.commerziapi.service.classes;
 
 import com.commerzi.commerziapi.address.CheckAddress;
 import com.commerzi.commerziapi.dao.UserRepository;
 import com.commerzi.commerziapi.exception.UserArgumentException;
 import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.security.HashPassword;
+import com.commerzi.commerziapi.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,35 +34,7 @@ public class UserService implements IUserService {
      */
     public int createUser(CommerziUser commerziUser) throws UserArgumentException {
 
-        if (userRepository.getUserByEmail(commerziUser.getEmail()) != null) {
-            throw new UserArgumentException("L'email est déjà utilisée");
-        }
-        if (commerziUser.getEmail() == null || commerziUser.getEmail().isEmpty()) {
-            throw new UserArgumentException("L'Email est vide");
-        }
-        if (!EMAIL_VALIDE.matcher(commerziUser.getEmail()).matches()) {
-            throw new UserArgumentException("L'email n'est pas valide");
-        }
-        if (commerziUser.getPassword() == null || commerziUser.getPassword().isEmpty()) {
-            throw new UserArgumentException("Le mot de passe est vide");
-        }
-        if (commerziUser.getFirstName() == null || commerziUser.getFirstName().isEmpty()) {
-            throw new UserArgumentException("Le prénom est vide");
-        }
-        if (commerziUser.getLastName() == null || commerziUser.getLastName().isEmpty()) {
-            throw new UserArgumentException("Le nom de famille est vide");
-        }
-        if (commerziUser.getAddress() == null || commerziUser.getAddress().isEmpty()) {
-            throw new UserArgumentException("L'addresse est vide");
-        }
-
-        if (!CheckAddress.checkAddress(commerziUser.getAddress())) {
-            throw new UserArgumentException("L'addresse n'est pas valide");
-        }
-
-        if (commerziUser.getPassword().length() < 8) {
-            throw new UserArgumentException("Password is too short");
-        }
+        verifyUser(commerziUser);
 
         String hashedPassword = HashPassword.hash(commerziUser.getPassword());
         commerziUser.setPassword(hashedPassword);
@@ -96,7 +69,9 @@ public class UserService implements IUserService {
      *
      * @param commerziUser the user to update
      */
-    public void updateUser(CommerziUser commerziUser) {
+    public void updateUser(CommerziUser commerziUser) throws UserArgumentException {
+        verifyUser(commerziUser);
+
         userRepository.save(commerziUser);
     }
 
@@ -107,5 +82,37 @@ public class UserService implements IUserService {
      */
     public void deleteUser(CommerziUser user) {
         userRepository.delete(user);
+    }
+
+
+    public static boolean verifyUser(CommerziUser commerziUser) throws UserArgumentException {
+        if (commerziUser.getEmail() == null || commerziUser.getEmail().isEmpty()) {
+            throw new UserArgumentException("L'Email est vide");
+        }
+        if (!EMAIL_VALIDE.matcher(commerziUser.getEmail()).matches()) {
+            throw new UserArgumentException("L'email n'est pas valide");
+        }
+        if (commerziUser.getPassword() == null || commerziUser.getPassword().isEmpty()) {
+            throw new UserArgumentException("Le mot de passe est vide");
+        }
+        if (commerziUser.getFirstName() == null || commerziUser.getFirstName().isEmpty()) {
+            throw new UserArgumentException("Le prénom est vide");
+        }
+        if (commerziUser.getLastName() == null || commerziUser.getLastName().isEmpty()) {
+            throw new UserArgumentException("Le nom de famille est vide");
+        }
+        if (commerziUser.getAddress() == null || commerziUser.getAddress().isEmpty()) {
+            throw new UserArgumentException("L'addresse est vide");
+        }
+
+        if (!CheckAddress.checkAddress(commerziUser.getAddress(), commerziUser.getCity())) {
+            throw new UserArgumentException("L'addresse n'est pas valide");
+        }
+
+        if (commerziUser.getPassword().length() < 8) {
+            throw new UserArgumentException("Password is too short");
+        }
+
+        return true;
     }
 }

@@ -1,16 +1,13 @@
 package com.commerzi.commerziapi.security;
 
 import com.commerzi.commerziapi.model.CommerziUser;
-import com.commerzi.commerziapi.service.IAuthentificationService;
+import com.commerzi.commerziapi.service.interfaces.IAuthentificationService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Aspect qui gère la vérification de l'authentification pour les méthodes annotées avec {@link CommerziAuthenticated}.
