@@ -39,4 +39,4 @@ build/
 *.properties
 
 ### Benchmark ###
-benchmark*.json
+benchmark-*.json

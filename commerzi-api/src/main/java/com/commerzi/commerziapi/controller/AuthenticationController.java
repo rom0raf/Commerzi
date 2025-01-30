@@ -39,7 +39,7 @@ public class AuthenticationController {
         CommerziUser realCommerziUser = userService.getUserByEmail(commerziUser.getEmail());
         realCommerziUser.setSession(Security.generateRandomSession());
         try {
-            userService.updateUser(realCommerziUser);
+            userService.updateUser(realCommerziUser, false);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

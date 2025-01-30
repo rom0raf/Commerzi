@@ -11,7 +11,7 @@ public interface IUserService {
 
     CommerziUser getUserByEmail(String email);
 
-    void updateUser(CommerziUser commerziUser) throws UserArgumentException;
+    void updateUser(CommerziUser commerziUser, boolean... checkAddress) throws UserArgumentException;
 
     void deleteUser(CommerziUser user);
 }

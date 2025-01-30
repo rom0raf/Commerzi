@@ -10,16 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 /**
- * Aspect qui gère la vérification de l'authentification pour les méthodes annotées avec {@link CommerziAuthenticated}.
+ * Aspect that handles authentication verification for methods annotated with {@link CommerziAuthenticated}.
  * <p>
- * Cette classe est responsable de vérifier si l'utilisateur est authentifié avant d'exécuter les méthodes annotées par {@code @CommerziAuthenticated}.
- * Si l'utilisateur n'est pas authentifié, elle retourne une réponse HTTP 401 (Unauthorized). Si l'utilisateur est authentifié,
- * elle permet l'exécution normale de la méthode annotée.
+ * This class is responsible for checking if the user is authenticated before executing methods annotated with {@code @CommerziAuthenticated}.
+ * If the user is not authenticated, it returns an HTTP 401 (Unauthorized) response. If the user is authenticated,
+ * it allows the normal execution of the annotated method.
  * </p>
  *
  * <p>
- * Le header HTTP attendu pour l'authentification est {@code X-Commerzi-Auth}. L'aspect utilise cette valeur de session pour récupérer
- * les informations sur l'utilisateur via le service {@link IAuthentificationService}.
+ * The expected HTTP header for authentication is {@code X-Commerzi-Auth}. The aspect uses this session value to retrieve
+ * user information via the {@link IAuthentificationService}.
  * </p>
  *
  * @see CommerziAuthenticated
@@ -30,21 +30,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommerziAuthenticatedAspect {
 
-    /** Service d'authentification */
+    /** Authentication service */
     @Autowired
     private IAuthentificationService authentificationService;
 
     /**
-     * Méthode qui intercepte les appels des méthodes annotées avec {@link CommerziAuthenticated}.
+     * Method that intercepts calls to methods annotated with {@link CommerziAuthenticated}.
      * <p>
-     * Cette méthode vérifie si l'utilisateur est authentifié en consultant le header {@code X-Commerzi-Auth}.
-     * Si l'utilisateur n'est pas trouvé, une réponse HTTP 401 (Unauthorized) est renvoyée.
-     * Si l'utilisateur est authentifié, la méthode continue son exécution normalement.
+     * This method checks if the user is authenticated by consulting the {@code X-Commerzi-Auth} header.
+     * If the user is not found, an HTTP 401 (Unauthorized) response is returned.
+     * If the user is authenticated, the method proceeds with its normal execution.
      * </p>
      *
-     * @param joinPoint Le point d'exécution de la méthode interceptée.
-     * @return La valeur de retour de la méthode, ou une réponse HTTP 401 si l'utilisateur n'est pas authentifié.
-     * @throws Throwable Si une exception est l evée pendant l'exécution de la méthode.
+     * @param joinPoint The execution point of the intercepted method.
+     * @return The return value of the method, or an HTTP 401 response if the user is not authenticated.
+     * @throws Throwable If an exception is thrown during the method execution.
      */
     @Around("@annotation(com.commerzi.commerziapi.security.CommerziAuthenticated)")
     public Object checkAuthentication(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -62,4 +62,4 @@ public class CommerziAuthenticatedAspect {
         return joinPoint.proceed();
     }
 
-}
+} // plunger

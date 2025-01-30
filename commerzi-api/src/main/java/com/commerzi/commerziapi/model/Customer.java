@@ -5,6 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 /**
  * Model class representing a customer in the Commerzi application.
@@ -12,8 +15,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "customers")
 public class Customer {
 
+    @MongoId
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Id
+    @Field(value = "_id", targetType = FieldType.OBJECT_ID)
     private String id;
     private String name;
     private String address;

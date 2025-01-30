@@ -38,13 +38,13 @@ public class TravelerAlgorithmBenchmark {
 
         /**
          * Calculates the total distance between the points in the sorted list.
-         * The distance is computed by calling {@link MapsUtils#calcTotalDistanceBetweenPoints(List)}
+         * The distance is computed by calling {@link MapsUtils#fullFlyingDistanceOverPoints(List)}
          * and dividing the result by 3 (likely for normalization or scaling purposes).
          *
          * @return the total distance between the points in the list, divided by 3
          */
         public Double totalDistance() {
-            return MapsUtils.calcTotalDistanceBetweenPoints(sortedPoints) / 3;
+            return MapsUtils.fullFlyingDistanceOverPoints(sortedPoints) / 3;
         }
     }
 
@@ -82,15 +82,28 @@ public class TravelerAlgorithmBenchmark {
     public void prepareData() {points = datasets.get(datasetIndex);}
 
     /**
-     * Benchmark for the sortPointsByShortestPath method.
+     * Benchmark for the nearestNeihborHeuristic method.
      * This method measures the time it takes to sort the points and returns the optimized list.
      *
+     * @param state the current benchmark state to count some other data
      * @return the optimized list of points sorted using the nearest-neighbor heuristic
      */
     @Benchmark
-    @Threads(1)
-    public List<JOpenCageLatLng> benchmarkSortPointsByShortestPath(BenchmarkState state) {
-        state.sortedPoints = TravelerAlgorithm.sortPointsByShortestPath(TravelerAlgorithmBenchmarkData.startingPoint, points);
+    public List<JOpenCageLatLng> benchmarkNearestNeihborHeuristic(BenchmarkState state) {
+        state.sortedPoints = TravelerAlgorithm.nearestNeihborHeuristic(TravelerAlgorithmBenchmarkData.startingPoint, points);
+        return state.sortedPoints;
+    }
+
+    /**
+     * Benchmark for the bruteForce method.
+     * This method measures the time it takes to sort the point and returns the optimized list.
+     *
+     * @param state the current benchmark state to count some other data
+     * @return the optimized list of points sorted using the brute force method
+     */
+    @Benchmark
+    public List<JOpenCageLatLng> benchmarkBruteForce(BenchmarkState state) {
+        state.sortedPoints = TravelerAlgorithm.bruteForce(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
 
@@ -125,6 +138,6 @@ public class TravelerAlgorithmBenchmark {
     private static String benchmarkFileOutput() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         String dateString = dateFormat.format(new Date());
-        return "benchmark-" + dateString + ".json";
+        return "benchmark-results/benchmark-" + dateString + ".json";
     }
 }

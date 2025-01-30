@@ -1,14 +1,12 @@
 package com.commerzi.commerziapi.maps;
 
 import com.opencagedata.jopencage.model.JOpenCageLatLng;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 class MapsUtilsTest {
 
@@ -76,7 +74,7 @@ class MapsUtilsTest {
             JOpenCageLatLng[] pointsPair = entry.getKey();
             double expectedDistance = entry.getValue();
 
-            double actualDistance = MapsUtils.distanceBetweenTwoPoints(pointsPair[0], pointsPair[1]);
+            double actualDistance = MapsUtils.flyingDistanceBetweenTwoPoints(pointsPair[0], pointsPair[1]);
 
             assertEquals(expectedDistance, actualDistance, 2.5);
         }

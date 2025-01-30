@@ -25,8 +25,8 @@ public class CustomerService implements ICustomerService {
      *
      * @return a list of all customers
      */
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+    public List<Customer> getAllCustomers(String userId) {
+        return customerRepository.findByUserId(userId);
     }
 
     /**
@@ -34,8 +34,8 @@ public class CustomerService implements ICustomerService {
      *
      * @return a list of all clients
      */
-    public List<Customer> getClients() {
-        return customerRepository.findByType(ECustomerType.client.toString());
+    public List<Customer> getClients(String userId) {
+        return customerRepository.findByTypeAndUserId(ECustomerType.client.toString(), userId);
     }
 
     /**
@@ -43,8 +43,8 @@ public class CustomerService implements ICustomerService {
      *
      * @return a list of all prospects
      */
-    public List<Customer> getProspects() {
-        return customerRepository.findByType(ECustomerType.prospect.toString());
+    public List<Customer> getProspects(String userId) {
+        return customerRepository.findByTypeAndUserId(ECustomerType.prospect.toString(), userId);
     }
 
     /**
@@ -62,6 +62,7 @@ public class CustomerService implements ICustomerService {
      *
      * @param customer the customer to create
      * @return the created customer
+     * @throws IllegalArgumentException if the customer is invalid
      */
     public Customer createCustomer(Customer customer) throws IllegalArgumentException {
         verifyCustomer(customer);
@@ -76,20 +77,21 @@ public class CustomerService implements ICustomerService {
     /**
      * Updates an existing customer.
      *
-     * @param id the ID of the customer to update
+     * @param existingCustomer the existing customer to update
      * @param customer the customer data to update
      * @return the updated customer, or null if not found
+     * @throws IllegalArgumentException if the customer is invalid
      */
-    public Customer updateCustomer(String id, Customer customer) {
-        Customer existingCustomer = customerRepository.findById(id).orElse(null);
-        if (existingCustomer == null) {
-            return null;
-        }
-
+    public Customer updateCustomer(Customer existingCustomer, Customer customer) throws IllegalArgumentException {
         verifyCustomer(customer);
 
         existingCustomer.merge(customer);
 
+        System.out.println("\n\n\n\n\n");
+        System.out.println("Id of existing customer: " + existingCustomer.getId());
+        System.out.println("\n\n\n\n\n");
+
+        // TODO if the address is the same as before don't update the gps coordinates
         existingCustomer.setGpsCoordinates(
                 CheckAddress.getCoordinates(existingCustomer.getAddress(), existingCustomer.getCity())
         );
@@ -101,7 +103,7 @@ public class CustomerService implements ICustomerService {
      * Deletes a customer by its ID.
      *
      * @param id the ID of the customer to delete
-     * @return true if the customer was deleted, false otherwise
+     * @return the deleted customer, or null if not found
      */
     public Customer deleteCustomer(String id) {
         Customer existingCustomer = customerRepository.findById(id).orElse(null);
@@ -116,45 +118,44 @@ public class CustomerService implements ICustomerService {
      * Verifies the validity of a customer.
      *
      * @param customer the customer to verify
-     * @return true if the customer is valid
+     * @param checkAddress optional parameter to check the address
      * @throws IllegalArgumentException if the customer is invalid
      */
-    public static boolean verifyCustomer(Customer customer) throws IllegalArgumentException {
-        if (!CheckAddress.checkAddress(customer.getAddress(), customer.getCity())) {
-            throw new IllegalArgumentException("Invalid address");
-        }
+    public static void verifyCustomer(Customer customer, boolean... checkAddress) throws IllegalArgumentException {
+
         if (customer.getType() == null) {
             throw new IllegalArgumentException("Customer type is required");
         }
-        if (!customer.getType().equals(ECustomerType.client.toString().toLowerCase())
-                && !customer.getType().equals(ECustomerType.prospect.toString().toLowerCase())) {
+        if (customer.getType() != ECustomerType.client && customer.getType() != ECustomerType.prospect) {
             throw new IllegalArgumentException("Invalid customer type");
         }
-        // if type starts with a capital letter, convert it to lowercase
-        switch (customer.getType().toString()) {
-            case "Client":
-                customer.setType(ECustomerType.client);
-                break;
-            case "Prospect":
-                customer.setType(ECustomerType.prospect);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid customer type");
-        }
-
-
         if (customer.getName() == null || customer.getName().isEmpty()) {
             throw new IllegalArgumentException("Customer name is required");
         }
-        if (customer.getCity() == null || customer.getCity().isEmpty()) {
-            throw new IllegalArgumentException("City is required");
+
+        if (checkAddress.length > 0 && checkAddress[0]) {
+            if (customer.getAddress() == null || customer.getAddress().isEmpty()) {
+                throw new IllegalArgumentException("Address is required");
+            }
+
+            if (customer.getCity() == null || customer.getCity().isEmpty()) {
+                throw new IllegalArgumentException("City is required");
+            }
+
+            if (!CheckAddress.checkAddress(customer.getAddress(), customer.getCity())) {
+                throw new IllegalArgumentException("Invalid address");
+            }
         }
 
         checkContact(customer.getContact());
-
-        return true;
     }
 
+    /**
+     * Checks the validity of a contact.
+     *
+     * @param contact the contact to check
+     * @throws IllegalArgumentException if the contact is invalid
+     */
     private static void checkContact(Contact contact) {
         if (contact == null) {
             throw new IllegalArgumentException("Contact information is required");
