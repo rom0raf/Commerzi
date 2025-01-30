@@ -91,7 +91,6 @@ public class SignupActivity extends AppCompatActivity {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            // Réponse JSON pour d'autres actions (si nécessaire)
                             Toast.makeText(SignupActivity.this, R.string.account_creation_success, Toast.LENGTH_LONG).show();
                             Intent intention = new Intent(SignupActivity.this, MainActivity.class);
                             startActivity(intention);

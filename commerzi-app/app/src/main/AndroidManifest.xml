@@ -28,6 +28,12 @@
         <activity
             android:name=".SignupActivity">
         </activity>
+        <activity
+            android:name=".AddClientActivity">
+        </activity>
+        <activity
+            android:name=".EditClientActivity">
+        </activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

@@ -3,31 +3,28 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
+
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="16dp"
-        tools:context=".MainActivity">
+        android:padding="16dp">
 
         <!-- Title -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/add_client"
+            android:text="@string/edit_client"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginBottom="32dp"
             android:gravity="center"/>
 
-
         <!-- Company input -->
         <EditText
-            android:id="@+id/nameField"
+            android:id="@+id/nameEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/client"
@@ -38,7 +35,7 @@
 
         <!-- Address input -->
         <EditText
-            android:id="@+id/addressField"
+            android:id="@+id/addressEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/address"
@@ -49,7 +46,7 @@
 
         <!-- City Input -->
         <EditText
-            android:id="@+id/cityField"
+            android:id="@+id/cityEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/city"
@@ -60,7 +57,7 @@
 
         <!-- Description Input -->
         <EditText
-            android:id="@+id/descriptionField"
+            android:id="@+id/descriptionEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/description"
@@ -71,21 +68,19 @@
 
         <!-- Radio Group -->
         <RadioGroup
-            android:id="@+id/radioGroupClientType"
+            android:id="@+id/radioGroupEditClientType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp">
 
-            <!-- Client RadioButton -->
             <RadioButton
-                android:id="@+id/radioClient"
+                android:id="@+id/radioEditClient"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/client"/>
 
-            <!-- Prospect RadioButton -->
             <RadioButton
-                android:id="@+id/radioProspect"
+                android:id="@+id/radioEditProspect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/prospect"/>
@@ -94,7 +89,7 @@
 
         <!-- Phone Number Input -->
         <EditText
-            android:id="@+id/phoneNumberField"
+            android:id="@+id/phoneNumberEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/telephone"
@@ -105,7 +100,7 @@
 
         <!-- Firstname Input -->
         <EditText
-            android:id="@+id/firstnameField"
+            android:id="@+id/firstnameEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/firstname"
@@ -116,7 +111,7 @@
 
         <!-- Lastname Input -->
         <EditText
-            android:id="@+id/lastnameField"
+            android:id="@+id/lastnameEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/lastname"
@@ -125,18 +120,16 @@
             android:paddingStart="12dp"
             android:layout_marginBottom="16dp"/>
 
-
-        <!-- Validate Button -->
+        <!-- Update Button -->
         <Button
-            android:id="@+id/btnCreateNewClient"
+            android:id="@+id/btnUpdateClient"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/grey"
-            android:text="@string/validate"
+            android:backgroundTint="@color/blue"
+            android:text="Mettre à jour"
             android:textColor="@android:color/white"
             android:paddingStart="12dp"
             android:layout_marginBottom="32dp"/>
 
     </LinearLayout>
 </ScrollView>
-

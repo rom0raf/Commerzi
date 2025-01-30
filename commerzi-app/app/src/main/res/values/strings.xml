@@ -37,5 +37,22 @@
     <string name="company">Entreprise</string>
     <string name="description">Description</string>
     <string name="add">Ajouter</string>
+    <string name="client_creation_success">Client créé avec succès</string>
+    <string name="client">Client</string>
+    <string name="prospect">Prospect</string>
+    <string name="error_select_type">Un type doit être sélectionné</string>
 
+    <!-- EDIT CLIENT / PROSPECT -->
+    <string name="edit_client">Modifier un client</string>
+
+    <!-- TABS -->
+    <string name="route_tab">Itinéraires</string>
+    <string name="client_tab">Clients</string>
+
+    <!-- ROUTE LIST -->
+    <string name="route_list_title">Itinéraires</string>
+
+    <!-- CLIENT LIST -->
+    <string name="client_list_title">Clients</string>
+    
 </resources>
