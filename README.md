@@ -24,7 +24,7 @@ Il s'inscrit dans le cadre de notre formation et vise à mettre en pratique les 
 
 ---
 
-## 🛠️ Aspects Techniques
+## Aspects Techniques
 
 Commerzi repose sur une architecture modulaire comprenant :
 
