@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des résultats de Benchmark</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .chart-container {
+            width: 45%;
+            margin: 10px;
+        }
+        #info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        #jsonFile {
+            display: block;
+            margin: 0 auto;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Analyse des résultats de Benchmark</h1>
+
+    <input type="file" id="jsonFile" accept=".json" onchange="loadFile(event)" style="padding: 10px;">
+
+    <div id="info"></div>
+
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="scoreChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="distanceChart"></canvas>
+        </div>
+        <div class="chart-container" style="width: 90%;">
+            <canvas id="combinedChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let benchmarkData = [];
+
+        function loadFile(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    benchmarkData = JSON.parse(e.target.result);
+                } catch (error) {
+                    alert('Fichier JSON invalide');
+                }
+                analyzeData();
+            };
+            reader.readAsText(file);
+        }
+
+        function analyzeData() {
+            if (benchmarkData.length === 0) {
+                alert('Aucune donnée à analyser');
+                return;
+            }
+
+            // Group data by benchmark name
+            const benchmarks = {};
+
+            benchmarkData.forEach(item => {
+                const benchmarkName = item.benchmark.split(".")[item.benchmark.split(".").length - 1].replace("benchmark", "");
+                const datasetIndex = parseInt(item.params.datasetIndex);
+                const score = item.primaryMetric.score;
+                const totalDistance = item.secondaryMetrics.totalDistance.score;
+                
+                // If benchmark name doesn't exist, initialize
+                if (!benchmarks[benchmarkName]) {
+                    benchmarks[benchmarkName] = {
+                        scores: [[], [], [], [], []], // datasets
+                        distances: [[], [], [], [], []]
+                    };
+                }
+
+                benchmarks[benchmarkName].scores[datasetIndex].push(score);
+                benchmarks[benchmarkName].distances[datasetIndex].push(totalDistance);
+            });
+
+            // Display benchmark names
+            const benchmarkNames = Object.keys(benchmarks);
+            document.getElementById("info").innerText = `Résultats de benchmarking pour : ${benchmarkNames.join(', ')}`;
+
+            // Create the charts
+            createChart('scoreChart', 'Score (ns/op)', benchmarks, benchmarkNames, 'Score');
+            createChart('distanceChart', 'Distance totale (km)', benchmarks, benchmarkNames, 'Total Distance');
+            createCombinedChart(benchmarks, benchmarkNames);
+        }
+
+        function createChart(chartId, label, benchmarks, benchmarkNames, metricType) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Dataset 0', 'Dataset 1', 'Dataset 2', 'Dataset 3', 'Dataset 4'],
+                    datasets: benchmarkNames.map(benchmark => ({
+                        label: `${metricType} - ${benchmark}`,
+                        data: benchmarks[benchmark][metricType === 'Score' ? 'scores' : 'distances'].map(dataset => Math.min(...dataset)),
+                        borderColor: getRandomColor(),
+                        fill: false,
+                        tension: 0.1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${metricType} sur les jeux de données`
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    const datasetIndex = tooltipItem.dataIndex;
+                                    const benchmarkName = tooltipItem.dataset.label.split(' - ')[1];
+                                    const value = tooltipItem.raw;
+                                    const formattedValue = formatTime(value);
+                                    return `${benchmarkName} - Dataset ${datasetIndex}: ${metricType}: ${formattedValue}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCombinedChart(benchmarks, benchmarkNames) {
+            const ctx = document.getElementById('combinedChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Dataset 0', 'Dataset 1', 'Dataset 2', 'Dataset 3', 'Dataset 4'],
+                    datasets: benchmarkNames.map(benchmark => ({
+                        label: `Score (ns/op) - ${benchmark}`,
+                        data: benchmarks[benchmark].scores.map(dataset => Math.min(...dataset)),
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    })).concat(benchmarkNames.map(benchmark => ({
+                        label: `Distance totale (km) - ${benchmark}`,
+                        data: benchmarks[benchmark].distances.map(dataset => Math.min(...dataset)),
+                        backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    })))
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Résultats combinés du benchmark (Score et Distance totale)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            type: 'logarithmic' // Use logarithmic scale for better visibility
+                        }
+                    }
+                }
+            });
+        }
+
+        // Helper function to generate random colors for the graphs
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Function to format the time (in ns) into a human-readable format
+        function formatTime(ns) {
+            if (ns >= 1e9) {
+                return (ns / 1e9).toFixed(2) + ' s'; // Seconds
+            } else if (ns >= 1e6) {
+                return (ns / 1e6).toFixed(2) + ' ms'; // Milliseconds
+            } else if (ns >= 1e3) {
+                return (ns / 1e3).toFixed(2) + ' µs'; // Microseconds
+            } else {
+                return ns.toFixed(2) + ' ns'; // Nanoseconds
+            }
+        }
+    </script>
+</body>
+</html>

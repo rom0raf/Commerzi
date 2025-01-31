@@ -15,6 +15,7 @@ public class MapsUtils {
 
     /**
      * Cached calculated flying distances
+     * ConcurrentMap for thread safe access
      */
     private static final ConcurrentMap<String, Double> distanceCache = new ConcurrentHashMap<>();
 
@@ -63,33 +64,22 @@ public class MapsUtils {
             return 0.0;
         }
 
-        String cacheKey = generateCacheKey(p1, p2);
+        return distanceCache.computeIfAbsent(generateCacheKey(p1, p2), x -> {
+            double lat1 = p1.getLat();
+            double lon1 = p1.getLng();
 
-        Double cachedDistance = distanceCache.get(cacheKey);
-        if (cachedDistance != null) {
-            return cachedDistance;
-        }
+            double lat2 = p2.getLat();
+            double lon2 = p2.getLng();
 
-        double lat1 = p1.getLat();
-        double lon1 = p1.getLng();
+            double latitudinalDistance = Math.toRadians(lat2 - lat1);
+            double longitudinalDistance = Math.toRadians(lon2 - lon1);
 
-        double lat2 = p2.getLat();
-        double lon2 = p2.getLng();
+            // Haversine formula https://en.wikipedia.org/wiki/Haversine_formula
+            double a = haversine(latitudinalDistance) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * haversine(longitudinalDistance);
 
-        double latitudinalDistance = Math.toRadians(lat2 - lat1);
-        double longitudinalDistance = Math.toRadians(lon2 - lon1);
-
-        // Haversine formula https://en.wikipedia.org/wiki/Haversine_formula
-        double a = haversine(latitudinalDistance) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * haversine(longitudinalDistance);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = EARTH_RADIUS * c;
-
-        // This is for safety as an other thread calling this might already have added
-        // the same cache key and distance in the map
-        distanceCache.putIfAbsent(cacheKey, distance);
-
-        return distance;
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return EARTH_RADIUS * c;
+        });
     }
 
     /**
@@ -159,7 +149,6 @@ public class MapsUtils {
         }
 
         route.setCustomersAndProspects(orderedCustomers);
-
         route.setTotalDistance(fullFlyingDistanceOverPoints(points));
 
         return route;

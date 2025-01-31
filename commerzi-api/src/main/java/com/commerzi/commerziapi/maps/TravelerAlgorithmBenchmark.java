@@ -1,5 +1,7 @@
 package com.commerzi.commerziapi.maps;
 
+import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
+import com.commerzi.commerziapi.maps.algorithms.AlgorithmType;
 import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -82,20 +84,20 @@ public class TravelerAlgorithmBenchmark {
     public void prepareData() {points = datasets.get(datasetIndex);}
 
     /**
-     * Benchmark for the nearestNeihborHeuristic method.
+     * Benchmark for the NearestNeighborHeuristic class.
      * This method measures the time it takes to sort the points and returns the optimized list.
      *
      * @param state the current benchmark state to count some other data
      * @return the optimized list of points sorted using the nearest-neighbor heuristic
      */
     @Benchmark
-    public List<JOpenCageLatLng> benchmarkNearestNeihborHeuristic(BenchmarkState state) {
-        state.sortedPoints = TravelerAlgorithm.nearestNeihborHeuristic(TravelerAlgorithmBenchmarkData.startingPoint, points);
+    public List<JOpenCageLatLng> benchmarkNearestNeighborHeuristic(BenchmarkState state) {
+        state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.NEAREST_NEIGHBOR_HEURISTIC).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
 
     /**
-     * Benchmark for the bruteForce method.
+     * Benchmark for the BruteForce class.
      * This method measures the time it takes to sort the point and returns the optimized list.
      *
      * @param state the current benchmark state to count some other data
@@ -103,7 +105,20 @@ public class TravelerAlgorithmBenchmark {
      */
     @Benchmark
     public List<JOpenCageLatLng> benchmarkBruteForce(BenchmarkState state) {
-        state.sortedPoints = TravelerAlgorithm.bruteForce(TravelerAlgorithmBenchmarkData.startingPoint, points);
+        state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
+        return state.sortedPoints;
+    }
+
+    /**
+     * Benchmark for the BruteForceOptimized class.
+     * This method measures the time it takes to sort the point and returns the optimized list.
+     *
+     * @param state the current benchmark state to count some other data
+     * @return the optimized list of points sorted using the brute force method
+     */
+    @Benchmark
+    public List<JOpenCageLatLng> benchmarkBruteForceOptimized(BenchmarkState state) {
+        state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
 
