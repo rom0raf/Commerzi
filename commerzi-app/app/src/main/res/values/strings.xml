@@ -1,3 +1,61 @@
 <resources>
     <string name="app_name">Commerzi App</string>
+
+    <!-- LOGIN PAGE -->
+    <string name="connection">Connexion</string>
+    <string name="email">Email</string>
+    <string name="password">Mot de passe</string>
+    <string name="validate">Valider</string>
+    <string name="login_email_error_message">Email incorrect</string>
+    <string name="login_password_error_message">Mot de passe incorrect</string>
+    <string name="login_error_message">Impossible de vous connecter, veuillez réessayer</string>
+    <string name="email_password_empty">Les champs email et mot de passe ne doivent pas être vides</string>
+    <string name="credentials_error">Identifiants incorrects</string>
+    <string name="response_parsing_error">Response parsing error</string>
+    <string name="connection_error">Impossible de se connecter</string>
+
+    <!-- SIGN UP PAGE -->
+    <string name="signup">Inscription</string>
+    <string name="firstname">Prénom</string>
+    <string name="lastname">Nom</string>
+    <string name="address">Adresse</string>
+    <string name="city">Ville</string>
+    <string name="confirmation">Confirmation</string>
+    <string name="error_empty_field">Tous les champs doivent être remplis</string>
+    <string name="error_invalid_password">La confirmation du mot de passe est invalide</string>
+    <string name="account_creation_success">Compte créé avec succès</string>
+    <string name="error_signup">Signup failed: </string>
+    <string name="request_creation_error">Request creation error</string>
+    <string name="unexpected_error">Erreur inattentue</string>
+
+    <!-- EDIT USER PAGE -->
+    <string name="edit_user">Modification du profil</string>
+    
+    <!-- ADD CLIENT / PROSPECT PAGE -->
+    <string name="add_client">Ajout d\'un client / prospect</string>
+    <string name="telephone">Téléphone</string>
+    <string name="company">Entreprise</string>
+    <string name="description">Description</string>
+    <string name="add">Ajouter</string>
+    <string name="client_creation_success">Client créé avec succès</string>
+    <string name="client">Client</string>
+    <string name="prospect">Prospect</string>
+    <string name="error_select_type">Un type doit être sélectionné</string>
+
+    <!-- EDIT CLIENT / PROSPECT -->
+    <string name="edit_client">Modifier un client</string>
+
+    <!-- TABS -->
+    <string name="route_tab">Itinéraires</string>
+    <string name="client_tab">Clients</string>
+
+    <!-- ROUTE LIST -->
+    <string name="route_list_title">Itinéraires</string>
+
+    <!-- CLIENT LIST -->
+    <string name="client_list_title">Clients</string>
+    
+    <!-- PROFILE -->
+    <string name="profile">Profil</string>
+    
 </resources>

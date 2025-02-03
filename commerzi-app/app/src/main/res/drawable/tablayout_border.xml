@@ -1,0 +1,9 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fond du TabLayout -->
+    <item android:left="0dp" android:top="1dp" android:right="0dp" android:bottom="0dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/grey"/>
+        </shape>
+    </item>
+</layer-list>

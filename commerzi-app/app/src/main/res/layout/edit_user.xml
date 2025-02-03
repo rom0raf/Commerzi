@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="16dp"
+        tools:context=".MainActivity">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_user"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="32dp"
+            android:gravity="center"/>
+
+        <!-- Last name input -->
+        <EditText
+            android:id="@+id/lastnameUpdateField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/lastname"
+            android:inputType="textPersonName"
+            android:drawableStart="@drawable/ic_avatar"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- First name input -->
+        <EditText
+            android:id="@+id/firstnameUpdateField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/firstname"
+            android:inputType="textPersonName"
+            android:drawableStart="@drawable/ic_avatar"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Email Input -->
+        <EditText
+            android:id="@+id/emailUpdateField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/email"
+            android:inputType="textEmailAddress"
+            android:drawableStart="@drawable/ic_email"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Address Input -->
+        <EditText
+            android:id="@+id/addressUpdateField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/address"
+            android:inputType="text"
+            android:drawableStart="@drawable/ic_home"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- City Input -->
+        <EditText
+            android:id="@+id/cityUpdateField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/city"
+            android:inputType="text"
+            android:drawableStart="@drawable/ic_city"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Password Input -->
+        <EditText
+            android:id="@+id/passwordUpdateField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            android:drawableStart="@drawable/ic_password"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Password Confirmation Input -->
+        <EditText
+            android:id="@+id/confirmationUpdateField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/confirmation"
+            android:inputType="textPassword"
+            android:drawableStart="@drawable/ic_password"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="32dp"/>
+
+        <!-- Validate Button -->
+        <Button
+            android:id="@+id/btnValidateUpdate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/grey"
+            android:text="@string/validate"
+            android:textColor="@android:color/white"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="32dp"/>
+
+    </LinearLayout>
+</ScrollView>
+
