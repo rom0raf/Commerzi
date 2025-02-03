@@ -1,6 +1,10 @@
 package com.commerzi.app;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
@@ -14,15 +18,32 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.home_page);
 
         ViewPager2 pager = findViewById(R.id.home_viewpager);
-        TabLayout tabManager = findViewById(R.id.tab_layout);
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
 
         pager.setAdapter(new FragmentAdapter(this)) ;
 
-        String[] tabTitles = {getString(R.string.route_tab),
-                getString(R.string.client_tab)};
+        new TabLayoutMediator(tabLayout, pager, (tab, position) -> {
+            View customView = LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
 
-        new TabLayoutMediator(tabManager, pager,
-                (tab, position) -> tab.setText(tabTitles[position])
-        ).attach();
+            ImageView icon = customView.findViewById(R.id.tab_icon);
+            TextView title = customView.findViewById(R.id.tab_title);
+
+            switch (position) {
+                case 0:
+                    icon.setImageResource(R.drawable.ic_route);
+                    title.setText(getString(R.string.route_tab));
+                    break;
+                case 1:
+                    icon.setImageResource(R.drawable.ic_company);
+                    title.setText(getString(R.string.client_tab));
+                    break;
+                case 2:
+                    icon.setImageResource(R.drawable.ic_avatar);
+                    title.setText(getString(R.string.profile));
+                    break;
+            }
+
+            tab.setCustomView(customView);
+        }).attach();
     }
 }

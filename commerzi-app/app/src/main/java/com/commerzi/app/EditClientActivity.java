@@ -2,6 +2,9 @@ package com.commerzi.app;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -75,7 +78,6 @@ public class EditClientActivity extends AppCompatActivity {
 
         JSONObject jsonBody = new JSONObject();
         try {
-            jsonBody.put("id", client.getId());
             jsonBody.put("name", etName.getText().toString());
             jsonBody.put("address", etAddress.getText().toString());
             jsonBody.put("city", etCity.getText().toString());

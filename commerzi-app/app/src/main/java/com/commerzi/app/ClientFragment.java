@@ -39,17 +39,21 @@ public class ClientFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.client_list, container, false);
         btnAddClient = fragmentView.findViewById(R.id.btnAddClient);
         btnAddClient.setOnClickListener(this);
 
-        // RecyclerView recyclerView = getView().findViewById(R.id.recyclerView);
-        // recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
-
         loadClients();
         return fragmentView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadClients();
     }
 
     public void onClick(View v) {
@@ -126,7 +130,7 @@ public class ClientFragment extends Fragment implements View.OnClickListener {
         // Configurez le RecyclerView avec un LinearLayoutManager
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
+        // recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
 
         // Créez l'adaptateur avec les données des clients et associez-le au RecyclerView
         ClientAdapter adapter = new ClientAdapter(clientList, this.getContext());

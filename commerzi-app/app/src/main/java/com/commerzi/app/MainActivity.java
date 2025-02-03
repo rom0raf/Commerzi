@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(MainActivity.this, R.string.connection_error + error.getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, R.string.connection_error, Toast.LENGTH_LONG).show();
                         }
                     }) {
 
