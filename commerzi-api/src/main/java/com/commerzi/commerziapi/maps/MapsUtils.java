@@ -108,7 +108,7 @@ public class MapsUtils {
 
     /**
      * Builds a full route by ordering customers based on the shortest flying distance, starting and ending at the commercial home.
-     * The method uses any custom sorting function (see {@code TravelerAlgorithm} class) to arrange the customers in the optimal order,
+     * The method uses any custom sorting class (see {@link ATravelerAlgorithm} class) to arrange the customers in the optimal order,
      * and then calculates the total flying travel distance of the route.
      *
      * @param commercialHome the starting and ending point for the route, representing the commercial home GPS coordinates
@@ -154,7 +154,10 @@ public class MapsUtils {
         }
 
         route.setCustomersAndProspects(orderedCustomers);
-        route.setTotalDistance(fullFlyingDistanceOverPoints(points));
+
+        points.add(commercialHome);
+        points.add(0, commercialHome);
+        route.setTotalDistance(algorithm.getFullDistanceOverPointsFunc().apply(points));
 
         return route;
     }

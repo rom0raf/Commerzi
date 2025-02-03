@@ -103,4 +103,11 @@ public abstract class ATravelerAlgorithm {
      */
     protected abstract List<JOpenCageLatLng> performAlgorithm(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points);
 
+    /**
+     * This is public so it can be used by {@link MapsUtils}
+     * @return the function that is currently used to calculate the distance over a list of points
+     */
+    public Function<List<JOpenCageLatLng>, Double> getFullDistanceOverPointsFunc() {
+        return fullDistanceOverPointsFunc;
+    }
 }
