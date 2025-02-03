@@ -7,33 +7,85 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f9;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fb;
+            color: #333;
         }
+
         h1 {
             text-align: center;
             color: #333;
+            margin: 40px 0;
+            font-size: 2.5em;
+            font-weight: 600;
         }
+
         .container {
             display: flex;
             justify-content: space-around;
             flex-wrap: wrap;
+            padding: 20px;
         }
+
         .chart-container {
             width: 45%;
-            margin: 10px;
+            margin: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
         }
+
         #info {
             text-align: center;
             margin-top: 20px;
             font-size: 1.2em;
+            color: #555;
         }
+
         #jsonFile {
             display: block;
             margin: 0 auto;
-            padding: 10px;
+            padding: 10px 20px;
             margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            font-size: 1em;
+        }
+
+        .chart-container canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .chart-container {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        #combinedChart {
+            width: 90%;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                width: 100%;
+            }
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -81,7 +133,6 @@
                 return;
             }
 
-            // Group data by benchmark name
             const benchmarks = {};
 
             benchmarkData.forEach(item => {
@@ -89,11 +140,10 @@
                 const datasetIndex = parseInt(item.params.datasetIndex);
                 const score = item.primaryMetric.score;
                 const totalDistance = item.secondaryMetrics.totalDistance.score;
-                
-                // If benchmark name doesn't exist, initialize
+
                 if (!benchmarks[benchmarkName]) {
                     benchmarks[benchmarkName] = {
-                        scores: [[], [], [], [], []], // datasets
+                        scores: [[], [], [], [], []],
                         distances: [[], [], [], [], []]
                     };
                 }
@@ -102,11 +152,9 @@
                 benchmarks[benchmarkName].distances[datasetIndex].push(totalDistance);
             });
 
-            // Display benchmark names
             const benchmarkNames = Object.keys(benchmarks);
             document.getElementById("info").innerText = `Résultats de benchmarking pour : ${benchmarkNames.join(', ')}`;
 
-            // Create the charts
             createChart('scoreChart', 'Score (ns/op)', benchmarks, benchmarkNames, 'Score');
             createChart('distanceChart', 'Distance totale (km)', benchmarks, benchmarkNames, 'Total Distance');
             createCombinedChart(benchmarks, benchmarkNames);
@@ -139,7 +187,14 @@
                                     const datasetIndex = tooltipItem.dataIndex;
                                     const benchmarkName = tooltipItem.dataset.label.split(' - ')[1];
                                     const value = tooltipItem.raw;
-                                    const formattedValue = formatTime(value);
+                                    let formattedValue;
+
+                                    if (metricType === 'Score') {
+                                        formattedValue = formatTime(value);
+                                    } else {
+                                        formattedValue = formatDistance(value);
+                                    }
+
                                     return `${benchmarkName} - Dataset ${datasetIndex}: ${metricType}: ${formattedValue}`;
                                 }
                             }
@@ -185,14 +240,13 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            type: 'logarithmic' // Use logarithmic scale for better visibility
+                            type: 'logarithmic'
                         }
                     }
                 }
             });
         }
 
-        // Helper function to generate random colors for the graphs
         function getRandomColor() {
             const letters = '0123456789ABCDEF';
             let color = '#';
@@ -202,17 +256,20 @@
             return color;
         }
 
-        // Function to format the time (in ns) into a human-readable format
         function formatTime(ns) {
             if (ns >= 1e9) {
-                return (ns / 1e9).toFixed(2) + ' s'; // Seconds
+                return (ns / 1e9).toFixed(2) + ' s';
             } else if (ns >= 1e6) {
-                return (ns / 1e6).toFixed(2) + ' ms'; // Milliseconds
+                return (ns / 1e6).toFixed(2) + ' ms';
             } else if (ns >= 1e3) {
-                return (ns / 1e3).toFixed(2) + ' µs'; // Microseconds
+                return (ns / 1e3).toFixed(2) + ' µs';
             } else {
-                return ns.toFixed(2) + ' ns'; // Nanoseconds
+                return ns.toFixed(2) + ' ns';
             }
+        }
+
+        function formatDistance(distance) {
+            return distance.toFixed(2) + ' km';
         }
     </script>
 </body>

@@ -33,8 +33,7 @@ public class BruteForceOptimized extends ATravelerAlgorithm {
 
     /**
      * Explores all possible paths in a depth-first search (DFS) manner and updates the best path if a shorter one is found.
-     * This method adds the starting point at both the beginning and end of the path and calculates the total distance of the path.
-     * If the path is shorter than the current best known path, it updates the best path.
+     * Optimizes distance calculation by keeping track of partial distances.
      *
      * @param startingPoint the starting point of the journey
      * @param points the list of points to visit
@@ -42,24 +41,24 @@ public class BruteForceOptimized extends ATravelerAlgorithm {
      * @param visited a boolean array tracking visited points
      * @param bestPath the list to store the best found path
      * @param minDistance an array containing the minimum distance found so far
+     * @param currentDistance the current partial distance of the path
      */
-    private void explorePaths(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points, List<JOpenCageLatLng> currentPath,
-                                  boolean[] visited, List<JOpenCageLatLng> bestPath, double[] minDistance) {
+    private void explorePaths(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points,
+                              List<JOpenCageLatLng> currentPath, boolean[] visited,
+                              List<JOpenCageLatLng> bestPath, double[] minDistance, double currentDistance) {
         if (currentPath.size() == points.size()) {
-            currentPath.add(0, startingPoint);
-            currentPath.add(startingPoint);
+            double totalDistance = currentDistance + this.distanceBetweenTwoPoints.apply(currentPath.get(currentPath.size() - 1), startingPoint);
 
-            double distance = this.fullDistanceOverPointsFunc.apply(currentPath);
-
-            if (distance < minDistance[0]) {
-                minDistance[0] = distance;
+            if (totalDistance < minDistance[0]) {
+                minDistance[0] = totalDistance;
                 bestPath.clear();
-                bestPath.addAll(currentPath.subList(1, currentPath.size() - 1));
+                bestPath.addAll(currentPath);
             }
 
-            // We delete starting and end points
-            currentPath.remove(0);
-            currentPath.remove(currentPath.size() - 1);
+            return;
+        }
+
+        if (currentPath.size() >= 2 && currentDistance > minDistance[0]) {
             return;
         }
 
@@ -68,15 +67,14 @@ public class BruteForceOptimized extends ATravelerAlgorithm {
                 visited[i] = true;
                 currentPath.add(points.get(i));
 
-                if (currentPath.size() >= 2) {
-                    double partialDistance = this.fullDistanceOverPointsFunc.apply(currentPath);
-
-                    if (partialDistance < minDistance[0]) {
-                        explorePaths(startingPoint, points, currentPath, visited, bestPath, minDistance);
-                    }
+                double newDistance = currentDistance;
+                if (currentPath.size() == 1) {
+                    newDistance += this.distanceBetweenTwoPoints.apply(startingPoint, points.get(i));
                 } else {
-                    explorePaths(startingPoint, points, currentPath, visited, bestPath, minDistance);
+                    newDistance += this.distanceBetweenTwoPoints.apply(currentPath.get(currentPath.size() - 2), points.get(i));
                 }
+
+                explorePaths(startingPoint, points, currentPath, visited, bestPath, minDistance, newDistance);
 
                 currentPath.remove(currentPath.size() - 1);
                 visited[i] = false;
@@ -87,7 +85,6 @@ public class BruteForceOptimized extends ATravelerAlgorithm {
     /**
      * This method performs the Brute Force Optimized algorithm to find the optimal TSP route.
      * It generates all paths, evaluates their distances, and selects the shortest route that returns to the starting point.
-     * The algorithm reduces unnecessary path explorations by pruning non-optimal routes early.
      *
      * @param startingPoint the point to start the journey from
      * @param points the list of points to visit
@@ -95,24 +92,15 @@ public class BruteForceOptimized extends ATravelerAlgorithm {
      */
     @Override
     protected List<JOpenCageLatLng> performAlgorithm(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points) {
-        List<JOpenCageLatLng> bestPath = null;
+        List<JOpenCageLatLng> bestPath = new ArrayList<>();
         double minDistance = Double.MAX_VALUE;
 
         double[] minDistanceArray = new double[]{minDistance};
 
-        List<JOpenCageLatLng> initialPath = new ArrayList<>();
-        initialPath.add(startingPoint);
-        initialPath.addAll(points);
-        initialPath.add(startingPoint);
-
-        double initialDistance = this.fullDistanceOverPointsFunc.apply(initialPath);
-        minDistanceArray[0] = initialDistance;
-        bestPath = new ArrayList<>(points);
-
         List<JOpenCageLatLng> currentPath = new ArrayList<>();
         boolean[] visited = new boolean[points.size()];
 
-        explorePaths(startingPoint, points, currentPath, visited, bestPath, minDistanceArray);
+        explorePaths(startingPoint, points, currentPath, visited, bestPath, minDistanceArray, 0);
 
         return bestPath;
     }
