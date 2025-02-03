@@ -111,22 +111,17 @@ public class MapsUtils {
      * The method uses any custom sorting class (see {@link ATravelerAlgorithm} class) to arrange the customers in the optimal order,
      * and then calculates the total flying travel distance of the route.
      *
-     * @param commercialHome the starting and ending point for the route, representing the commercial home GPS coordinates
-     * @param customers a list of customers whose locations need to be included in the route
+     * @param initialRoute the original PlannedRoute that contains all the data about the Route
      * @param algorithm allows to sort the points via optimised algorithms of the developer choice
      * @return a PlannedRoute object containing the ordered customers and the total flying travel distance
      * @throws IllegalArgumentException if the customers list is null or empty, or if the commercialHome is null
      */
-    public static PlannedRoute buildFullRoute(
-        JOpenCageLatLng commercialHome,
-        List<Customer> customers,
-        ATravelerAlgorithm algorithm
-    ) {
-        if (customers == null || customers.isEmpty()) {
+    public static void buildFullRoute(PlannedRoute initialRoute, ATravelerAlgorithm algorithm) {
+        if (initialRoute.getCustomersAndProspects() == null || initialRoute.getCustomersAndProspects().isEmpty()) {
             throw new IllegalArgumentException("Customer list cannot be null or empty.");
         }
 
-        if (commercialHome == null) {
+        if (initialRoute.getStartingPoint() == null) {
             throw new IllegalArgumentException("Commercial home can't be null.");
         }
 
@@ -134,32 +129,25 @@ public class MapsUtils {
             throw new IllegalArgumentException("Algorithm can't be null.");
         }
 
-        PlannedRoute route = new PlannedRoute();
-
-        route.setStartingPoint(commercialHome);
-        route.setEndingPoint(commercialHome);
-
-        List<JOpenCageLatLng> points = customers.stream()
+        List<JOpenCageLatLng> points = initialRoute.getCustomersAndProspects().stream()
             .map(Customer::getGpsCoordinates)
             .toList();
 
-        points = algorithm.apply(commercialHome, points);
+        points = algorithm.apply(initialRoute.getStartingPoint(), points);
 
         List<Customer> orderedCustomers = new ArrayList<>();
         for (JOpenCageLatLng point : points) {
-            customers.stream()
+            initialRoute.getCustomersAndProspects().stream()
                 .filter(c -> c.getGpsCoordinates().equals(point))
                 .findFirst()
                 .ifPresent(orderedCustomers::add);
         }
 
-        route.setCustomersAndProspects(orderedCustomers);
+        initialRoute.setCustomersAndProspects(orderedCustomers);
 
-        points.add(commercialHome);
-        points.add(0, commercialHome);
-        route.setTotalDistance(algorithm.getFullDistanceOverPointsFunc().apply(points));
-
-        return route;
+        points.add(initialRoute.getEndingPoint());
+        points.add(0, initialRoute.getStartingPoint());
+        initialRoute.setTotalDistance(algorithm.getFullDistanceOverPointsFunc().apply(points));
     }
 
 }
