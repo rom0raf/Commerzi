@@ -16,6 +16,8 @@ import java.util.function.Function;
  * This algorithm is computationally expensive as it evaluates every possible route, making it suitable only for small
  * numbers of points due to its factorial time complexity.
  *
+ * [WARNING] This method is VERY slow with more than 10 points.
+ *
  * @see ATravelerAlgorithm
  */
 public class BruteForce extends ATravelerAlgorithm {
@@ -62,6 +64,8 @@ public class BruteForce extends ATravelerAlgorithm {
      * Generates all possible permutations of a list of points (excluding the starting point)
      * and calculates the total distance for each permutation to find the shortest path.
      * This algorithm takes into account the starting point AND end point.
+     *
+     * [WARNING] This method is VERY slow with more than 10 points.
      *
      * @param startingPoint the starting point of the journey
      * @param points the list of points to visit (excluding the starting point)

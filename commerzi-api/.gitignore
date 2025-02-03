@@ -40,3 +40,4 @@ build/
 
 ### Benchmark ###
 benchmark-*.json
+crazy-benchmark-*.json

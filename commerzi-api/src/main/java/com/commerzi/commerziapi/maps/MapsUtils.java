@@ -1,5 +1,6 @@
 package com.commerzi.commerziapi.maps;
 
+import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
 import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.opencagedata.jopencage.model.JOpenCageLatLng;
@@ -112,14 +113,14 @@ public class MapsUtils {
      *
      * @param commercialHome the starting and ending point for the route, representing the commercial home GPS coordinates
      * @param customers a list of customers whose locations need to be included in the route
-     * @param sortFunction a function that sorts the list of customers' locations based on the nearest-neighbor or other sorting criteria
+     * @param algorithm allows to sort the points via optimised algorithms of the developer choice
      * @return a PlannedRoute object containing the ordered customers and the total flying travel distance
      * @throws IllegalArgumentException if the customers list is null or empty, or if the commercialHome is null
      */
     public static PlannedRoute buildFullRoute(
         JOpenCageLatLng commercialHome,
         List<Customer> customers,
-        BiFunction<JOpenCageLatLng, List<JOpenCageLatLng>, List<JOpenCageLatLng>> sortFunction
+        ATravelerAlgorithm algorithm
     ) {
         if (customers == null || customers.isEmpty()) {
             throw new IllegalArgumentException("Customer list cannot be null or empty.");
@@ -127,6 +128,10 @@ public class MapsUtils {
 
         if (commercialHome == null) {
             throw new IllegalArgumentException("Commercial home can't be null.");
+        }
+
+        if (algorithm == null) {
+            throw new IllegalArgumentException("Algorithm can't be null.");
         }
 
         PlannedRoute route = new PlannedRoute();
@@ -138,7 +143,7 @@ public class MapsUtils {
             .map(Customer::getGpsCoordinates)
             .toList();
 
-        points = sortFunction.apply(commercialHome, points);
+        points = algorithm.apply(commercialHome, points);
 
         List<Customer> orderedCustomers = new ArrayList<>();
         for (JOpenCageLatLng point : points) {
