@@ -2,7 +2,7 @@ package com.commerzi.app;
 
 public class Session {
 
-    private User user;
+    private static User user;
 
     private static Session instance = null;
 
@@ -13,15 +13,15 @@ public class Session {
         return instance;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public static void setUser(User newUser) {
+        user = newUser;
     }
 
-    public User getUser() {
+    public static User getUser() {
         return user;
     }
 
-    public String getApiKey() {
+    public static String getApiKey() {
         return user.getApiKey();
     }
 

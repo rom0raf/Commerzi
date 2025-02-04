@@ -72,7 +72,6 @@ public class EditClientActivity extends AppCompatActivity {
 
     private void updateClient() {
         String url = "http://57.128.220.88:8080/api/customers/" + client.getId();
-        Log.d("TEST", url);
         RequestQueue queue = Volley.newRequestQueue(this);
         String apiKey = Session.getInstance().getApiKey();
 
