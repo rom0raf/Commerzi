@@ -29,7 +29,7 @@ public class PlannedRouteController {
      * @return a list of all planned routes for the current user
      */
     @CommerziAuthenticated
-    @GetMapping()
+    @GetMapping("/")
     public ResponseEntity getAllPlannedRoutes() {
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
 
@@ -58,6 +58,11 @@ public class PlannedRouteController {
     @GetMapping("/{id}")
     public ResponseEntity<PlannedRoute> getPlannedRoutes(@PathVariable String id) {
         PlannedRoute plannedRoute = plannedRouteService.getPlannedRouteById(id);
+
+        if (plannedRoute == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.ok(plannedRoute);
     }
 
@@ -68,7 +73,7 @@ public class PlannedRouteController {
      * @return the ID of the created planned route
      */
     @CommerziAuthenticated
-    @PostMapping()
+    @PostMapping("/")
     public ResponseEntity<String> createPlannedRoute(@RequestBody PlannedRoute plannedRoute) {
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
         plannedRoute.setUserId("" + user.getUserId());
@@ -89,7 +94,7 @@ public class PlannedRouteController {
      * @return a response indicating the update status
      */
     @CommerziAuthenticated
-    @PutMapping()
+    @PutMapping("/")
     public ResponseEntity<String> updatePlannedRoute(@RequestBody PlannedRoute plannedRoute) {
 
         try {
@@ -105,13 +110,13 @@ public class PlannedRouteController {
     /**
      * Deletes a planned route.
      *
-     * @param plannedRoute the planned route to delete
+     * @param id the ID of the planned route to delete
      * @return a response indicating the deletion status
      */
     @CommerziAuthenticated
-    @DeleteMapping()
-    public ResponseEntity<String> deletePlannedRoute(@RequestBody PlannedRoute plannedRoute) {
-        plannedRouteService.deleteRoute(plannedRoute);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePlannedRoute(@PathVariable String id) {
+        plannedRouteService.deleteRouteById(id);
         return ResponseEntity.ok("Route deleted successfully");
     }
 

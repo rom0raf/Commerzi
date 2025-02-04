@@ -14,6 +14,6 @@ public interface IPlannedRouteService {
 
     void updateRoute(PlannedRoute route);
 
-    void deleteRoute(PlannedRoute route);
+    void deleteRouteById(String id);
 
 }

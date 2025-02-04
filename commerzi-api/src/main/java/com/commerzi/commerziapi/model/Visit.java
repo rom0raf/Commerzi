@@ -6,7 +6,7 @@ package com.commerzi.commerziapi.model;
 public class Visit {
     private String id;
     private Customer type; // "client" or "prospect"
-    private EVisitStatus status; // "visited" or "not-visited"
+    private EVisitStatus status;
 
     private static final int idCounter = 0;
 

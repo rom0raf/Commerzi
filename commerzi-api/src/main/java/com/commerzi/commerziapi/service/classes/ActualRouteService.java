@@ -1,10 +1,7 @@
 package com.commerzi.commerziapi.service.classes;
 
 import com.commerzi.commerziapi.dao.ActualRouteRepository;
-import com.commerzi.commerziapi.model.ActualRoute;
-import com.commerzi.commerziapi.model.Customer;
-import com.commerzi.commerziapi.model.PlannedRoute;
-import com.commerzi.commerziapi.model.Visit;
+import com.commerzi.commerziapi.model.*;
 import com.commerzi.commerziapi.service.interfaces.IActualRouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,12 +22,13 @@ public class ActualRouteService implements IActualRouteService {
     /**
      * Saves an actual route to the repository.
      *
-     * @param plannedRouteId the actual route to save
+     * @param actualRoute the actual route to save
      * @return the ID of the saved actual route
      */
-    public String saveActualRoute(ActualRoute plannedRouteId) {
-        actualRouteRepository.save(plannedRouteId);
-        return plannedRouteId.getId();
+    public String saveActualRoute(ActualRoute actualRoute) throws IllegalArgumentException {
+        checkActualRoute(actualRoute);
+        actualRouteRepository.save(actualRoute);
+        return actualRoute.getId();
     }
 
     /**
@@ -50,7 +48,7 @@ public class ActualRouteService implements IActualRouteService {
      * @return the created actual route
      */
     public ActualRoute createActualRouteFromPlannedRoute(PlannedRoute plannedRoute) {
-        checkPlannedRoute(plannedRoute);
+        PlannedRouteService.checkPlannedRoute(plannedRoute);
 
         ActualRoute actualRoute = new ActualRoute();
 
@@ -62,10 +60,16 @@ public class ActualRouteService implements IActualRouteService {
                 getVisitFromPlannedRoute(plannedRoute)
         );
 
+        actualRoute.setCoordinates(
+                new ArrayList<>()
+        );
+
+        actualRoute.setStatus(ERouteStatus.IN_PROGRESS);
+
         return actualRoute;
     }
 
-    public static List<Visit> getVisitFromPlannedRoute(PlannedRoute plannedRoute) {
+    private static List<Visit> getVisitFromPlannedRoute(PlannedRoute plannedRoute) {
         List<Visit> visits = new ArrayList<>();
         for (Customer customer : plannedRoute.getCustomersAndProspects()) {
             visits.add(new Visit(customer));
@@ -73,22 +77,31 @@ public class ActualRouteService implements IActualRouteService {
         return visits;
     }
 
-    private static void checkPlannedRoute(PlannedRoute plannedRoute) throws IllegalArgumentException {
-        if (plannedRoute == null) {
-            throw new IllegalArgumentException("Planned route cannot be null");
-        }
-        if (plannedRoute.getCustomersAndProspects() == null || plannedRoute.getCustomersAndProspects().isEmpty()) {
-            throw new IllegalArgumentException("Customers and prospects cannot be null or empty");
-        }
 
-        for (Customer customer : plannedRoute.getCustomersAndProspects()) {
-            if (customer == null) {
-                throw new IllegalArgumentException("Customer cannot be null");
-            }
+    private static void checkActualRoute(ActualRoute route) throws IllegalArgumentException {
+        if (route == null) {
+            throw new IllegalArgumentException("Route cannot be null");
         }
-
-        if (plannedRoute.getUserId() == null || plannedRoute.getUserId().isEmpty()) {
-            throw new IllegalArgumentException("User ID cannot be null or empty");
+        if (route.getDate() == null) {
+            throw new IllegalArgumentException("Route date cannot be null");
+        }
+        if (route.getUserId() == null) {
+            throw new IllegalArgumentException("Route user ID cannot be null");
+        }
+        if (route.getRouteId() == null) {
+            throw new IllegalArgumentException("Route ID cannot be null");
+        }
+        if (route.getVisits() == null) {
+            throw new IllegalArgumentException("Route visits cannot be null");
+        }
+        if (route.getVisits().isEmpty()) {
+            throw new IllegalArgumentException("Route visits cannot be empty");
+        }
+        if (route.getStatus() == null) {
+            throw new IllegalArgumentException("Route status cannot be null");
+        }
+        if (route.getCoordinates() == null) {
+            throw new IllegalArgumentException("Route current location cannot be null");
         }
     }
 }

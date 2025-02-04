@@ -4,14 +4,11 @@ import com.commerzi.commerziapi.dao.PlannedRouteRepository;
 import com.commerzi.commerziapi.maps.MapsUtils;
 import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
 import com.commerzi.commerziapi.maps.algorithms.AlgorithmType;
-import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.service.interfaces.IPlannedRouteService;
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +27,7 @@ public class PlannedRouteService implements IPlannedRouteService {
      * @return the ID of the created planned route
      */
     public String createRoute(PlannedRoute route) throws IllegalArgumentException {
-        checkRoute(route);
+        checkPlannedRoute(route);
 
         MapsUtils.buildFullRoute(
                 route,
@@ -68,7 +65,7 @@ public class PlannedRouteService implements IPlannedRouteService {
      */
     public void updateRoute(PlannedRoute route) throws IllegalArgumentException {
 
-        checkRoute(route);
+        checkPlannedRoute(route);
 
         plannedRouteRepository.save(route);
     }
@@ -76,13 +73,13 @@ public class PlannedRouteService implements IPlannedRouteService {
     /**
      * Deletes a planned route.
      *
-     * @param route the planned route to delete
+     * @param id the ID of the planned route to delete
      */
-    public void deleteRoute(PlannedRoute route) {
-        plannedRouteRepository.delete(route);
+    public void deleteRouteById(String id) {
+        plannedRouteRepository.deleteById(id);
     }
 
-    private static void checkRoute (PlannedRoute route) throws IllegalArgumentException {
+    public static void checkPlannedRoute(PlannedRoute route) throws IllegalArgumentException {
         if (route.getCustomersAndProspects().size() > 8) {
             throw new IllegalArgumentException("Too many customers");
         }

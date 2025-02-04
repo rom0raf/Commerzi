@@ -4,9 +4,12 @@ import com.commerzi.commerziapi.model.ActualRoute;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
 import com.commerzi.commerziapi.service.interfaces.IActualRouteService;
+import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * REST controller for handling actual routes in the Commerzi application.
@@ -26,8 +29,13 @@ public class ActualRouteController {
      */
     @CommerziAuthenticated
     @GetMapping("/{id}")
-    public ResponseEntity<ActualRoute> getActualRoutes(@PathVariable String id) {
+    public ResponseEntity getActualRoutes(@PathVariable String id) {
         ActualRoute actualRoute = actualRouteService.getActualRouteById(id);
+
+        if (actualRoute == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.ok(actualRoute);
     }
 
@@ -38,9 +46,14 @@ public class ActualRouteController {
      * @return the created actual route
      */
     @CommerziAuthenticated
-    @PostMapping()
-    public ResponseEntity<ActualRoute> getActualRoutes(@RequestBody PlannedRoute plannedRoute) {
+    @PostMapping("/")
+    public ResponseEntity getActualRoutes(@RequestBody PlannedRoute plannedRoute) {
         ActualRoute actualRoute = actualRouteService.createActualRouteFromPlannedRoute(plannedRoute);
+        try {
+            actualRouteService.saveActualRoute(actualRoute);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
         return ResponseEntity.ok(actualRoute);
     }
 
@@ -53,7 +66,28 @@ public class ActualRouteController {
     @CommerziAuthenticated
     @PostMapping("/save")
     public ResponseEntity<String> createActualRoute(@RequestBody ActualRoute actualRoute) {
-        String id = actualRouteService.saveActualRoute(actualRoute);
+        String id;
+        try {
+            id = actualRouteService.saveActualRoute(actualRoute);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
         return ResponseEntity.ok(id);
     }
+
+    @CommerziAuthenticated
+    @PostMapping("/{id}")
+    public ResponseEntity updateRouteCoordinates(@RequestBody List<JOpenCageLatLng> newCoordinates, @PathVariable String id) {
+        ActualRoute actualRoute = actualRouteService.getActualRouteById(id);
+        if (actualRoute == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        actualRoute.getCoordinates().addAll(newCoordinates);
+
+        actualRouteService.saveActualRoute(actualRoute);
+        return ResponseEntity.ok(actualRoute);
+    }
+
 }

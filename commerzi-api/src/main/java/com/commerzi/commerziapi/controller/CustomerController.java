@@ -31,7 +31,7 @@ public class CustomerController {
      * @return a list of all customers
      */
     @CommerziAuthenticated
-    @GetMapping()
+    @GetMapping("/")
     public ResponseEntity<List<Customer>> getAllCustomers() {
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
 
@@ -43,11 +43,6 @@ public class CustomerController {
         return ResponseEntity.ok(customers);
     }
 
-    @CommerziAuthenticated
-    @GetMapping("/")
-    public ResponseEntity<List<Customer>> getAllCustomers2() {
-        return getAllCustomers();
-    }
 
     /**
      * Retrieves all customers of type "client".

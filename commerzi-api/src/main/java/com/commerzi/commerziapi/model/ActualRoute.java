@@ -20,6 +20,8 @@ public class ActualRoute {
     private String userId;
     private String plannedRouteId;
     private List<Visit> visits;
+    private ERouteStatus status;
+    private List<JOpenCageLatLng> coordinates;
 
     /**
      * Gets the ID of the journey.
@@ -111,6 +113,42 @@ public class ActualRoute {
         this.visits = visits;
     }
 
+    /**
+     * Gets the status of the journey.
+     *
+     * @return the status of the journey
+     */
+    public ERouteStatus getStatus() {
+        return status;
+    }
+
+    /**
+     * Sets the status of the journey.
+     *
+     * @param status the status to set
+     */
+    public void setStatus(ERouteStatus status) {
+        this.status = status;
+    }
+
+    /**
+     * Gets the current location of the journey.
+     *
+     * @return the current location of the journey
+     */
+    public List<JOpenCageLatLng> getCoordinates() {
+        return coordinates;
+    }
+
+    /**
+     * Sets the current location of the journey.
+     *
+     * @param coordinates the current location to set
+     */
+    public void setCoordinates(List<JOpenCageLatLng> coordinates) {
+        this.coordinates = coordinates;
+    }
+
     @Override
     public String toString() {
         return "ActualRoute{" +
@@ -119,6 +157,8 @@ public class ActualRoute {
                 ", userId='" + userId + '\'' +
                 ", plannedRouteId='" + plannedRouteId + '\'' +
                 ", visits=" + visits +
+                ", status=" + status +
+                ", coordinates=" + coordinates +
                 '}';
     }
 }
