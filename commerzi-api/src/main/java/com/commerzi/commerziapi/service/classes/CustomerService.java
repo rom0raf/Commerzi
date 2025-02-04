@@ -87,14 +87,11 @@ public class CustomerService implements ICustomerService {
 
         existingCustomer.merge(customer);
 
-        System.out.println("\n\n\n\n\n");
-        System.out.println("Id of existing customer: " + existingCustomer.getId());
-        System.out.println("\n\n\n\n\n");
-
-        // TODO if the address is the same as before don't update the gps coordinates
-        existingCustomer.setGpsCoordinates(
-                CheckAddress.getCoordinates(existingCustomer.getAddress(), existingCustomer.getCity())
-        );
+        if (existingCustomer.getAddress() != null && existingCustomer.getCity() != null) {
+            existingCustomer.setGpsCoordinates(
+                    CheckAddress.getCoordinates(existingCustomer.getAddress(), existingCustomer.getCity())
+            );
+        }
 
         return customerRepository.save(existingCustomer);
     }
@@ -142,7 +139,7 @@ public class CustomerService implements ICustomerService {
                 throw new IllegalArgumentException("City is required");
             }
 
-            if (!CheckAddress.checkAddress(customer.getAddress(), customer.getCity())) {
+            if (CheckAddress.isAddressInvalid(customer.getAddress(), customer.getCity())) {
                 throw new IllegalArgumentException("Invalid address");
             }
         }

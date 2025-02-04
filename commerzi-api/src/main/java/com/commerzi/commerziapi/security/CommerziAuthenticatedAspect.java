@@ -62,4 +62,4 @@ public class CommerziAuthenticatedAspect {
         return joinPoint.proceed();
     }
 
-} // plunger
+}

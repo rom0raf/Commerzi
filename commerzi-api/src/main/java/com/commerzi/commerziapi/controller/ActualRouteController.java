@@ -2,6 +2,7 @@ package com.commerzi.commerziapi.controller;
 
 import com.commerzi.commerziapi.model.ActualRoute;
 import com.commerzi.commerziapi.model.PlannedRoute;
+import com.commerzi.commerziapi.security.CommerziAuthenticated;
 import com.commerzi.commerziapi.service.interfaces.IActualRouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class ActualRouteController {
      * @param id the ID of the actual route to retrieve
      * @return the actual route with the specified ID
      */
+    @CommerziAuthenticated
     @GetMapping("/{id}")
     public ResponseEntity<ActualRoute> getActualRoutes(@PathVariable String id) {
         ActualRoute actualRoute = actualRouteService.getActualRouteById(id);
@@ -35,6 +37,7 @@ public class ActualRouteController {
      * @param plannedRoute the planned route to convert
      * @return the created actual route
      */
+    @CommerziAuthenticated
     @PostMapping()
     public ResponseEntity<ActualRoute> getActualRoutes(@RequestBody PlannedRoute plannedRoute) {
         ActualRoute actualRoute = actualRouteService.createActualRouteFromPlannedRoute(plannedRoute);
@@ -47,6 +50,7 @@ public class ActualRouteController {
      * @param actualRoute the actual route to save
      * @return the ID of the saved actual route
      */
+    @CommerziAuthenticated
     @PostMapping("/save")
     public ResponseEntity<String> createActualRoute(@RequestBody ActualRoute actualRoute) {
         String id = actualRouteService.saveActualRoute(actualRoute);

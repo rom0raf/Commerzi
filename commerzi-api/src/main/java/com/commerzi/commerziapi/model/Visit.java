@@ -73,4 +73,13 @@ public class Visit {
     public void setStatus(EVisitStatus status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "Visit{" +
+                "id='" + id + '\'' +
+                ", type=" + type +
+                ", status=" + status +
+                '}';
+    }
 }

@@ -9,7 +9,6 @@ import com.commerzi.commerziapi.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -72,6 +71,7 @@ public class UserService implements IUserService {
      */
     public void updateUser(CommerziUser commerziUser, boolean... checkAddress) throws UserArgumentException {
         verifyUser(commerziUser, checkAddress);
+
         userRepository.save(commerziUser);
     }
 
@@ -107,7 +107,7 @@ public class UserService implements IUserService {
                 throw new UserArgumentException("L'addresse est vide");
             }
 
-            if (!CheckAddress.checkAddress(commerziUser.getAddress(), commerziUser.getCity())) {
+            if (CheckAddress.isAddressInvalid(commerziUser.getAddress(), commerziUser.getCity())) {
                 throw new UserArgumentException("L'addresse n'est pas valide");
             }
 

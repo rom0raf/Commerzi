@@ -111,22 +111,14 @@ public class ActualRoute {
         this.visits = visits;
     }
 
-    public static ActualRoute fromPlannedRoute(PlannedRoute plannedRoute) {
-        ActualRoute actualRoute = new ActualRoute();
-        actualRoute.setDate(LocalTime.now().toString());
-        actualRoute.setUserId(plannedRoute.getUserId());
-        actualRoute.setRouteId(plannedRoute.getId());
-        actualRoute.setVisits(getVisitFromPlannedRoute(plannedRoute));
-        return actualRoute;
+    @Override
+    public String toString() {
+        return "ActualRoute{" +
+                "id='" + id + '\'' +
+                ", date='" + date + '\'' +
+                ", userId='" + userId + '\'' +
+                ", plannedRouteId='" + plannedRouteId + '\'' +
+                ", visits=" + visits +
+                '}';
     }
-
-
-    public static List<Visit> getVisitFromPlannedRoute(PlannedRoute plannedRoute) {
-        List<Visit> visits = new ArrayList<>();
-        for (Customer customer : plannedRoute.getCustomersAndProspects()) {
-            visits.add(new Visit(customer));
-        }
-        return visits;
-    }
-
 }

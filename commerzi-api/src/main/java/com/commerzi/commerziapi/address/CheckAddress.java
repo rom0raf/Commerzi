@@ -33,14 +33,14 @@ public class CheckAddress {
         return response.getFirstPosition();
     }
 
-    public static boolean checkAddress(String address, String city) {
+    public static boolean isAddressInvalid(String address, String city) {
         if (address == null || address.isEmpty() || city == null || city.isEmpty()) {
-            return false;
+            return true;
         }
 
 
         JOpenCageLatLng coordinates = callAPI(address, city);
-        return coordinates != null;
+        return coordinates == null;
     }
 
     public static JOpenCageLatLng getCoordinates(String address, String city) {

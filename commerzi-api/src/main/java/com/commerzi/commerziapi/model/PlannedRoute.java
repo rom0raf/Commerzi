@@ -127,4 +127,16 @@ public class PlannedRoute {
     public void setTotalDistance(double totalDistance) {
         this.totalDistance = totalDistance;
     }
+
+    @Override
+    public String toString() {
+        return "PlannedRoute{" +
+                "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
+                ", customersAndProspects=" + customersAndProspects +
+                ", startingPoint=" + startingPoint +
+                ", endingPoint=" + endingPoint +
+                ", totalDistance=" + totalDistance +
+                '}';
+    }
 }

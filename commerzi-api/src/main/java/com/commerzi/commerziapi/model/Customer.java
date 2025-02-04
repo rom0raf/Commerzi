@@ -198,4 +198,19 @@ public class Customer {
         setType(second.getType());
         setUserId(second.getUserId());
     }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", city='" + city + '\'' +
+                ", description='" + description + '\'' +
+                ", gpsCoordinates=" + gpsCoordinates +
+                ", contact=" + contact +
+                ", type=" + type +
+                ", userId='" + userId + '\'' +
+                '}';
+    }
 }

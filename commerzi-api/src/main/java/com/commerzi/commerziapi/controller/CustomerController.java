@@ -28,51 +28,60 @@ public class CustomerController {
     /**
      * Retrieves all customers.
      *
-     * @param userId the ID of the user making the request
      * @return a list of all customers
      */
     @CommerziAuthenticated
     @GetMapping()
-    public ResponseEntity<List<Customer>> getAllCustomers(@RequestParam String userId) {
-        if (userId == null) {
+    public ResponseEntity<List<Customer>> getAllCustomers() {
+        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
+
+        if (user == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        List<Customer> customers = customerService.getAllCustomers(userId);
+        List<Customer> customers = customerService.getAllCustomers("" + user.getUserId());
         return ResponseEntity.ok(customers);
+    }
+
+    @CommerziAuthenticated
+    @GetMapping("/")
+    public ResponseEntity<List<Customer>> getAllCustomers2() {
+        return getAllCustomers();
     }
 
     /**
      * Retrieves all customers of type "client".
      *
-     * @param userId the ID of the user making the request
      * @return a list of customers with type "client"
      */
     @CommerziAuthenticated
     @GetMapping("/clients")
-    public ResponseEntity<List<Customer>> getClients(@RequestParam String userId) {
-        if (userId == null) {
+    public ResponseEntity<List<Customer>> getClients() {
+        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
+
+        if (user == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        List<Customer> clients = customerService.getClients(userId);
+        List<Customer> clients = customerService.getClients("" + user.getUserId());
         return ResponseEntity.ok(clients);
     }
 
     /**
      * Retrieves all customers of type "prospect".
      *
-     * @param userId the ID of the user making the request
      * @return a list of customers with type "prospect"
      */
     @CommerziAuthenticated
     @GetMapping("/prospects")
-    public ResponseEntity<List<Customer>> getProspects(@RequestParam String userId) {
-        if (userId == null) {
+    public ResponseEntity<List<Customer>> getProspects() {
+        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
+
+        if (user == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        List<Customer> prospects = customerService.getProspects(userId);
+        List<Customer> prospects = customerService.getProspects("" + user.getUserId());
         return ResponseEntity.ok(prospects);
     }
 
