@@ -57,5 +57,6 @@
     
     <!-- PROFILE -->
     <string name="profile">Profil</string>
+    <string name="edit_profile">Modifier mon profil</string>
     
 </resources>

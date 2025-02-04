@@ -23,6 +23,43 @@
             android:textStyle="bold"
             android:layout_marginBottom="32dp"
             android:gravity="center"/>
+
+        <!-- Full name -->
+        <TextView
+            android:id="@+id/userFullName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_marginBottom="32dp"
+            android:gravity="center"/>
+
+        <!-- Email -->
+        <TextView
+            android:id="@+id/userEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_marginBottom="32dp"
+            android:gravity="center"/>
+
+        <!-- Address -->
+        <TextView
+            android:id="@+id/userAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_marginBottom="32dp"
+            android:gravity="center"/>
+
+        <Button
+            android:id="@+id/btnEditProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_profile"
+            android:backgroundTint="@color/grey"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp" />
+
     </LinearLayout>
 </ScrollView>
 

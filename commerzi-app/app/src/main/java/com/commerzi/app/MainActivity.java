@@ -72,8 +72,17 @@ public class MainActivity extends AppCompatActivity {
                                 boolean success = !jsonResponse.getString("userId").isEmpty();
 
                                 if (success) {
-                                    String key = jsonResponse.getString("session").toString();
+                                    String key = jsonResponse.getString("session");
+                                    String firstname = jsonResponse.getString("firstName");
+                                    String lastname = jsonResponse.getString("lastName");
+                                    String email = jsonResponse.getString("email");
+                                    String address = jsonResponse.getString("address");
+                                    String city = jsonResponse.getString("city");
+                                    String password = jsonResponse.getString("password");
+                                    User user = new User(firstname, lastname, address, city, email, password);
+
                                     Session.getInstance().setApiKey(key);
+                                    Session.setUser(user);
                                     Intent intention = new Intent(MainActivity.this, HomeActivity.class);
                                     startActivity(intention);
                                 } else {
