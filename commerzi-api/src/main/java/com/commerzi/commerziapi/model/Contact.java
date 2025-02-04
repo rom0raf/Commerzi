@@ -3,7 +3,7 @@ package com.commerzi.commerziapi.model;
 /**
  * Model class representing a contact in the Commerzi application.
  */
-class Contact {
+public class Contact {
     private String firstName;
     private String lastName;
     private String phoneNumber;
@@ -60,5 +60,14 @@ class Contact {
      */
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "Contact{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                '}';
     }
 }

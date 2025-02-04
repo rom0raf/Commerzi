@@ -1,11 +1,13 @@
 package com.commerzi.commerziapi.model;
 
-import com.commerzi.commerziapi.address.CheckAddress;
+import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import org.hibernate.annotations.Check;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 /**
  * Model class representing a customer in the Commerzi application.
@@ -13,18 +15,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "customers")
 public class Customer {
 
-    public static final String CLIENT = "client";
-    public static final String PROSPECT = "prospect";
-
+    @MongoId
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Id
+    @Field(value = "_id", targetType = FieldType.OBJECT_ID)
     private String id;
     private String name;
     private String address;
+    private String city;
     private String description;
-    private String gpsCoordinates;
+    private JOpenCageLatLng gpsCoordinates;
     private Contact contact;
-    private String type;
+    private ECustomerType type;
+    private String userId;
 
     /**
      * Gets the ID of the customer.
@@ -81,6 +83,22 @@ public class Customer {
     }
 
     /**
+     * Gets the city of the customer.
+     * @return the city of the customer
+     */
+    public String getCity() {
+        return city;
+    }
+
+    /**
+     * Sets the city of the customer.
+     * @param city the city to set
+     */
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    /**
      * Gets the description of the customer.
      *
      * @return the description of the customer
@@ -103,7 +121,7 @@ public class Customer {
      *
      * @return the GPS coordinates of the customer
      */
-    public String getGpsCoordinates() {
+    public JOpenCageLatLng getGpsCoordinates() {
         return gpsCoordinates;
     }
 
@@ -112,7 +130,7 @@ public class Customer {
      *
      * @param gpsCoordinates the GPS coordinates to set
      */
-    public void setGpsCoordinates(String gpsCoordinates) {
+    public void setGpsCoordinates(JOpenCageLatLng gpsCoordinates) {
         this.gpsCoordinates = gpsCoordinates;
     }
 
@@ -139,7 +157,7 @@ public class Customer {
      *
      * @return the type of the customer
      */
-    public String getType() {
+    public ECustomerType getType() {
         return type;
     }
 
@@ -148,17 +166,51 @@ public class Customer {
      *
      * @param type the type to set
      */
-    public void setType(String type) {
+    public void setType(ECustomerType type) {
         this.type = type;
     }
 
+    /**
+     * Gets the user ID associated with the customer.
+     *
+     * @return the user ID associated with the customer
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Sets the user ID associated with the customer.
+     *
+     * @param userId the user ID to set
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public void merge(Customer second) {
         setName(second.getName());
         setAddress(second.getAddress());
+        setCity(second.getCity());
         setDescription(second.getDescription());
         setGpsCoordinates(second.getGpsCoordinates());
         setContact(second.getContact());
         setType(second.getType());
+        setUserId(second.getUserId());
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", city='" + city + '\'' +
+                ", description='" + description + '\'' +
+                ", gpsCoordinates=" + gpsCoordinates +
+                ", contact=" + contact +
+                ", type=" + type +
+                ", userId='" + userId + '\'' +
+                '}';
     }
 }

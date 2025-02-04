@@ -1,9 +1,11 @@
 package com.commerzi.commerziapi.controller;
 
-import com.commerzi.commerziapi.dao.CustomerRepository;
+import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
-import com.commerzi.commerziapi.service.ICustomerService;
+import com.commerzi.commerziapi.security.Security;
+import com.commerzi.commerziapi.service.interfaces.IAuthentificationService;
+import com.commerzi.commerziapi.service.interfaces.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,17 +22,27 @@ public class CustomerController {
     @Autowired
     private ICustomerService customerService;
 
+    @Autowired
+    private IAuthentificationService authentificationService;
+
     /**
      * Retrieves all customers.
      *
      * @return a list of all customers
      */
     @CommerziAuthenticated
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<Customer>> getAllCustomers() {
-        List<Customer> customers = customerService.getAllCustomers();
+        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
+
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<Customer> customers = customerService.getAllCustomers("" + user.getUserId());
         return ResponseEntity.ok(customers);
     }
+
 
     /**
      * Retrieves all customers of type "client".
@@ -40,7 +52,13 @@ public class CustomerController {
     @CommerziAuthenticated
     @GetMapping("/clients")
     public ResponseEntity<List<Customer>> getClients() {
-        List<Customer> clients = customerService.getClients();
+        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
+
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<Customer> clients = customerService.getClients("" + user.getUserId());
         return ResponseEntity.ok(clients);
     }
 
@@ -52,7 +70,13 @@ public class CustomerController {
     @CommerziAuthenticated
     @GetMapping("/prospects")
     public ResponseEntity<List<Customer>> getProspects() {
-        List<Customer> prospects = customerService.getProspects();
+        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
+
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<Customer> prospects = customerService.getProspects("" + user.getUserId());
         return ResponseEntity.ok(prospects);
     }
 
@@ -81,30 +105,57 @@ public class CustomerController {
      */
     @CommerziAuthenticated
     @PostMapping("/")
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity createCustomer(@RequestBody Customer customer) {
+        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
 
-        String customerType = customer.getType().toLowerCase();
+        customer.setUserId("" + user.getUserId());
 
-        if (Customer.CLIENT.equals(customerType) || Customer.PROSPECT.equals(customerType)) {
-            customer.setType(customerType);
-        } else {
-            return null;
+        try {
+            customerService.createCustomer(customer);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        customerService.saveCustomer(customer);
         return ResponseEntity.ok(customer);
     }
 
+    /**
+     * Updates an existing customer.
+     *
+     * @param id the ID of the customer to update
+     * @param customer the customer data to update
+     * @return the updated customer
+     */
     @CommerziAuthenticated
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
+    public ResponseEntity updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
         Customer existingCustomer = customerService.getCustomerById(id);
         if (existingCustomer == null) {
-            return null;
+            return ResponseEntity.notFound().build();
         }
 
-        customerService.saveCustomer(customer);
+        try {
+            customerService.updateCustomer(existingCustomer, customer);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
         return ResponseEntity.ok(customer);
+    }
+
+    /**
+     * Deletes a customer by their ID.
+     *
+     * @param id the ID of the customer to delete
+     * @return the deleted customer
+     */
+    @CommerziAuthenticated
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Customer> deleteCustomer(@PathVariable String id) {
+        if (id == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Customer result = customerService.deleteCustomer(id);
+        return ResponseEntity.ok(result);
     }
 
     /**

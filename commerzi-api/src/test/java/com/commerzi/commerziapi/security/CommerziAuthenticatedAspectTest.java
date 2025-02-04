@@ -1,8 +1,7 @@
 package com.commerzi.commerziapi.security;
 
 import com.commerzi.commerziapi.model.CommerziUser;
-import com.commerzi.commerziapi.service.IAuthentificationService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.commerzi.commerziapi.service.interfaces.IAuthentificationService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

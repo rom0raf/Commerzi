@@ -1,5 +1,6 @@
 package com.commerzi.commerziapi.model;
 
+import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,14 +10,14 @@ import java.util.List;
  * Model class representing a route in the Commerzi application.
  */
 @Document(collection = "routes")
-public class Route {
+public class PlannedRoute {
 
     @Id
     private String id;
     private String userId;
     private List<Customer> customersAndProspects;
-    private String startingPoint;
-    private String endingPoint;
+    private JOpenCageLatLng startingPoint;
+    private JOpenCageLatLng endingPoint;
     private double totalDistance;
 
     /**
@@ -78,7 +79,7 @@ public class Route {
      *
      * @return the starting point of the route
      */
-    public String getStartingPoint() {
+    public JOpenCageLatLng getStartingPoint() {
         return startingPoint;
     }
 
@@ -87,7 +88,7 @@ public class Route {
      *
      * @param startingPoint the starting point to set
      */
-    public void setStartingPoint(String startingPoint) {
+    public void setStartingPoint(JOpenCageLatLng startingPoint) {
         this.startingPoint = startingPoint;
     }
 
@@ -96,7 +97,7 @@ public class Route {
      *
      * @return the ending point of the route
      */
-    public String getEndingPoint() {
+    public JOpenCageLatLng getEndingPoint() {
         return endingPoint;
     }
 
@@ -105,7 +106,7 @@ public class Route {
      *
      * @param endingPoint the ending point to set
      */
-    public void setEndingPoint(String endingPoint) {
+    public void setEndingPoint(JOpenCageLatLng endingPoint) {
         this.endingPoint = endingPoint;
     }
 
@@ -125,5 +126,17 @@ public class Route {
      */
     public void setTotalDistance(double totalDistance) {
         this.totalDistance = totalDistance;
+    }
+
+    @Override
+    public String toString() {
+        return "PlannedRoute{" +
+                "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
+                ", customersAndProspects=" + customersAndProspects +
+                ", startingPoint=" + startingPoint +
+                ", endingPoint=" + endingPoint +
+                ", totalDistance=" + totalDistance +
+                '}';
     }
 }

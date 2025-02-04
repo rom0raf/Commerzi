@@ -1,5 +1,6 @@
 package com.commerzi.commerziapi.model;
 
+import com.commerzi.commerziapi.security.HashPassword;
 import jakarta.persistence.*;
 
 /**
@@ -166,6 +167,7 @@ public class CommerziUser {
      */
     public void setSession(String session) { this.session = session; }
 
+
     /**
      * Creates a clone of the current user.
      *
@@ -195,9 +197,27 @@ public class CommerziUser {
         setFirstName(second.getFirstName());
         setLastName(second.getLastName());
         setEmail(second.getEmail());
-        setPassword(second.getPassword());
         setAddress(second.getAddress());
         setCity(second.getCity());
         setSession(second.getSession());
+
+        if (!second.getPassword().equals(getPassword())) {
+            String hash = HashPassword.hash(second.getPassword());
+            setPassword(hash);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "CommerziUser{" +
+                "userId=" + userId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", address='" + address + '\'' +
+                ", city='" + city + '\'' +
+                ", session='" + session + '\'' +
+                '}';
     }
 }
