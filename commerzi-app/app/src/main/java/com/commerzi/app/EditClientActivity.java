@@ -17,6 +17,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.commerzi.app.communication.Communicator;
+import com.commerzi.app.communication.responses.CommunicatorCallback;
 
 import org.json.JSONObject;
 
@@ -67,53 +69,21 @@ public class EditClientActivity extends AppCompatActivity {
             }
         }
 
-        btnSave.setOnClickListener(v -> updateClient());
+        btnSave.setOnClickListener(v -> updateClient(client));
     }
 
-    private void updateClient() {
-        String url = "http://57.128.220.88:8080/api/customers/" + client.getId();
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String apiKey = Session.getInstance().getApiKey();
+    private void updateClient(Client client) {
+        Communicator communicator = Communicator.getInstance(getApplicationContext());
 
-        JSONObject jsonBody = new JSONObject();
-        try {
-            jsonBody.put("name", etName.getText().toString());
-            jsonBody.put("address", etAddress.getText().toString());
-            jsonBody.put("city", etCity.getText().toString());
-            jsonBody.put("description", etDescription.getText().toString());
-            jsonBody.put("type", radioClient.isChecked() ? "client" : "prospect");
-
-            JSONObject contact = new JSONObject();
-            contact.put("firstName", etFirstName.getText().toString());
-            contact.put("lastName", etLastName.getText().toString());
-            contact.put("phoneNumber", etPhoneNumber.getText().toString());
-
-            jsonBody.put("contact", contact);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.PUT,
-                url,
-                jsonBody,
+        communicator.updateClient(client, new CommunicatorCallback<>(
                 response -> {
-                    Toast.makeText(EditClientActivity.this, "Client mis à jour", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditClientActivity.this, response.message, Toast.LENGTH_SHORT).show();
                     finish();
                 },
                 error -> {
-                    Toast.makeText(EditClientActivity.this, "Erreur lors de la mise à jour", Toast.LENGTH_SHORT).show();
-                }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                headers.put("X-Commerzi-Auth", apiKey);
-                return headers;
-            }
-        };
-
-        queue.add(request);
+                    Toast.makeText(EditClientActivity.this, error.message, Toast.LENGTH_SHORT).show();
+                }
+        ));
     }
 }
 

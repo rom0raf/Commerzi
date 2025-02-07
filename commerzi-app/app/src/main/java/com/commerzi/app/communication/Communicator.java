@@ -5,9 +5,11 @@ import android.content.Context;
 import androidx.annotation.Nullable;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.commerzi.app.Client;
@@ -22,9 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Communicator {
@@ -33,7 +35,6 @@ public class Communicator {
     private RequestQueue queue;
     private CommunicatorProperties properties;
     private String sessionToken;
-
 
     private static Communicator instance;
 
@@ -47,13 +48,12 @@ public class Communicator {
     }
 
     private Communicator(Context context) {
+        this.updateContext(context);
         try {
             this.loadProperties();
         } catch(IOException e) {
             e.printStackTrace();
         }
-
-        this.updateContext(context);
     }
 
     public void updateContext(Context context) {
@@ -82,7 +82,7 @@ public class Communicator {
         return this.getBaseUrl() + this.properties.getString(CommunicatorProperties.CUSTOMER_URL);
     }
 
-    private String buildCustomersById(String id) {
+    private String buildCustomersUrlById(String id) {
         return this.buildCustomersBaseUrl() + id;
     }
 
@@ -102,6 +102,11 @@ public class Communicator {
             }
 
             @Override
+            public Response<String> parseNetworkResponse(NetworkResponse response) {
+                return Response.success(new String(new String(response.data).getBytes(StandardCharsets.UTF_8)), HttpHeaderParser.parseCacheHeaders(response));
+            }
+
+            @Override
             public String getBodyContentType() {
                 if (requestBody != null) {
                     return "application/json; charset=utf-8";
@@ -118,7 +123,7 @@ public class Communicator {
                 }
 
                 if (authenticated) {
-                    headers.put("X-Auth", token);
+                    headers.put("X-Commerzi-Auth", token);
                 }
 
                 return headers;
@@ -172,6 +177,10 @@ public class Communicator {
     }
 
     public void signup(User user, CommunicatorCallback<GenericMessageResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
         try {
             JSONObject requestBody = new JSONObject();
             requestBody.put("email", user.getEmail());
@@ -182,17 +191,15 @@ public class Communicator {
             requestBody.put("city", user.getCity());
 
             this.request(Request.Method.POST, this.buildUserFullUrl(), requestBody, false,
-                response -> {
-                    callback.onSuccess(
-                        new GenericMessageResponse(
-                            context.getString(R.string.account_creation_success)
-                        )
-                    );
-                },
+                response -> callback.onSuccess(
+                    new GenericMessageResponse(
+                        context.getString(R.string.account_creation_success)
+                    )
+                ),
                 error -> {
                     GenericMessageResponse signupResponse;
                     if (error != null && error.networkResponse != null) {
-                        signupResponse = new GenericMessageResponse(new String(error.networkResponse.data).toString());
+                        signupResponse = new GenericMessageResponse(new String(error.networkResponse.data));
                     } else {
                         signupResponse = new GenericMessageResponse(context.getString(R.string.unexpected_error));
                     }
@@ -205,7 +212,11 @@ public class Communicator {
         }
     }
 
-    public void updateClient(Client client, CommunicatorCallback<GenericMessageResponse> callback) {
+    public void createClient(Client client, CommunicatorCallback<GenericMessageResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
         try {
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("name", client.getName());
@@ -221,13 +232,39 @@ public class Communicator {
 
             jsonBody.put("contact", contact);
 
-            this.request(Request.Method.PUT, this.buildCustomersById(client.getId()), jsonBody, true,
-                response -> {
-                    callback.onSuccess(new GenericMessageResponse("Client mis à jour"));
-                },
-                error -> {
-                    callback.onFailure(new GenericMessageResponse("Erreur lors de la mise à jour"));
-                }
+            this.request(Request.Method.POST, this.buildCustomersBaseUrl(), jsonBody, true,
+                response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.client_creation_success))),
+                error -> callback.onFailure(new GenericMessageResponse(context.getString(R.string.unexpected_error)))
+            );
+        } catch(Exception e) {
+            e.printStackTrace();
+            callback.onFailure(new GenericMessageResponse(context.getString(R.string.request_creation_error)));
+        }
+    }
+
+    public void updateClient(Client client, CommunicatorCallback<GenericMessageResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        try {
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("name", client.getName());
+            jsonBody.put("address", client.getAddress());
+            jsonBody.put("city", client.getCity());
+            jsonBody.put("description", client.getDescription());
+            jsonBody.put("type", client.getType());
+
+            JSONObject contact = new JSONObject();
+            contact.put("firstName", client.getContactFirstName());
+            contact.put("lastName", client.getContactLastName());
+            contact.put("phoneNumber", client.getContactPhoneNumber());
+
+            jsonBody.put("contact", contact);
+
+            this.request(Request.Method.PUT, this.buildCustomersUrlById(client.getId()), jsonBody, true,
+                response -> callback.onSuccess(new GenericMessageResponse("Client mis à jour")),
+                error -> callback.onFailure(new GenericMessageResponse("Erreur lors de la mise à jour"))
             );
         } catch(Exception e) {
             e.printStackTrace();
@@ -236,13 +273,18 @@ public class Communicator {
     }
 
     public void getClients(CommunicatorCallback<ClientsResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
         this.request(Request.Method.GET, this.buildCustomersBaseUrl(), null, true,
             response -> {
-                List<Client> clientList = new ArrayList<>();
+                ArrayList<Client> clientList = new ArrayList<>();
                 try {
                     JSONArray jsonResponse = new JSONArray(response);
 
-                    for (int i = 0; i < response.length(); i++) {
+
+                    for (int i = 0; i < jsonResponse.length(); i++) {
                         JSONObject clientJson = jsonResponse.getJSONObject(i);
 
                         String id = clientJson.optString("id", "Inconnu");
@@ -263,23 +305,47 @@ public class Communicator {
 
                     callback.onSuccess(new ClientsResponse(clientList, null));
                 } catch (Exception e) {
+                    e.printStackTrace();
                     callback.onFailure(new ClientsResponse(null, "Erreur de traitement des données"));
                 }
             },
-            error -> {
-                callback.onFailure(new ClientsResponse(null, "Impossible de charger les clients"));
-            }
+            error -> callback.onFailure(new ClientsResponse(null, "Impossible de charger les clients"))
         );
     }
 
     public void deleteClient(Client client, CommunicatorCallback<GenericMessageResponse> callback) {
-        this.request(Request.Method.DELETE, this.buildCustomersById(client.getId()), null, true,
-            response -> {
-                callback.onSuccess(new GenericMessageResponse("Entreprise supprimée"));
-            },
-            error -> {
-                callback.onFailure(new GenericMessageResponse("Erreur lors de la suppression"));
-            }
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        this.request(Request.Method.DELETE, this.buildCustomersUrlById(client.getId()), null, true,
+            response -> callback.onSuccess(new GenericMessageResponse("Entreprise supprimée")),
+            error -> callback.onFailure(new GenericMessageResponse("Erreur lors de la suppression"))
         );
+    }
+
+    public void updateProfile(User user, CommunicatorCallback<GenericMessageResponse> callback){
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+                
+        try {
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("firstName", user.getFirstName());
+            jsonBody.put("lastName", user.getLastName());
+            jsonBody.put("email", user.getEmail());
+            jsonBody.put("address", user.getAddress());
+            jsonBody.put("city", user.getCity());
+            jsonBody.put("password", user.getPassword());
+            jsonBody.put("session", this.sessionToken);
+
+            this.request(Request.Method.PUT, this.buildUserFullUrl(), jsonBody, true,
+                response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.profile_updated))),
+                error -> callback.onFailure(new GenericMessageResponse(context.getString(R.string.error_during_update)))
+            );
+        } catch(Exception e) {
+            e.printStackTrace();
+            callback.onFailure(new GenericMessageResponse(context.getString(R.string.request_creation_error)));
+        }
     }
 }

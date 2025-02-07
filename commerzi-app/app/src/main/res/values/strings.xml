@@ -58,5 +58,7 @@
     <!-- PROFILE -->
     <string name="profile">Profil</string>
     <string name="edit_profile">Modifier mon profil</string>
+    <string name="profile_updated">Profil mis à jour</string>
+    <string name="error_during_update">Erreur lors de la mise à jour</string>
     
 </resources>
