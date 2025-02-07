@@ -17,13 +17,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.commerzi.app.communication.Communicator;
+import com.commerzi.app.communication.responses.CommunicatorCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
-
-    private final String API_URL = "http://57.128.220.88:8080/api/auth/";
     EditText txtEmail;
     EditText txtPassword;
     Button btnValidate;
@@ -56,67 +56,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loginUser(String email, String password) {
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-
-        try {
-            JSONObject requestBody = new JSONObject();
-            requestBody.put("email", email);
-            requestBody.put("password", password);
-
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject jsonResponse = new JSONObject(response);
-                                boolean success = !jsonResponse.getString("userId").isEmpty();
-
-                                if (success) {
-                                    String key = jsonResponse.getString("session");
-                                    String firstname = jsonResponse.getString("firstName");
-                                    String lastname = jsonResponse.getString("lastName");
-                                    String email = jsonResponse.getString("email");
-                                    String address = jsonResponse.getString("address");
-                                    String city = jsonResponse.getString("city");
-                                    String password = jsonResponse.getString("password");
-                                    User user = new User(firstname, lastname, address, city, email, password);
-
-                                    Session.getInstance().setApiKey(key);
-                                    Session.setUser(user);
-                                    Intent intention = new Intent(MainActivity.this, HomeActivity.class);
-                                    startActivity(intention);
-                                } else {
-                                    Toast.makeText(MainActivity.this, R.string.credentials_error, Toast.LENGTH_LONG).show();
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Toast.makeText(MainActivity.this, R.string.response_parsing_error, Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(MainActivity.this, R.string.connection_error, Toast.LENGTH_LONG).show();
-                        }
-                    }) {
-
-                @Override
-                public byte[] getBody() {
-                    return requestBody.toString().getBytes();
+        Communicator communicator = Communicator.getInstance(getApplicationContext());
+        communicator.login(email, password, new CommunicatorCallback<>(
+                response ->  {
+                    Session.setUser(response.user);
+                    Intent intention = new Intent(MainActivity.this, HomeActivity.class);
+                    startActivity(intention);
+                },
+                error -> {
+                    Toast.makeText(MainActivity.this, error.message, Toast.LENGTH_LONG).show();
                 }
-
-                @Override
-                public String getBodyContentType() {
-                    return "application/json; charset=utf-8";
-                }
-            };
-
-            queue.add(stringRequest);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Toast.makeText(this, R.string.request_creation_error, Toast.LENGTH_LONG).show();
-        }
+        ));
     }
 
     public void handleSignupButtonClicked(View view) {

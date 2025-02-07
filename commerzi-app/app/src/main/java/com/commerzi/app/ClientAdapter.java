@@ -18,6 +18,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.commerzi.app.communication.Communicator;
+import com.commerzi.app.communication.responses.CommunicatorCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -102,31 +104,16 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.ClientView
     }
 
     private void deleteClient(Client client, int position) {
-        String url = "http://57.128.220.88:8080/api/customers/" + client.getId();
-
-        RequestQueue queue = Volley.newRequestQueue(context);
-        String apiKey = Session.getInstance().getApiKey();
-
-        StringRequest deleteRequest = new StringRequest(
-                Request.Method.DELETE,
-                url,
+        Communicator communicator = Communicator.getInstance(context);
+        communicator.deleteClient(client, new CommunicatorCallback<>(
                 response -> {
-                    Toast.makeText(context, "Entreprise supprimée", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show();
                     clientList.remove(position);
                     notifyItemRemoved(position);
                 },
                 error -> {
-                    Toast.makeText(context, "Erreur lors de la suppression", Toast.LENGTH_SHORT).show();
-                }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                headers.put("X-Commerzi-Auth", apiKey);
-                return headers;
-            }
-        };
-
-        queue.add(deleteRequest);
+                    Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show();
+                }
+        ));
     }
 }

@@ -15,6 +15,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.commerzi.app.communication.Communicator;
+import com.commerzi.app.communication.responses.CommunicatorCallback;
 
 import org.json.JSONObject;
 
@@ -66,72 +68,26 @@ public class EditProfileActivity extends AppCompatActivity {
             password = Session.getUser().getPassword();
         }
 
-        editLocalProfile(firstname, lastname, email, address, city, password);
-        editRemoteProfile(firstname, lastname, email, address, city, password);
+        User user = new User(firstname, lastname, address, city, email, password);
+
+        editLocalProfile(user);
+        editRemoteProfile(user);
     }
 
-    private void editLocalProfile(String firstname, String lastname, String email, String address, String city, String password) {
-        User user = Session.getUser();
-
-        user.setFirstName(firstname);
-        user.setLastName(lastname);
-        user.setEmail(email);
-        user.setAddress(address);
-        user.setCity(city);
-        user.setPassword(password);
+    private void editLocalProfile(User user) {
+        Session.setUser(user);
     }
 
-    private void editRemoteProfile(String firstname, String lastname, String email, String address, String city, String password) {
-        String url = "http://57.128.220.88:8080/api/user/";
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String apiKey = Session.getInstance().getApiKey();
-
-        JSONObject jsonBody = new JSONObject();
-        try {
-            jsonBody.put("firstName", firstname);
-            jsonBody.put("lastName", lastname);
-            jsonBody.put("email", email);
-            jsonBody.put("address", address);
-            jsonBody.put("city", city);
-            jsonBody.put("password", password);
-            jsonBody.put("session", apiKey);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        StringRequest request = new StringRequest(
-                Request.Method.PUT,
-                url,
+    private void editRemoteProfile(User user) {
+        Communicator communicator = Communicator.getInstance(getApplicationContext());
+        communicator.updateProfile(user, new CommunicatorCallback<>(
                 response -> {
-                    Toast.makeText(EditProfileActivity.this, "Profil mis à jour", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditProfileActivity.this, response.message, Toast.LENGTH_SHORT).show();
                     finish();
                 },
                 error -> {
-                    Toast.makeText(EditProfileActivity.this, "Erreur lors de la mise à jour", Toast.LENGTH_SHORT).show();
-                }) {
-
-            @Override
-            public byte[] getBody() {
-                return jsonBody.toString().getBytes();
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                headers.put("X-Commerzi-Auth", apiKey);
-                return headers;
-            }
-        };
-
-        queue.add(request);
-
+                    Toast.makeText(EditProfileActivity.this, error.message, Toast.LENGTH_SHORT).show();
+                }
+        ));
     }
-
 }

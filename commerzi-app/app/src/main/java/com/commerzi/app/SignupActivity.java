@@ -15,6 +15,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.commerzi.app.communication.Communicator;
+import com.commerzi.app.communication.responses.CommunicatorCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,57 +74,22 @@ public class SignupActivity extends AppCompatActivity {
             return;
         }
 
-        signupUser(email, password, firstname, lastname, address, city);
+        User user = new User(firstname, lastname, address, city, email, password);
+        signupUser(user);
     }
 
-    private void signupUser(String email, String password, String firstname, String lastname, String address, String city) {
-        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-
-        try {
-            JSONObject requestBody = new JSONObject();
-            requestBody.put("email", email);
-            requestBody.put("password", password);
-            requestBody.put("firstName", firstname);
-            requestBody.put("lastName", lastname);
-            requestBody.put("address", address);
-            requestBody.put("city", city);
-
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, API_URL,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            Toast.makeText(SignupActivity.this, R.string.account_creation_success, Toast.LENGTH_LONG).show();
-                            Intent intention = new Intent(SignupActivity.this, MainActivity.class);
-                            startActivity(intention);
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            if (error != null && error.networkResponse != null) {
-                                String response = new String(error.networkResponse.data);
-                                Toast.makeText(SignupActivity.this, response.toString(), Toast.LENGTH_LONG).show();
-                            } else {
-                                Toast.makeText(SignupActivity.this, R.string.unexpected_error, Toast.LENGTH_LONG).show();                            }
-                        }
-                    }) {
-
-                @Override
-                public byte[] getBody() {
-                    return requestBody.toString().getBytes();
+    private void signupUser(User user) {
+        Communicator communicator = Communicator.getInstance(getApplicationContext());
+        communicator.signup(user, new CommunicatorCallback<>(
+                response -> {
+                    Toast.makeText(SignupActivity.this, response.message, Toast.LENGTH_LONG).show();
+                    Intent intention = new Intent(SignupActivity.this, MainActivity.class);
+                    startActivity(intention);
+                },
+                error -> {
+                    Toast.makeText(SignupActivity.this, error.message, Toast.LENGTH_LONG).show();
                 }
-
-                @Override
-                public String getBodyContentType() {
-                    return "application/json; charset=utf-8";
-                }
-            };
-
-            queue.add(stringRequest);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Toast.makeText(this, R.string.request_creation_error, Toast.LENGTH_LONG).show();
-        }
+        ));
     }
 
     public void onLoginButtonClicked(View view) {
