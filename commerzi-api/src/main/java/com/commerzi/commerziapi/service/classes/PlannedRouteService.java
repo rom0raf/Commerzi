@@ -31,7 +31,7 @@ public class PlannedRouteService implements IPlannedRouteService {
 
         MapsUtils.buildFullRoute(
                 route,
-                ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED)
+                ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
         );
 
         plannedRouteRepository.save(route);

@@ -101,15 +101,41 @@ public class TravelerAlgorithmBenchmark {
     }
 
     /**
-     * Benchmark for the BruteForce class.
+     * Benchmark for the BruteForceThreaded class.
      * This method measures the time it takes to sort the point and returns the optimized list.
      *
      * @param state the current benchmark state to count some other data
      * @return the optimized list of points sorted using the brute force method
      */
     @Benchmark
+    public List<JOpenCageLatLng> benchmarkBruteForceThreaded(BenchmarkState state) {
+        state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_THREADED).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
+        return state.sortedPoints;
+    }
+
+     /**
+      * Benchmark for the BruteForce class.
+      * This method measures the time it takes to sort the point and returns the optimized list.
+      *
+      * @param state the current benchmark state to count some other data
+      * @return the optimized list of points sorted using the brute force method
+      */
+    @Benchmark
     public List<JOpenCageLatLng> benchmarkBruteForce(BenchmarkState state) {
         state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
+        return state.sortedPoints;
+    }
+
+    /**
+      * Benchmark for the BruteForceOptimizedThreaded class.
+      * This method measures the time it takes to sort the point and returns the optimized list.
+      *
+      * @param state the current benchmark state to count some other data
+      * @return the optimized list of points sorted using the brute force method
+      */
+    @Benchmark
+    public List<JOpenCageLatLng> benchmarkBruteForceOptimizedThreaded(BenchmarkState state) {
+        state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
 
@@ -136,9 +162,9 @@ public class TravelerAlgorithmBenchmark {
         Options options = new OptionsBuilder()
                 .include(TravelerAlgorithmBenchmark.class.getSimpleName())
                 .forks(1)
-                .warmupIterations(3)
+                .warmupIterations(2)
                 .warmupTime(TimeValue.seconds(3))
-                .measurementIterations(3)
+                .measurementIterations(2)
                 .measurementTime(TimeValue.seconds(3))
                 .resultFormat(ResultFormatType.JSON)
                 .result(benchmarkFileOutput())

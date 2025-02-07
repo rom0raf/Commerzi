@@ -54,6 +54,10 @@ public abstract class ATravelerAlgorithm {
                 return new BruteForceOptimized(fullDistanceFunc, distanceFunc);
             case NEAREST_NEIGHBOR_HEURISTIC:
                 return new NearestNeighborHeuristic(fullDistanceFunc, distanceFunc);
+            case BRUTE_FORCE_THREADED:
+                return new BruteForceThreaded(fullDistanceFunc, distanceFunc);
+            case BRUTE_FORCE_OPTIMIZED_THREADED:
+                return new BruteForceOptimizedThreaded(fullDistanceFunc, distanceFunc);
             default:
                 throw new IllegalArgumentException("Unsupported algorithm type: " + type);
         }

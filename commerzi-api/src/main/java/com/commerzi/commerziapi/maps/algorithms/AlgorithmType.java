@@ -12,12 +12,22 @@ public enum AlgorithmType {
     BRUTE_FORCE,
 
     /**
+     * {@link BruteForceThreaded}
+     */
+    BRUTE_FORCE_THREADED,
+
+    /**
      * {@link BruteForceOptimized}
      */
     BRUTE_FORCE_OPTIMIZED,
 
     /**
+     * {@link BruteForceOptimizedThreaded}
+     */
+    BRUTE_FORCE_OPTIMIZED_THREADED,
+
+    /**
      * {@link NearestNeighborHeuristic}
      */
-    NEAREST_NEIGHBOR_HEURISTIC
+    NEAREST_NEIGHBOR_HEURISTIC;
 }
