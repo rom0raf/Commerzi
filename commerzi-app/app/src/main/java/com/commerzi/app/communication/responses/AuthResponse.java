@@ -1,6 +1,6 @@
 package com.commerzi.app.communication.responses;
 
-import com.commerzi.app.User;
+import com.commerzi.app.auth.User;
 
 public class AuthResponse {
     public final String message;

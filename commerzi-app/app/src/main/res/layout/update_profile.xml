@@ -11,14 +11,14 @@
         android:orientation="vertical"
         android:gravity="center"
         android:padding="16dp"
-        tools:context=".MainActivity">
+        tools:context=".auth.LoginActivity">
 
         <!-- Title -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/edit_user"
+            android:text="@string/edit_profile"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginBottom="32dp"
@@ -26,7 +26,7 @@
 
         <!-- Last name input -->
         <EditText
-            android:id="@+id/lastnameUpdateField"
+            android:id="@+id/lastnameEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/lastname"
@@ -37,7 +37,7 @@
 
         <!-- First name input -->
         <EditText
-            android:id="@+id/firstnameUpdateField"
+            android:id="@+id/firstnameEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/firstname"
@@ -48,7 +48,7 @@
 
         <!-- Email Input -->
         <EditText
-            android:id="@+id/emailUpdateField"
+            android:id="@+id/emailEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/email"
@@ -59,7 +59,7 @@
 
         <!-- Address Input -->
         <EditText
-            android:id="@+id/addressUpdateField"
+            android:id="@+id/addressEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/address"
@@ -70,7 +70,7 @@
 
         <!-- City Input -->
         <EditText
-            android:id="@+id/cityUpdateField"
+            android:id="@+id/cityEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/city"
@@ -81,7 +81,7 @@
 
         <!-- Password Input -->
         <EditText
-            android:id="@+id/passwordUpdateField"
+            android:id="@+id/passwordEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/password"
@@ -92,7 +92,7 @@
 
         <!-- Password Confirmation Input -->
         <EditText
-            android:id="@+id/confirmationUpdateField"
+            android:id="@+id/confirmationEditField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/confirmation"
@@ -103,7 +103,7 @@
 
         <!-- Validate Button -->
         <Button
-            android:id="@+id/btnValidateUpdate"
+            android:id="@+id/btnValidateEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/grey"

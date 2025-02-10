@@ -7,14 +7,14 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
-    tools:context=".MainActivity">
+    tools:context=".auth.LoginActivity">
 
     <!-- Title -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/connection"
+        android:text="@string/login_label"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_marginBottom="32dp"

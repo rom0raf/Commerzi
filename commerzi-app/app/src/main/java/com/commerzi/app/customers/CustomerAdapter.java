@@ -1,4 +1,4 @@
-package com.commerzi.app;
+package com.commerzi.app.customers;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,56 +14,51 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.ClientViewHolder> {
+public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.CustomerViewHolder> {
 
-    private ArrayList<Client> clientList;
+    private ArrayList<Customer> customerList;
     private Context context;
 
-    public ClientAdapter(ArrayList<Client> clientList, Context context) {
-        this.clientList = clientList;
+    public CustomerAdapter(ArrayList<Customer> customerList, Context context) {
+        this.customerList = customerList;
         this.context = context;
     }
 
     @NonNull
     @Override
-    public ClientViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_client, parent, false);
-        return new ClientViewHolder(view);
+    public CustomerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_customer, parent, false);
+        return new CustomerViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ClientViewHolder holder, int position) {
-        Client client = clientList.get(position);
+    public void onBindViewHolder(@NonNull CustomerViewHolder holder, int position) {
+        Customer customer = customerList.get(position);
 
-        holder.tvClientName.setText(client.getName());
-        holder.tvAddress.setText("Adresse : " + client.getAddress());
-        holder.tvCity.setText("Ville : " + client.getCity());
-        holder.tvDescription.setText("Description : " + client.getDescription());
-        holder.tvContact.setText("Contact : " + client.getContactInfo());
+        holder.tvCustomerName.setText(customer.getName());
+        holder.tvAddress.setText("Adresse : " + customer.getAddress());
+        holder.tvCity.setText("Ville : " + customer.getCity());
+        holder.tvDescription.setText("Description : " + customer.getDescription());
+        holder.tvContact.setText("Contact : " + customer.getContactInfo());
 
         // Logique d'affichage/dépliage
         holder.itemView.setOnClickListener(v -> {
             if (holder.detailsContainer.getVisibility() == View.GONE) {
                 holder.detailsContainer.setVisibility(View.VISIBLE);
-                holder.tvClientName.setCompoundDrawablesWithIntrinsicBounds(
+                holder.tvCustomerName.setCompoundDrawablesWithIntrinsicBounds(
                         ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_dropdown),
                         null,
                         null ,
                         null);
             } else {
                 holder.detailsContainer.setVisibility(View.GONE);
-                holder.tvClientName.setCompoundDrawablesWithIntrinsicBounds(
+                holder.tvCustomerName.setCompoundDrawablesWithIntrinsicBounds(
                         ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_dropdown_closed),
                         null,
                         null ,
@@ -71,28 +66,28 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.ClientView
             }
         });
 
-        holder.btnDelete.setOnClickListener(v -> deleteClient(client, position));
+        holder.btnDelete.setOnClickListener(v -> deleteCustomer(customer, position));
         holder.btnEdit.setOnClickListener(v -> {
-            Intent intent = new Intent(context, EditClientActivity.class);
-            intent.putExtra("client", client);
+            Intent intent = new Intent(context, UpdateCustomerActivity.class);
+            intent.putExtra("customer", customer);
             context.startActivity(intent);
         });
     }
 
     @Override
     public int getItemCount() {
-        return clientList.size();
+        return customerList.size();
     }
 
-    static class ClientViewHolder extends RecyclerView.ViewHolder {
-        TextView tvClientName, tvAddress, tvCity, tvDescription, tvContact;
+    static class CustomerViewHolder extends RecyclerView.ViewHolder {
+        TextView tvCustomerName, tvAddress, tvCity, tvDescription, tvContact;
         LinearLayout detailsContainer;
         Button btnDelete;
         Button btnEdit;
 
-        public ClientViewHolder(@NonNull View itemView) {
+        public CustomerViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvClientName = itemView.findViewById(R.id.tvCompanyName);
+            tvCustomerName = itemView.findViewById(R.id.tvCompanyName);
             tvAddress = itemView.findViewById(R.id.tvAddress);
             tvCity = itemView.findViewById(R.id.tvCity);
             tvDescription = itemView.findViewById(R.id.tvDescription);
@@ -103,12 +98,12 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.ClientView
         }
     }
 
-    private void deleteClient(Client client, int position) {
+    private void deleteCustomer(Customer customer, int position) {
         Communicator communicator = Communicator.getInstance(context);
-        communicator.deleteClient(client, new CommunicatorCallback<>(
+        communicator.deleteCustomer(customer, new CommunicatorCallback<>(
                 response -> {
                     Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show();
-                    clientList.remove(position);
+                    customerList.remove(position);
                     notifyItemRemoved(position);
                 },
                 error -> {

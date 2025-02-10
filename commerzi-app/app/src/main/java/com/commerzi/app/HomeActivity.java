@@ -31,11 +31,11 @@ public class HomeActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     icon.setImageResource(R.drawable.ic_route);
-                    title.setText(getString(R.string.route_tab));
+                    title.setText(getString(R.string.routes));
                     break;
                 case 1:
                     icon.setImageResource(R.drawable.ic_company);
-                    title.setText(getString(R.string.client_tab));
+                    title.setText(getString(R.string.customers));
                     break;
                 case 2:
                     icon.setImageResource(R.drawable.ic_avatar);

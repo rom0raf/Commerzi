@@ -1,4 +1,4 @@
-package com.commerzi.app;
+package com.commerzi.app.auth;
 
 import org.json.JSONException;
 import org.json.JSONObject;

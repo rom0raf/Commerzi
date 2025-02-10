@@ -7,7 +7,7 @@
     android:padding="8dp"
     android:background="?attr/selectableItemBackground">
 
-    <!-- Nom de l'entreprise (toujours visible) -->
+    <!-- Nom de l'entreprise -->
     <TextView
         android:id="@+id/tvCompanyName"
         android:layout_width="match_parent"

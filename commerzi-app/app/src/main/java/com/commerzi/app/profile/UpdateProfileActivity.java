@@ -1,7 +1,6 @@
-package com.commerzi.app;
+package com.commerzi.app.profile;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -9,21 +8,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.commerzi.app.R;
+import com.commerzi.app.auth.Session;
+import com.commerzi.app.auth.User;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
-
-public class EditProfileActivity extends AppCompatActivity {
+public class UpdateProfileActivity extends AppCompatActivity {
 
     EditText etFirstName;
     EditText etLastName;
@@ -32,12 +23,12 @@ public class EditProfileActivity extends AppCompatActivity {
     EditText etCity;
     EditText etPassword;
     EditText etPasswordConfirmation;
-    Button btnEditProfile;
+    Button btnUpdateProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_profile);
+        setContentView(R.layout.update_profile);
 
         etFirstName = findViewById(R.id.lastnameEditField);
         etLastName = findViewById(R.id.firstnameEditField);
@@ -46,9 +37,9 @@ public class EditProfileActivity extends AppCompatActivity {
         etCity = findViewById(R.id.cityEditField);
         etPassword = findViewById(R.id.passwordEditField);
         etPasswordConfirmation = findViewById(R.id.confirmationEditField);
-        btnEditProfile = findViewById(R.id.btnValidateEdit);
+        btnUpdateProfile = findViewById(R.id.btnValidateEdit);
 
-        btnEditProfile.setOnClickListener(this::onValidateButtonClicked);
+        btnUpdateProfile.setOnClickListener(this::onValidateButtonClicked);
 
         etFirstName.setText(Session.getUser().getFirstName());
         etLastName.setText(Session.getUser().getLastName());
@@ -70,23 +61,23 @@ public class EditProfileActivity extends AppCompatActivity {
 
         User user = new User(firstname, lastname, address, city, email, password);
 
-        editLocalProfile(user);
-        editRemoteProfile(user);
+        updateLocalProfile(user);
+        updateRemoteProfile(user);
     }
 
-    private void editLocalProfile(User user) {
+    private void updateLocalProfile(User user) {
         Session.setUser(user);
     }
 
-    private void editRemoteProfile(User user) {
+    private void updateRemoteProfile(User user) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
         communicator.updateProfile(user, new CommunicatorCallback<>(
                 response -> {
-                    Toast.makeText(EditProfileActivity.this, response.message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UpdateProfileActivity.this, response.message, Toast.LENGTH_SHORT).show();
                     finish();
                 },
                 error -> {
-                    Toast.makeText(EditProfileActivity.this, error.message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UpdateProfileActivity.this, error.message, Toast.LENGTH_SHORT).show();
                 }
         ));
     }

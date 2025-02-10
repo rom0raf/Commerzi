@@ -1,4 +1,4 @@
-package com.commerzi.app;
+package com.commerzi.app.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,17 +9,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -65,12 +57,12 @@ public class SignupActivity extends AppCompatActivity {
         if (email.isEmpty() || password.isEmpty()
                 || firstname.isEmpty() || lastname.isEmpty()
                 || address.isEmpty() || pwdConfirmation.isEmpty()) {
-            Toast.makeText(this, R.string.error_empty_field, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.empty_field_error, Toast.LENGTH_LONG).show();
             return;
         }
 
         if (!password.equals(pwdConfirmation))  {
-            Toast.makeText(this, R.string.error_invalid_password, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.password_error, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -83,7 +75,7 @@ public class SignupActivity extends AppCompatActivity {
         communicator.signup(user, new CommunicatorCallback<>(
                 response -> {
                     Toast.makeText(SignupActivity.this, response.message, Toast.LENGTH_LONG).show();
-                    Intent intention = new Intent(SignupActivity.this, MainActivity.class);
+                    Intent intention = new Intent(SignupActivity.this, LoginActivity.class);
                     startActivity(intention);
                 },
                 error -> {
@@ -93,7 +85,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void onLoginButtonClicked(View view) {
-        Intent intention = new Intent(SignupActivity.this, MainActivity.class);
+        Intent intention = new Intent(SignupActivity.this, LoginActivity.class);
         startActivity(intention);
     }
 }
