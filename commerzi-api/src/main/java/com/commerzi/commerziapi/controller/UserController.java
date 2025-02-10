@@ -1,10 +1,12 @@
 package com.commerzi.commerziapi.controller;
 
+import com.commerzi.commerziapi.exception.UserArgumentException;
 import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
+import com.commerzi.commerziapi.security.HashPassword;
 import com.commerzi.commerziapi.security.Security;
-import com.commerzi.commerziapi.service.IAuthentificationService;
-import com.commerzi.commerziapi.service.IUserService;
+import com.commerzi.commerziapi.service.interfaces.IAuthentificationService;
+import com.commerzi.commerziapi.service.interfaces.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,10 +51,21 @@ public class UserController {
     public ResponseEntity edit(@RequestBody CommerziUser modifiedUser) {
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
 
-        user.merge(modifiedUser);
-        userService.updateUser(user);
+        if (user == null) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
 
-        return ResponseEntity.ok().build();
+        user.merge(modifiedUser);
+
+        try {
+            userService.updateUser(user);
+        } catch (UserArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        return ResponseEntity.ok(
+                "User updated successfully"
+        );
     }
 
     /**

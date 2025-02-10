@@ -8,23 +8,23 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 /**
- * Classe utilitaire de sécurité pour Commerzi
+ * Security utility class for Commerzi.
  */
 public class Security {
 
-    /** Générateur aléatoire sécurisé */
+    /** Secure random number generator */
     private static final SecureRandom secureRandom = new SecureRandom();
 
-    /** Taille d'un token de session */
+    /** Length of a session token */
     private static final int SESSION_LENGTH = 64;
 
-    /** Nom du header HTTP utilisé pour l'authentification */
+    /** Name of the HTTP header used for authentication */
     public final static String AUTHENTIFICATION_HEADER_NAME = "X-Commerzi-Auth";
 
     /**
-     * Genère un token de session aléatoire
-     * de la taille {@code SESSION_LENGTH}
-     * @return le token de session
+     * Generates a random session token of length {@code SESSION_LENGTH}.
+     *
+     * @return the session token
      */
     public static String generateRandomSession() {
         byte[] randomBytes = new byte[SESSION_LENGTH];
@@ -33,9 +33,10 @@ public class Security {
     }
 
     /**
-     * Renvoie la session commerzi envoyée par le client
-     * Cette session est présente dans les header de la requete
-     * @return la session commerzi si présente sinon null
+     * Returns the Commerzi session sent by the client.
+     * This session is present in the request headers.
+     *
+     * @return the Commerzi session if present, otherwise null
      */
     public static String getSessionFromSpring() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();

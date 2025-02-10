@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse des résultats de Benchmark</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fb;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin: 40px 0;
+            font-size: 2.5em;
+            font-weight: 600;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+
+        .chart-container {
+            width: 45%;
+            margin: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        #info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        #jsonFile {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            font-size: 1em;
+        }
+
+        .chart-container canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .chart-container {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        #combinedChart {
+            width: 90%;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                width: 100%;
+            }
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Analyse des résultats de Benchmark</h1>
+
+    <input type="file" id="jsonFile" accept=".json" onchange="loadFile(event)" style="padding: 10px;">
+
+    <div id="info"></div>
+
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="scoreChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="distanceChart"></canvas>
+        </div>
+        <div class="chart-container" style="width: 90%;">
+            <canvas id="combinedChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let benchmarkData = [];
+
+        function loadFile(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    benchmarkData = JSON.parse(e.target.result);
+                } catch (error) {
+                    alert('Fichier JSON invalide');
+                }
+                analyzeData();
+            };
+            reader.readAsText(file);
+        }
+
+        function analyzeData() {
+            if (benchmarkData.length === 0) {
+                alert('Aucune donnée à analyser');
+                return;
+            }
+
+            const benchmarks = {};
+
+            benchmarkData.forEach(item => {
+                const benchmarkName = item.benchmark.split(".")[item.benchmark.split(".").length - 1].replace("benchmark", "");
+                const datasetIndex = parseInt(item.params.datasetIndex);
+                const score = item.primaryMetric.score;
+                const totalDistance = item.secondaryMetrics.totalDistance.score;
+
+                if (!benchmarks[benchmarkName]) {
+                    benchmarks[benchmarkName] = {
+                        scores: [[], [], [], [], []],
+                        distances: [[], [], [], [], []]
+                    };
+                }
+
+                benchmarks[benchmarkName].scores[datasetIndex].push(score);
+                benchmarks[benchmarkName].distances[datasetIndex].push(totalDistance);
+            });
+
+            const benchmarkNames = Object.keys(benchmarks);
+            document.getElementById("info").innerText = `Résultats de benchmarking pour : ${benchmarkNames.join(', ')}`;
+
+            createChart('scoreChart', 'Score (ns/op)', benchmarks, benchmarkNames, 'Score');
+            createChart('distanceChart', 'Distance totale (km)', benchmarks, benchmarkNames, 'Total Distance');
+            createCombinedChart(benchmarks, benchmarkNames);
+        }
+
+        function createChart(chartId, label, benchmarks, benchmarkNames, metricType) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Dataset 0', 'Dataset 1', 'Dataset 2', 'Dataset 3', 'Dataset 4'],
+                    datasets: benchmarkNames.map(benchmark => ({
+                        label: `${metricType} - ${benchmark}`,
+                        data: benchmarks[benchmark][metricType === 'Score' ? 'scores' : 'distances'].map(dataset => Math.min(...dataset)),
+                        borderColor: getRandomColor(),
+                        fill: false,
+                        tension: 0.1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${metricType} sur les jeux de données`
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    const datasetIndex = tooltipItem.dataIndex;
+                                    const benchmarkName = tooltipItem.dataset.label.split(' - ')[1];
+                                    const value = tooltipItem.raw;
+                                    let formattedValue;
+
+                                    if (metricType === 'Score') {
+                                        formattedValue = formatTime(value);
+                                    } else {
+                                        formattedValue = formatDistance(value);
+                                    }
+
+                                    return `${benchmarkName} - Dataset ${datasetIndex}: ${metricType}: ${formattedValue}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCombinedChart(benchmarks, benchmarkNames) {
+            const ctx = document.getElementById('combinedChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Dataset 0', 'Dataset 1', 'Dataset 2', 'Dataset 3', 'Dataset 4'],
+                    datasets: benchmarkNames.map(benchmark => ({
+                        label: `Score (ns/op) - ${benchmark}`,
+                        data: benchmarks[benchmark].scores.map(dataset => Math.min(...dataset)),
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    })).concat(benchmarkNames.map(benchmark => ({
+                        label: `Distance totale (km) - ${benchmark}`,
+                        data: benchmarks[benchmark].distances.map(dataset => Math.min(...dataset)),
+                        backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    })))
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Résultats combinés du benchmark (Score et Distance totale)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            type: 'logarithmic'
+                        }
+                    }
+                }
+            });
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function formatTime(ns) {
+            if (ns >= 1e9) {
+                return (ns / 1e9).toFixed(2) + ' s';
+            } else if (ns >= 1e6) {
+                return (ns / 1e6).toFixed(2) + ' ms';
+            } else if (ns >= 1e3) {
+                return (ns / 1e3).toFixed(2) + ' µs';
+            } else {
+                return ns.toFixed(2) + ' ns';
+            }
+        }
+
+        function formatDistance(distance) {
+            return distance.toFixed(2) + ' km';
+        }
+    </script>
+</body>
+</html>
