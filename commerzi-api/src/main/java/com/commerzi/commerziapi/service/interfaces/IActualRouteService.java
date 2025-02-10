@@ -10,4 +10,6 @@ public interface IActualRouteService {
     ActualRoute getActualRouteById(String plannedRouteId);
 
     ActualRoute createActualRouteFromPlannedRoute(PlannedRoute plannedRoute);
+
+    ActualRoute skipVisit(int visit, ActualRoute route);
 }

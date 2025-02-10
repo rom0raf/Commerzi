@@ -90,4 +90,15 @@ public class ActualRouteController {
         return ResponseEntity.ok(actualRoute);
     }
 
+    @CommerziAuthenticated
+    @PostMapping("/skip?visit={visit}")
+    public ResponseEntity skipVisit(@PathVariable int visit, @RequestBody ActualRoute actualRoute) {
+        if (actualRoute == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        actualRoute = actualRouteService.skipVisit(visit, actualRoute);
+
+        return ResponseEntity.ok(actualRoute);
+    }
 }

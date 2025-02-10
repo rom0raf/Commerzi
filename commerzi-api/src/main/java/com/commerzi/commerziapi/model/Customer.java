@@ -196,7 +196,6 @@ public class Customer {
         setGpsCoordinates(second.getGpsCoordinates());
         setContact(second.getContact());
         setType(second.getType());
-        setUserId(second.getUserId());
     }
 
     @Override
