@@ -118,7 +118,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/grey"
-            android:text="@string/connection"
+            android:text="@string/login"
             android:textColor="@android:color/white" />
 
     </LinearLayout>
