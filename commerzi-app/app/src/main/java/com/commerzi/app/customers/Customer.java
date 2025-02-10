@@ -1,8 +1,8 @@
-package com.commerzi.app;
+package com.commerzi.app.customers;
 
 import java.io.Serializable;
 
-public class Client implements Serializable {
+public class Customer implements Serializable {
 
     private String id;
     private String name;
@@ -14,7 +14,7 @@ public class Client implements Serializable {
     private String contactLastName;
     private String contactPhoneNumber;
 
-    public Client(String id,String name, String address, String city, String description, String type, String contactFirstName, String contactLastName, String contactPhoneNumber) {
+    public Customer(String id, String name, String address, String city, String description, String type, String contactFirstName, String contactLastName, String contactPhoneNumber) {
         this.id = id;
         this.name = name;
         this.address = address;

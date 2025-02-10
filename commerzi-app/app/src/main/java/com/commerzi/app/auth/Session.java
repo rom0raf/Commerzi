@@ -1,4 +1,4 @@
-package com.commerzi.app;
+package com.commerzi.app.auth;
 
 public class Session {
 

@@ -11,66 +11,45 @@
         android:orientation="vertical"
         android:gravity="center"
         android:padding="16dp"
-        tools:context=".MainActivity">
+        tools:context=".auth.LoginActivity">
 
         <!-- Title -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/edit_profile"
+            android:text="@string/add_customer"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginBottom="32dp"
             android:gravity="center"/>
 
-        <!-- Last name input -->
+
+        <!-- Company input -->
         <EditText
-            android:id="@+id/lastnameEditField"
+            android:id="@+id/nameField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/lastname"
-            android:inputType="textPersonName"
-            android:drawableStart="@drawable/ic_avatar"
+            android:hint="@string/customer"
+            android:inputType="text"
+            android:drawableStart="@drawable/ic_company"
             android:paddingStart="12dp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- First name input -->
+        <!-- Address input -->
         <EditText
-            android:id="@+id/firstnameEditField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/firstname"
-            android:inputType="textPersonName"
-            android:drawableStart="@drawable/ic_avatar"
-            android:paddingStart="12dp"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Email Input -->
-        <EditText
-            android:id="@+id/emailEditField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/email"
-            android:inputType="textEmailAddress"
-            android:drawableStart="@drawable/ic_email"
-            android:paddingStart="12dp"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Address Input -->
-        <EditText
-            android:id="@+id/addressEditField"
+            android:id="@+id/addressField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/address"
             android:inputType="text"
-            android:drawableStart="@drawable/ic_home"
+            android:drawableStart="@drawable/ic_address"
             android:paddingStart="12dp"
             android:layout_marginBottom="16dp"/>
 
         <!-- City Input -->
         <EditText
-            android:id="@+id/cityEditField"
+            android:id="@+id/cityField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/city"
@@ -79,31 +58,77 @@
             android:paddingStart="12dp"
             android:layout_marginBottom="16dp"/>
 
-        <!-- Password Input -->
+        <!-- Description Input -->
         <EditText
-            android:id="@+id/passwordEditField"
+            android:id="@+id/descriptionField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/password"
-            android:inputType="textPassword"
-            android:drawableStart="@drawable/ic_password"
-            android:paddingStart="12dp"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Password Confirmation Input -->
-        <EditText
-            android:id="@+id/confirmationEditField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/confirmation"
-            android:inputType="textPassword"
-            android:drawableStart="@drawable/ic_password"
+            android:hint="@string/description"
+            android:inputType="textLongMessage"
+            android:drawableStart="@drawable/ic_description"
             android:paddingStart="12dp"
             android:layout_marginBottom="32dp"/>
 
+        <!-- Radio Group -->
+        <RadioGroup
+            android:id="@+id/radioGroupCustomerType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp">
+
+            <!-- Customer RadioButton -->
+            <RadioButton
+                android:id="@+id/radioCustomer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/customer"/>
+
+            <!-- Prospect RadioButton -->
+            <RadioButton
+                android:id="@+id/radioProspect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prospect"/>
+
+        </RadioGroup>
+
+        <!-- Phone Number Input -->
+        <EditText
+            android:id="@+id/phoneNumberField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/telephone"
+            android:inputType="phone"
+            android:drawableStart="@drawable/ic_phone"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Firstname Input -->
+        <EditText
+            android:id="@+id/firstnameField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/firstname"
+            android:inputType="text"
+            android:drawableStart="@drawable/ic_avatar"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Lastname Input -->
+        <EditText
+            android:id="@+id/lastnameField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/lastname"
+            android:inputType="text"
+            android:drawableStart="@drawable/ic_avatar"
+            android:paddingStart="12dp"
+            android:layout_marginBottom="16dp"/>
+
+
         <!-- Validate Button -->
         <Button
-            android:id="@+id/btnValidateEdit"
+            android:id="@+id/btnCreateNewCustomer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/grey"

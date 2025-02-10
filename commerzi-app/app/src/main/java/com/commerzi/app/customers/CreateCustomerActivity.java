@@ -1,4 +1,4 @@
-package com.commerzi.app;
+package com.commerzi.app.customers;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,24 +11,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.commerzi.app.HomeActivity;
+import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
-
-public class AddClientActivity extends AppCompatActivity {
-
-    private final String API_URL = "http://57.128.220.88:8080/api/customers/";
+public class CreateCustomerActivity extends AppCompatActivity {
     EditText txtName;
     EditText txtAddress;
     EditText txtCity;
@@ -36,13 +24,13 @@ public class AddClientActivity extends AppCompatActivity {
     EditText txtPhoneNumber;
     EditText txtFirstname;
     EditText txtLastname;
-    RadioGroup radioGroupClientType; // Ajout du RadioGroup
+    RadioGroup radioGroupCustomerType; // Ajout du RadioGroup
     Button btnCreateNewClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_client);
+        setContentView(R.layout.create_customer);
 
         txtName = findViewById(R.id.nameField);
         txtAddress = findViewById(R.id.addressField);
@@ -51,8 +39,8 @@ public class AddClientActivity extends AppCompatActivity {
         txtPhoneNumber = findViewById(R.id.phoneNumberField);
         txtFirstname = findViewById(R.id.firstnameField);
         txtLastname = findViewById(R.id.lastnameField);
-        radioGroupClientType = findViewById(R.id.radioGroupClientType); // Initialisation du RadioGroup
-        btnCreateNewClient = findViewById(R.id.btnCreateNewClient);
+        radioGroupCustomerType = findViewById(R.id.radioGroupCustomerType); // Initialisation du RadioGroup
+        btnCreateNewClient = findViewById(R.id.btnCreateNewCustomer);
 
         btnCreateNewClient.setOnClickListener(this::handleCreateClientButtonClicked);
     }
@@ -67,7 +55,7 @@ public class AddClientActivity extends AppCompatActivity {
         String lastname = txtLastname.getText().toString();
 
         // Vérification de sélection d'un RadioButton
-        int selectedRadioId = radioGroupClientType.getCheckedRadioButtonId();
+        int selectedRadioId = radioGroupCustomerType.getCheckedRadioButtonId();
         if (selectedRadioId == -1) {
             Toast.makeText(this, R.string.error_select_type, Toast.LENGTH_LONG).show();
             return;
@@ -84,20 +72,20 @@ public class AddClientActivity extends AppCompatActivity {
             return;
         }
         
-        Client client = new Client(null, name, address, city, description, clientType, firstname, lastname, phoneNumber);
-        createClient(client);
+        Customer customer = new Customer(null, name, address, city, description, clientType, firstname, lastname, phoneNumber);
+        createClient(customer);
     }
 
-    private void createClient(Client client) {
+    private void createClient(Customer customer) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
-        communicator.createClient(client, new CommunicatorCallback<>(
+        communicator.createCustomer(customer, new CommunicatorCallback<>(
                 response -> {
-                    Toast.makeText(AddClientActivity.this, response.message, Toast.LENGTH_LONG).show();
-                    Intent intention = new Intent(AddClientActivity.this, HomeActivity.class);
+                    Toast.makeText(CreateCustomerActivity.this, response.message, Toast.LENGTH_LONG).show();
+                    Intent intention = new Intent(CreateCustomerActivity.this, HomeActivity.class);
                     startActivity(intention);
                 },
                 error -> {
-                    Toast.makeText(AddClientActivity.this, error.message, Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreateCustomerActivity.this, error.message, Toast.LENGTH_LONG).show();
                 }
         ));
     }

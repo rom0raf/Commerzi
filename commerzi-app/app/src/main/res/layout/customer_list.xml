@@ -11,10 +11,10 @@
         android:padding="16dp">
 
         <Button
-            android:id="@+id/btnAddClient"
+            android:id="@+id/btnGoToCreateCustomer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ajouter un client"
+            android:text="@string/add_customer"
             android:backgroundTint="@color/grey"
             android:textColor="@android:color/white"
             android:layout_marginBottom="16dp" />

@@ -12,11 +12,11 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.commerzi.app.Client;
+import com.commerzi.app.customers.Customer;
 import com.commerzi.app.R;
-import com.commerzi.app.User;
+import com.commerzi.app.auth.User;
 import com.commerzi.app.communication.responses.AuthResponse;
-import com.commerzi.app.communication.responses.ClientsResponse;
+import com.commerzi.app.communication.responses.CustomerResponse;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 import com.commerzi.app.communication.responses.GenericMessageResponse;
 
@@ -161,12 +161,12 @@ public class Communicator {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        AuthResponse authResponse = new AuthResponse(context.getString(R.string.response_parsing_error), null);
+                        AuthResponse authResponse = new AuthResponse(context.getString(R.string.unexpected_error), null);
                         callback.onFailure(authResponse);
                     }
                 },
                 error -> {
-                    AuthResponse authResponse = new AuthResponse(context.getString(R.string.connection_error), null);
+                    AuthResponse authResponse = new AuthResponse(context.getString(R.string.login_error_message), null);
                     callback.onFailure(authResponse);
                 }
             );
@@ -212,28 +212,28 @@ public class Communicator {
         }
     }
 
-    public void createClient(Client client, CommunicatorCallback<GenericMessageResponse> callback) {
+    public void createCustomer(Customer customer, CommunicatorCallback<GenericMessageResponse> callback) {
         if (callback == null) {
             throw new IllegalArgumentException("Callback can't be null.");
         }
 
         try {
             JSONObject jsonBody = new JSONObject();
-            jsonBody.put("name", client.getName());
-            jsonBody.put("address", client.getAddress());
-            jsonBody.put("city", client.getCity());
-            jsonBody.put("description", client.getDescription());
-            jsonBody.put("type", client.getType());
+            jsonBody.put("name", customer.getName());
+            jsonBody.put("address", customer.getAddress());
+            jsonBody.put("city", customer.getCity());
+            jsonBody.put("description", customer.getDescription());
+            jsonBody.put("type", customer.getType());
 
             JSONObject contact = new JSONObject();
-            contact.put("firstName", client.getContactFirstName());
-            contact.put("lastName", client.getContactLastName());
-            contact.put("phoneNumber", client.getContactPhoneNumber());
+            contact.put("firstName", customer.getContactFirstName());
+            contact.put("lastName", customer.getContactLastName());
+            contact.put("phoneNumber", customer.getContactPhoneNumber());
 
             jsonBody.put("contact", contact);
 
             this.request(Request.Method.POST, this.buildCustomersBaseUrl(), jsonBody, true,
-                response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.client_creation_success))),
+                response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.customer_creation_success))),
                 error -> callback.onFailure(new GenericMessageResponse(context.getString(R.string.unexpected_error)))
             );
         } catch(Exception e) {
@@ -242,27 +242,27 @@ public class Communicator {
         }
     }
 
-    public void updateClient(Client client, CommunicatorCallback<GenericMessageResponse> callback) {
+    public void updateCustomer(Customer customer, CommunicatorCallback<GenericMessageResponse> callback) {
         if (callback == null) {
             throw new IllegalArgumentException("Callback can't be null.");
         }
 
         try {
             JSONObject jsonBody = new JSONObject();
-            jsonBody.put("name", client.getName());
-            jsonBody.put("address", client.getAddress());
-            jsonBody.put("city", client.getCity());
-            jsonBody.put("description", client.getDescription());
-            jsonBody.put("type", client.getType());
+            jsonBody.put("name", customer.getName());
+            jsonBody.put("address", customer.getAddress());
+            jsonBody.put("city", customer.getCity());
+            jsonBody.put("description", customer.getDescription());
+            jsonBody.put("type", customer.getType());
 
             JSONObject contact = new JSONObject();
-            contact.put("firstName", client.getContactFirstName());
-            contact.put("lastName", client.getContactLastName());
-            contact.put("phoneNumber", client.getContactPhoneNumber());
+            contact.put("firstName", customer.getContactFirstName());
+            contact.put("lastName", customer.getContactLastName());
+            contact.put("phoneNumber", customer.getContactPhoneNumber());
 
             jsonBody.put("contact", contact);
 
-            this.request(Request.Method.PUT, this.buildCustomersUrlById(client.getId()), jsonBody, true,
+            this.request(Request.Method.PUT, this.buildCustomersUrlById(customer.getId()), jsonBody, true,
                 response -> callback.onSuccess(new GenericMessageResponse("Client mis à jour")),
                 error -> callback.onFailure(new GenericMessageResponse("Erreur lors de la mise à jour"))
             );
@@ -272,53 +272,53 @@ public class Communicator {
         }
     }
 
-    public void getClients(CommunicatorCallback<ClientsResponse> callback) {
+    public void getCustomers(CommunicatorCallback<CustomerResponse> callback) {
         if (callback == null) {
             throw new IllegalArgumentException("Callback can't be null.");
         }
 
         this.request(Request.Method.GET, this.buildCustomersBaseUrl(), null, true,
             response -> {
-                ArrayList<Client> clientList = new ArrayList<>();
+                ArrayList<Customer> customerList = new ArrayList<>();
                 try {
                     JSONArray jsonResponse = new JSONArray(response);
 
 
                     for (int i = 0; i < jsonResponse.length(); i++) {
-                        JSONObject clientJson = jsonResponse.getJSONObject(i);
+                        JSONObject customerJson = jsonResponse.getJSONObject(i);
 
-                        String id = clientJson.optString("id", "Inconnu");
-                        String name = clientJson.optString("name", "Inconnu");
-                        String address = clientJson.optString("address", "Non spécifié");
-                        String city = clientJson.optString("city", "Non spécifié");
-                        String description = clientJson.optString("description", "Non spécifiée");
-                        String type = clientJson.optString("type", "Inconnu");
+                        String id = customerJson.optString("id", "Inconnu");
+                        String name = customerJson.optString("name", "Inconnu");
+                        String address = customerJson.optString("address", "Non spécifié");
+                        String city = customerJson.optString("city", "Non spécifié");
+                        String description = customerJson.optString("description", "Non spécifiée");
+                        String type = customerJson.optString("type", "Inconnu");
 
-                        JSONObject contact = clientJson.optJSONObject("contact");
+                        JSONObject contact = customerJson.optJSONObject("contact");
                         String firstName = contact != null ? contact.optString("firstName", "Inconnu") : "Inconnu";
                         String lastName = contact != null ? contact.optString("lastName", "Inconnu") : "Inconnu";
                         String phoneNumber = contact != null ? contact.optString("phoneNumber", "Non spécifié") : "Non spécifié";
 
-                        Client client = new Client(id, name, address, city, description, type, firstName, lastName, phoneNumber);
-                        clientList.add(client);
+                        Customer customer = new Customer(id, name, address, city, description, type, firstName, lastName, phoneNumber);
+                        customerList.add(customer);
                     }
 
-                    callback.onSuccess(new ClientsResponse(clientList, null));
+                    callback.onSuccess(new CustomerResponse(customerList, null));
                 } catch (Exception e) {
                     e.printStackTrace();
-                    callback.onFailure(new ClientsResponse(null, "Erreur de traitement des données"));
+                    callback.onFailure(new CustomerResponse(null, "Erreur de traitement des données"));
                 }
             },
-            error -> callback.onFailure(new ClientsResponse(null, "Impossible de charger les clients"))
+            error -> callback.onFailure(new CustomerResponse(null, "Impossible de charger les clients"))
         );
     }
 
-    public void deleteClient(Client client, CommunicatorCallback<GenericMessageResponse> callback) {
+    public void deleteCustomer(Customer customer, CommunicatorCallback<GenericMessageResponse> callback) {
         if (callback == null) {
             throw new IllegalArgumentException("Callback can't be null.");
         }
 
-        this.request(Request.Method.DELETE, this.buildCustomersUrlById(client.getId()), null, true,
+        this.request(Request.Method.DELETE, this.buildCustomersUrlById(customer.getId()), null, true,
             response -> callback.onSuccess(new GenericMessageResponse("Entreprise supprimée")),
             error -> callback.onFailure(new GenericMessageResponse("Erreur lors de la suppression"))
         );
@@ -340,7 +340,7 @@ public class Communicator {
             jsonBody.put("session", this.sessionToken);
 
             this.request(Request.Method.PUT, this.buildUserFullUrl(), jsonBody, true,
-                response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.profile_updated))),
+                response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.profile_update_success))),
                 error -> callback.onFailure(new GenericMessageResponse(context.getString(R.string.error_during_update)))
             );
         } catch(Exception e) {

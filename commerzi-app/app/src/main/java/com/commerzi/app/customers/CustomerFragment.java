@@ -1,36 +1,27 @@
-package com.commerzi.app;
+package com.commerzi.app.customers;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
+import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-public class ClientFragment extends Fragment implements View.OnClickListener {
-    Button btnAddClient;
+public class CustomerFragment extends Fragment implements View.OnClickListener {
+    Button btnAddCustomer;
 
-    public static ClientFragment newInstance() {
-        ClientFragment fragment = new ClientFragment();
+    public static CustomerFragment newInstance() {
+        CustomerFragment fragment = new CustomerFragment();
         return fragment;
     }
 
@@ -41,34 +32,34 @@ public class ClientFragment extends Fragment implements View.OnClickListener {
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View fragmentView = inflater.inflate(R.layout.client_list, container, false);
-        btnAddClient = fragmentView.findViewById(R.id.btnAddClient);
-        btnAddClient.setOnClickListener(this);
+        View fragmentView = inflater.inflate(R.layout.customer_list, container, false);
+        btnAddCustomer = fragmentView.findViewById(R.id.btnGoToCreateCustomer);
+        btnAddCustomer.setOnClickListener(this);
 
-        loadClients();
+        loadCustomers();
         return fragmentView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadClients();
+        loadCustomers();
     }
 
     public void onClick(View v) {
-        if (v.getId() == R.id.btnAddClient) {
-            Intent intention = new Intent(getActivity(), AddClientActivity.class);
+        if (v.getId() == R.id.btnGoToCreateCustomer) {
+            Intent intention = new Intent(getActivity(), CreateCustomerActivity.class);
             startActivity(intention);
         }
     }
 
-    private void loadClients() {
+    private void loadCustomers() {
         if (getActivity() == null) return;
 
         Communicator communicator = Communicator.getInstance(getActivity());
-        communicator.getClients(new CommunicatorCallback<>(
+        communicator.getCustomers(new CommunicatorCallback<>(
                 response -> {
-                    displayClients(response.clients);
+                    displayCustomers(response.customers);
                 },
                 error -> {
                     Toast.makeText(getActivity(), error.message, Toast.LENGTH_SHORT).show();
@@ -76,10 +67,10 @@ public class ClientFragment extends Fragment implements View.OnClickListener {
         ));
     }
 
-    private void displayClients(ArrayList<Client> clientList) {
+    private void displayCustomers(ArrayList<Customer> customerList) {
         RecyclerView recyclerView = getView().findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        ClientAdapter adapter = new ClientAdapter(clientList, this.getContext());
+        CustomerAdapter adapter = new CustomerAdapter(customerList, this.getContext());
         recyclerView.setAdapter(adapter);
     }
 

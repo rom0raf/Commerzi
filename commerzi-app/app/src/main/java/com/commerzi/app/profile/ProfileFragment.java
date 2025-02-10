@@ -1,8 +1,7 @@
-package com.commerzi.app;
+package com.commerzi.app.profile;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +9,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+
+import com.commerzi.app.R;
+import com.commerzi.app.auth.Session;
+import com.commerzi.app.auth.User;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
@@ -61,7 +64,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btnEditProfile) {
-            Intent intention = new Intent(getActivity(), EditProfileActivity.class);
+            Intent intention = new Intent(getActivity(), UpdateProfileActivity.class);
             startActivity(intention);
         }
     }
