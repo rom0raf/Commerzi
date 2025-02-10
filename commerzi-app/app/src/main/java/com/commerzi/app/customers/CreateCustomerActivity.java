@@ -57,7 +57,7 @@ public class CreateCustomerActivity extends AppCompatActivity {
         // Vérification de sélection d'un RadioButton
         int selectedRadioId = radioGroupCustomerType.getCheckedRadioButtonId();
         if (selectedRadioId == -1) {
-            Toast.makeText(this, R.string.error_select_type, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.select_type_error, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -68,7 +68,7 @@ public class CreateCustomerActivity extends AppCompatActivity {
         if (name.isEmpty() || address.isEmpty() || city.isEmpty()
                 || description.isEmpty() || phoneNumber.isEmpty()
                 || firstname.isEmpty() || lastname.isEmpty()) {
-            Toast.makeText(this, R.string.error_empty_field, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.empty_field_error, Toast.LENGTH_LONG).show();
             return;
         }
         

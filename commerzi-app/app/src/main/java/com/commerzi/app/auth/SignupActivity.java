@@ -57,12 +57,12 @@ public class SignupActivity extends AppCompatActivity {
         if (email.isEmpty() || password.isEmpty()
                 || firstname.isEmpty() || lastname.isEmpty()
                 || address.isEmpty() || pwdConfirmation.isEmpty()) {
-            Toast.makeText(this, R.string.error_empty_field, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.empty_field_error, Toast.LENGTH_LONG).show();
             return;
         }
 
         if (!password.equals(pwdConfirmation))  {
-            Toast.makeText(this, R.string.error_invalid_password, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.password_error, Toast.LENGTH_LONG).show();
             return;
         }
 
