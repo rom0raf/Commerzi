@@ -203,4 +203,72 @@ public class ATravelerAlgorithmTest {
         }
     }
 
+    @Nested
+    class BruteForceThreadedTests {
+
+        private ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_THREADED);
+        private ATravelerAlgorithm bruteAlgorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED);
+
+        @Test
+        void basic() {
+            List<JOpenCageLatLng> pointsToVisit = new ArrayList<>() {{
+                add(points.get(0)); // Toulouse
+                add(points.get(2)); // Nîmes
+                add(points.get(1)); // Montpellier
+            }};
+
+            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, pointsToVisit);
+            List<JOpenCageLatLng> bruteForcedPath = bruteAlgorithm.apply(startingPoint, pointsToVisit);
+
+            assertEquals(optimalPath, bruteForcedPath);
+        }
+
+        @Test
+        void complete() {
+            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, points);
+            List<JOpenCageLatLng> bruteForcedPath = bruteAlgorithm.apply(startingPoint, points);
+
+            assertEquals(optimalPath, bruteForcedPath);
+        }
+
+        @Test
+        void illegalArguments() {
+            testIllegalArguments(algorithm);
+        }
+    }
+
+    @Nested
+    class BruteForceOptimizedThreadedTests {
+
+        private ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED);
+        private ATravelerAlgorithm bruteAlgorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED);
+
+        @Test
+        void basic() {
+            List<JOpenCageLatLng> pointsToVisit = new ArrayList<>() {{
+                add(points.get(0)); // Toulouse
+                add(points.get(2)); // Nîmes
+                add(points.get(1)); // Montpellier
+            }};
+
+            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, pointsToVisit);
+            List<JOpenCageLatLng> bruteForcedPath = bruteAlgorithm.apply(startingPoint, pointsToVisit);
+
+            assertEquals(optimalPath, bruteForcedPath);
+        }
+
+        @Test
+        void complete() {
+            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, points);
+            List<JOpenCageLatLng> bruteForcedPath = bruteAlgorithm.apply(startingPoint, points);
+
+            assertEquals(optimalPath, bruteForcedPath);
+        }
+
+        @Test
+        void illegalArguments() {
+            testIllegalArguments(algorithm);
+        }
+    }
+
 }

@@ -35,32 +35,6 @@ public class BruteForce extends ATravelerAlgorithm {
     }
 
     /**
-     * Generates all permutations of a list of points.
-     *
-     * @param list the list of points
-     * @return a list of all permutations of the input list
-     */
-    private static List<List<JOpenCageLatLng>> generatePermutations(List<JOpenCageLatLng> list) {
-        List<List<JOpenCageLatLng>> permutations = new ArrayList<>();
-        if (list.size() == 1) {
-            permutations.add(new ArrayList<>(list));
-        } else {
-            for (int i = 0; i < list.size(); i++) {
-                JOpenCageLatLng current = list.get(i);
-                List<JOpenCageLatLng> remaining = new ArrayList<>(list);
-                remaining.remove(i);
-
-                List<List<JOpenCageLatLng>> remainingPermutations = generatePermutations(remaining);
-                for (List<JOpenCageLatLng> perm : remainingPermutations) {
-                    perm.add(0, current);
-                    permutations.add(perm);
-                }
-            }
-        }
-        return permutations;
-    }
-
-    /**
      * Generates all possible permutations of a list of points (excluding the starting point)
      * and calculates the total distance for each permutation to find the shortest path.
      * This algorithm takes into account the starting point AND end point.
@@ -74,7 +48,7 @@ public class BruteForce extends ATravelerAlgorithm {
     @Override
     protected List<JOpenCageLatLng> performAlgorithm(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points) {
         List<JOpenCageLatLng> pointsToVisit = new ArrayList<>(points);
-        List<List<JOpenCageLatLng>> permutations = generatePermutations(pointsToVisit);
+        List<List<JOpenCageLatLng>> permutations = BruteForceUtils.generatePermutations(pointsToVisit);
 
         List<JOpenCageLatLng> bestPath = null;
         double minDistance = Double.MAX_VALUE;
