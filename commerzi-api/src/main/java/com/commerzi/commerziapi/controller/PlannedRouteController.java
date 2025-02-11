@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -73,17 +74,23 @@ public class PlannedRouteController {
      * @return the ID of the created planned route
      */
     @CommerziAuthenticated
-    @PostMapping("/")
-    public ResponseEntity<String> createPlannedRoute(@RequestBody PlannedRoute plannedRoute) {
+    @PostMapping("/?realDistance={useRealDistance}")
+    public ResponseEntity<String> createPlannedRoute(@RequestBody PlannedRoute plannedRoute, @PathVariable boolean useRealDistance) {
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
         plannedRoute.setUserId("" + user.getUserId());
 
         try {
-            String id = plannedRouteService.createRoute(plannedRoute);
+            String id = plannedRouteService.createRoute(plannedRoute, useRealDistance);
             return ResponseEntity.ok(id);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body("Error while fetching real distances");
+        } catch (Exception e) {
+            String message = "An unexpected error occurred while creating the route\n";
+            message += e.getMessage() != null ? ": " + e.getMessage() : "";
+            return ResponseEntity.internalServerError().body(message);
         }
     }
 

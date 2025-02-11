@@ -2,11 +2,12 @@ package com.commerzi.commerziapi.service.interfaces;
 
 import com.commerzi.commerziapi.model.PlannedRoute;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface IPlannedRouteService {
 
-    String createRoute(PlannedRoute route);
+    String createRoute(PlannedRoute route, boolean useRealDistance) throws Exception;
 
     List<PlannedRoute> getAll(String userId);
 

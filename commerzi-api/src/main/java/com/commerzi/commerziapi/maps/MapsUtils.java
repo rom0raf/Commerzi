@@ -128,7 +128,7 @@ public class MapsUtils {
      * @return a PlannedRoute object containing the ordered customers and the total flying travel distance
      * @throws IllegalArgumentException if the customers list is null or empty, or if the commercialHome is null
      */
-    public static void buildFullRoute(PlannedRoute initialRoute, ATravelerAlgorithm algorithm) {
+    public static void buildFullRoute(PlannedRoute initialRoute, ATravelerAlgorithm algorithm, boolean useRealDistance) throws IOException {
         if (initialRoute.getCustomersAndProspects() == null || initialRoute.getCustomersAndProspects().isEmpty()) {
             throw new IllegalArgumentException("Customer list cannot be null or empty.");
         }
@@ -159,7 +159,16 @@ public class MapsUtils {
 
         points.add(initialRoute.getEndingPoint());
         points.add(0, initialRoute.getStartingPoint());
-        initialRoute.setTotalDistance(algorithm.getFullDistanceOverPointsFunc().apply(points));
+
+        double distance;
+
+        if (useRealDistance) {
+            distance = realDistanceBetweenPoints(initialRoute.getStartingPoint(), initialRoute.getEndingPoint());
+        } else {
+            distance = algorithm.getFullDistanceOverPointsFunc().apply(points);
+        }
+
+        initialRoute.setTotalDistance(distance);
     }
 
     /**

@@ -9,6 +9,7 @@ import com.commerzi.commerziapi.service.interfaces.IPlannedRouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -26,12 +27,13 @@ public class PlannedRouteService implements IPlannedRouteService {
      * @param route the planned route to create
      * @return the ID of the created planned route
      */
-    public String createRoute(PlannedRoute route) throws IllegalArgumentException {
+    public String createRoute(PlannedRoute route, boolean useRealDistance) throws Exception {
         checkPlannedRoute(route);
 
         MapsUtils.buildFullRoute(
                 route,
-                ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED)
+                ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED),
+                useRealDistance
         );
 
         plannedRouteRepository.save(route);
