@@ -37,6 +37,12 @@ jobs:
       with:
         java-version: '17'
         distribution: 'corretto'
+
+    - name: Update application.properties with MySQL credentials
+      run: |
+        # Replace placeholders in application.properties with secrets
+        sed -i 's/<db_user>/${{ secrets.MYSQL_USER }}/' commerzi-api/src/main/resources/application.properties
+        sed -i 's/<db_password>/${{ secrets.MYSQL_PASSWORD }}/' commerzi-api/src/main/resources/application.properties
     
     - name: Compile with skip tests
       run: mvn -B package --file pom.xml -DskipTests
@@ -45,13 +51,6 @@ jobs:
     - name: Copy .jar to docker/api
       run: |
         cp commerzi-api/target/*.jar commerzi-api/docker/api/
-
-    - name: Update application.properties with MySQL credentials
-      run: |
-        # Replace placeholders in application.properties with secrets
-        sed -i 's/<db_user>/${{ secrets.MYSQL_USER }}/' commerzi-api/src/main/resources/application.properties
-        sed -i 's/<db_password>/${{ secrets.MYSQL_PASSWORD }}/' commerzi-api/src/main/resources/application.properties
-        cat commerzi-api/src/main/resources/application.properties
 
     - name: Deploy to remote server via SCP
       uses: appleboy/scp-action@v0.1.5
