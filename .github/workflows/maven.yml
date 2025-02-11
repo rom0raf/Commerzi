@@ -23,3 +23,44 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
       working-directory: commerzi-api
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17 for deploy
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'corretto'
+    
+    - name: Compile with skip tests
+      run: mvn -B package -DskipTests --file commerzi-api/pom.xml
+      working-directory: commerzi-api
+
+    - name: Copy .jar to docker/api
+      run: |
+        cp commerzi-api/target/*.jar commerzi-api/docker/api/
+
+    - name: Deploy to remote server via SFTP
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_PASSWORD }}
+        port: 22
+        source: "commerzi-api/docker/"
+        target: "/home/ubuntu/"
+        rm: true 
+
+    - name: Run Docker Compose remotely
+      run: |
+        sshpass -p ${{ secrets.REMOTE_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+          cd /home/ubuntu/
+          sudo docker compose down
+          sudo docker compose up -d --build
+        EOF
