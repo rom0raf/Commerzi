@@ -39,7 +39,7 @@ jobs:
         distribution: 'corretto'
     
     - name: Compile with skip tests
-      run: mvn -B package -DskipTests --file commerzi-api/pom.xml
+      run: mvn -B package --file pom.xml -DskipTests
       working-directory: commerzi-api
 
     - name: Copy .jar to docker/api
