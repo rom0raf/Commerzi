@@ -60,7 +60,7 @@ jobs:
     - name: Run Docker Compose remotely
       run: |
         sshpass -p ${{ secrets.REMOTE_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
-          cd /home/ubuntu/docker/
+          cd /home/ubuntu/docker/commerzi-api/docker/
           sudo docker compose down
           sudo docker compose up -d --build
         EOF
