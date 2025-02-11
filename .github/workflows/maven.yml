@@ -53,8 +53,8 @@ jobs:
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASSWORD }}
         port: 22
-        source: "commerzi-api/docker/"
-        target: "/home/ubuntu/"
+        source: "commerzi-api/docker/*"
+        target: "/home/ubuntu/docker/"
         rm: true 
 
     - name: Run Docker Compose remotely
