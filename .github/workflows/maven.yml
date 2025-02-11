@@ -49,8 +49,9 @@ jobs:
     - name: Update application.properties with MySQL credentials
       run: |
         # Replace placeholders in application.properties with secrets
-        sed -i "s|spring.datasource.username=.*|spring.datasource.username=${{ secrets.MYSQL_USER }}|" commerzi-api/src/main/resources/application.properties
-        sed -i "s|spring.datasource.password=.*|spring.datasource.password=${{ secrets.MYSQL_PASSWORD }}|" commerzi-api/src/main/resources/application.properties
+        sed -i "s/spring.datasource.username=/spring.datasource.username=${{ secrets.MYSQL_USER }}/" commerzi-api/src/main/resources/application.properties
+        sed -i "s/spring.datasource.password=/spring.datasource.password=${{ secrets.MYSQL_PASSWORD }}/" commerzi-api/src/main/resources/application.properties
+        cat commerzi-api/src/main/resources/application.properties
 
     - name: Deploy to remote server via SCP
       uses: appleboy/scp-action@v0.1.5
