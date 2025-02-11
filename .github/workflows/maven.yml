@@ -46,8 +46,8 @@ jobs:
       run: |
         cp commerzi-api/target/*.jar commerzi-api/docker/api/
 
-    - name: Deploy to remote server via SFTP
-      uses: appleboy/ssh-action@v0.1.5
+    - name: Deploy to remote server via SCP
+      uses: appleboy/scp-action@v0.1.5
       with:
         host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
@@ -55,12 +55,18 @@ jobs:
         port: 22
         source: "commerzi-api/docker/*"
         target: "/home/ubuntu/docker/"
-        rm: true 
+        recursive: true
 
     - name: Run Docker Compose remotely
       run: |
         sshpass -p ${{ secrets.REMOTE_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
-          cd /home/ubuntu/
+          cd /home/ubuntu/docker/
           sudo docker compose down
           sudo docker compose up -d --build
+        EOF
+
+    - name: Clean up remote docker folder
+      run: |
+        sshpass -p ${{ secrets.REMOTE_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+          rm -rf /home/ubuntu/docker/*
         EOF
