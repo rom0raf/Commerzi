@@ -91,13 +91,18 @@ public class ActualRouteController {
     }
 
     @CommerziAuthenticated
-    @PostMapping("/skip?visit={visit}")
-    public ResponseEntity skipVisit(@PathVariable int visit, @RequestBody ActualRoute actualRoute) {
+    @PutMapping("/{visitIndex}?status={status}")
+    public ResponseEntity skipVisit(@PathVariable int visitIndex, @PathVariable String status, @RequestBody ActualRoute actualRoute) {
         if (actualRoute == null) {
             return ResponseEntity.notFound().build();
         }
 
-        actualRoute = actualRouteService.skipVisit(visit, actualRoute);
+        try {
+            actualRoute = actualRouteService.updateVisit(visitIndex, status, actualRoute);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
         return ResponseEntity.ok(actualRoute);
     }

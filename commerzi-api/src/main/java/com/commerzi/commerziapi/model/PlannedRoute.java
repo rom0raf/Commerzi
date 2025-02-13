@@ -4,6 +4,7 @@ import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,10 @@ public class PlannedRoute {
     private JOpenCageLatLng startingPoint;
     private JOpenCageLatLng endingPoint;
     private double totalDistance;
+
+    public PlannedRoute() {
+        this.customersAndProspects = new ArrayList<>();
+    }
 
     /**
      * Gets the ID of the route.
@@ -71,6 +76,18 @@ public class PlannedRoute {
      * @param customersAndProspects the list of customers and prospects to set
      */
     public void setCustomersAndProspects(List<Customer> customersAndProspects) {
+        if (customersAndProspects == null || customersAndProspects.isEmpty()) {
+            throw new IllegalArgumentException("The list of customers and prospects cannot be null or empty.");
+        }
+
+        if (customersAndProspects.size() < 2) {
+            throw new IllegalArgumentException("The list of customers and prospects must contain at least two elements.");
+        }
+
+        if (customersAndProspects.size() > 8) {
+            throw new IllegalArgumentException("The list of customers and prospects must contain at most eight elements.");
+        }
+
         this.customersAndProspects = customersAndProspects;
     }
 

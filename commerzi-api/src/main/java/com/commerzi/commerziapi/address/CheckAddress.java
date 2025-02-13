@@ -5,11 +5,14 @@ import com.opencagedata.jopencage.model.JOpenCageForwardRequest;
 import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import com.opencagedata.jopencage.model.JOpenCageResponse;
 
+import java.util.HashMap;
 import java.util.Properties;
 
 public class CheckAddress {
 
     private static String apiKey;
+
+    private static HashMap<String, JOpenCageLatLng> cache = new HashMap<>();
 
     public static void init() {
         // read from application.properties
@@ -48,7 +51,21 @@ public class CheckAddress {
             return null;
         }
 
-        return callAPI(address, city);
+        if (city == null || city.isEmpty()) {
+            return null;
+        }
+
+        if (cache.containsKey(getCacheKey(address, city))) {
+            return cache.get(getCacheKey(address, city));
+        }
+
+        JOpenCageLatLng coordinates = callAPI(address, city);
+        cache.put(getCacheKey(address, city), coordinates);
+        return coordinates;
+    }
+
+    private static String getCacheKey(String address, String city) {
+        return address + "_" + city;
     }
 
 

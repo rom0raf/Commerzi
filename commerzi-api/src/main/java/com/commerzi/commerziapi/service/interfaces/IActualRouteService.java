@@ -11,5 +11,5 @@ public interface IActualRouteService {
 
     ActualRoute createActualRouteFromPlannedRoute(PlannedRoute plannedRoute);
 
-    ActualRoute skipVisit(int visit, ActualRoute route);
+    ActualRoute updateVisit(int visitId, String status, ActualRoute route);
 }

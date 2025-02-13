@@ -70,17 +70,16 @@ public class PlannedRouteController {
     /**
      * Creates a new planned route.
      *
-     * @param plannedRoute the planned route to create
      * @return the ID of the created planned route
      */
     @CommerziAuthenticated
-    @PostMapping("/?realDistance={useRealDistance}")
-    public ResponseEntity<String> createPlannedRoute(@RequestBody PlannedRoute plannedRoute, @PathVariable boolean useRealDistance) {
+    @PostMapping("/{useRealDistance}")
+    public ResponseEntity<String> createPlannedRoute(@PathVariable boolean useRealDistance, @RequestBody List<String> customersId) {
+
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
-        plannedRoute.setUserId("" + user.getUserId());
 
         try {
-            String id = plannedRouteService.createRoute(plannedRoute, useRealDistance);
+            String id = plannedRouteService.createRoute(customersId, user, useRealDistance);
             return ResponseEntity.ok(id);
 
         } catch (IllegalArgumentException e) {

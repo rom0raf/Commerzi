@@ -219,7 +219,6 @@ public class MapsUtils {
 
         double finalDistance = distance;
         return distanceCache.computeIfAbsent(generateCacheKey(start, end), x -> finalDistance);
-
     }
 
     /**
