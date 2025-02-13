@@ -7,6 +7,8 @@ import com.commerzi.commerziapi.security.Security;
 import com.commerzi.commerziapi.service.interfaces.IAuthentificationService;
 import com.commerzi.commerziapi.service.interfaces.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -162,6 +164,25 @@ public class CustomerController {
 
         Customer result = customerService.deleteCustomer(id);
         return ResponseEntity.ok(result);
+    }
+
+    @CommerziAuthenticated
+    @GetMapping("/near?distance={distance}")
+    public ResponseEntity<List<Customer>> getNearCustomers(
+            @RequestBody GeoJsonPoint location, @RequestParam(defaultValue = "1000.0") double distance) {
+
+        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
+
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<Customer> nearCustomers = customerService.getNearCustomers(
+                "" + user.getUserId(),
+                location,
+                distance
+        );
+        return ResponseEntity.ok(nearCustomers);
     }
 
     /**

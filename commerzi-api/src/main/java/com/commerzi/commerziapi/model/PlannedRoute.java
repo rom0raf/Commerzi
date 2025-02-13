@@ -15,6 +15,7 @@ public class PlannedRoute {
 
     @Id
     private String id;
+    private String name;
     private String userId;
     private List<Customer> customersAndProspects;
     private JOpenCageLatLng startingPoint;
@@ -41,6 +42,22 @@ public class PlannedRoute {
      */
     public void setId(String id) {
         this.id = id;
+    }
+
+    /**
+     * Get the name of the route.
+     * @return the name of the route
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set the name of the route.
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -149,6 +166,7 @@ public class PlannedRoute {
     public String toString() {
         return "PlannedRoute{" +
                 "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", userId='" + userId + '\'' +
                 ", customersAndProspects=" + customersAndProspects +
                 ", startingPoint=" + startingPoint +

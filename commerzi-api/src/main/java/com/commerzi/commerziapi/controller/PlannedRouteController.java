@@ -1,5 +1,6 @@
 package com.commerzi.commerziapi.controller;
 
+import com.commerzi.commerziapi.dto.PlannedRouteDTO;
 import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
@@ -73,13 +74,21 @@ public class PlannedRouteController {
      * @return the ID of the created planned route
      */
     @CommerziAuthenticated
-    @PostMapping("/{useRealDistance}")
-    public ResponseEntity<String> createPlannedRoute(@PathVariable boolean useRealDistance, @RequestBody List<String> customersId) {
+    @PostMapping("/{useRealDistance}?name={name}")
+    public ResponseEntity<String> createPlannedRoute(
+            @PathVariable boolean useRealDistance,
+            @PathVariable String name,
+            @RequestBody PlannedRouteDTO plannedRouteDTO) {
 
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
 
         try {
-            String id = plannedRouteService.createRoute(customersId, user, useRealDistance);
+            String id = plannedRouteService.createRoute(
+                    plannedRouteDTO.getCustomersId(),
+                    name,
+                    user,
+                    useRealDistance
+            );
             return ResponseEntity.ok(id);
 
         } catch (IllegalArgumentException e) {
