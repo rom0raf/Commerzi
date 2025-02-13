@@ -4,25 +4,27 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="16dp"
-        tools:context=".route.RouteFragment">
+        android:padding="16dp">
 
-        <!-- Title -->
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/btnGoToCreateRoute"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/routes"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="32dp"
-            android:gravity="center"/>
+            android:text="@string/add_route"
+            android:backgroundTint="@color/grey"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewRoute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:padding="8dp" />
+        
     </LinearLayout>
 </ScrollView>
 

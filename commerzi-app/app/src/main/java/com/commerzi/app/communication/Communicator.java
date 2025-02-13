@@ -1,6 +1,7 @@
 package com.commerzi.app.communication;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -12,6 +13,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.commerzi.app.communication.responses.PlannedRouteResponse;
 import com.commerzi.app.customers.Customer;
 import com.commerzi.app.R;
 import com.commerzi.app.auth.User;
@@ -19,14 +21,17 @@ import com.commerzi.app.communication.responses.AuthResponse;
 import com.commerzi.app.communication.responses.CustomerResponse;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 import com.commerzi.app.communication.responses.GenericMessageResponse;
+import com.commerzi.app.route.plannedRoute.PlannedRoute;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Communicator {
@@ -84,6 +89,10 @@ public class Communicator {
 
     private String buildCustomersUrlById(String id) {
         return this.buildCustomersBaseUrl() + id;
+    }
+
+    private String buildPlannedRoutesBaseUrl(){
+        return this.getBaseUrl() + this.properties.getString(CommunicatorProperties.PLANNED_ROUTE_URL);
     }
 
     private void request(int method, String url, JSONObject requestBody, boolean authenticated,
@@ -342,6 +351,61 @@ public class Communicator {
             this.request(Request.Method.PUT, this.buildUserFullUrl(), jsonBody, true,
                 response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.profile_update_success))),
                 error -> callback.onFailure(new GenericMessageResponse(context.getString(R.string.error_during_update)))
+            );
+        } catch(Exception e) {
+            e.printStackTrace();
+            callback.onFailure(new GenericMessageResponse(context.getString(R.string.request_creation_error)));
+        }
+    }
+
+    public void getRoutes(CommunicatorCallback<PlannedRouteResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        this.request(Request.Method.GET, this.buildPlannedRoutesBaseUrl(), null, true,
+                response -> {
+                    ArrayList<PlannedRoute> routes = new ArrayList<>();
+                    try {
+                        JSONArray jsonResponse = new JSONArray(response);
+
+                        for (int i = 0; i < jsonResponse.length(); i++) {
+                            JSONObject routesJson = jsonResponse.getJSONObject(i);
+
+                            String customers = routesJson.optString("id", "Inconnu");
+
+//                            PlannedRoute route = new PlannedRoute();
+//                            routes.add(route);
+                        }
+
+                        callback.onSuccess(new PlannedRouteResponse(routes, null));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        callback.onFailure(new PlannedRouteResponse(null, "Erreur de traitement des données"));
+                    }
+                },
+                error -> callback.onFailure(new PlannedRouteResponse(null, "Impossible de charger les itinéraires"))
+        );
+    }
+
+    public void createRoute(String name, PlannedRoute route, CommunicatorCallback<GenericMessageResponse> callback){
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        try {
+            JSONObject jsonBody = new JSONObject();
+            List<Customer> customers = route.getCustomersAndProspects();
+            List<String> customersId = new ArrayList<>();
+            for(int i = 0; i < customers.size(); i++) {
+                customersId.add(customers.get(i).getId());
+            }
+            jsonBody.put("customersId", customersId);
+            String encodedName = URLEncoder.encode(name);
+
+            this.request(Request.Method.POST, this.buildPlannedRoutesBaseUrl() + encodedName, jsonBody, true,
+                    response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.customer_creation_success))),
+                    error -> callback.onFailure(new GenericMessageResponse(context.getString(R.string.unexpected_error)))
             );
         } catch(Exception e) {
             e.printStackTrace();

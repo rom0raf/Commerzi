@@ -20,7 +20,7 @@ import com.commerzi.app.communication.responses.CommunicatorCallback;
 
 import java.util.ArrayList;
 
-public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.CustomerViewHolder> {
+public class CustomerAdapter extends RecyclerView.Adapter<com.commerzi.app.customers.CustomerAdapter.CustomerViewHolder> {
 
     private ArrayList<Customer> customerList;
     private Context context;

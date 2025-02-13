@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_route"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"/>
+
+    <EditText
+        android:id="@+id/routeNameField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/route_name"
+        android:inputType="text"
+        android:drawableStart="@drawable/ic_route"
+        android:paddingStart="12dp"
+        android:layout_marginBottom="16dp"/>
+
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/select_customers" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
+    
+    <Button
+        android:id="@+id/btnValidateCreateRoute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_route"
+        android:backgroundTint="@color/grey"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="16dp" />
+    
+</LinearLayout>

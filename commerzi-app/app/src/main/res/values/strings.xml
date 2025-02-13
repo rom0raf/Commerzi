@@ -9,6 +9,9 @@
 
     <string name="add_customer">Ajouter un client</string>
     <string name="edit_customer">Modifier un client</string>
+    <string name="select_customers">Sélectionner des clients</string>
+    
+    <string name="add_route">Ajouter un itinéraire</string>
 
     <string name="edit_profile">Modifier mon profil</string>
 
@@ -18,6 +21,7 @@
     <string name="customer">Client</string>
     <string name="customers">Clients</string>
     <string name="prospect">Prospect</string>
+    <string name="route_name">Nom de l\'itinéraire</string>
     <string name="routes">Itinéraires</string>
     <string name="profile">Profil</string>
 
