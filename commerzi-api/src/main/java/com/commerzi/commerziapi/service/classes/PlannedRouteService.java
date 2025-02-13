@@ -34,8 +34,9 @@ public class PlannedRouteService implements IPlannedRouteService {
      *
      * @return the ID of the created planned route
      */
-    public String createRoute(List<String> customerId, CommerziUser user) throws Exception {
+    public String createRoute(List<String> customerId, String name, CommerziUser user) throws Exception {
         PlannedRoute route = new PlannedRoute();
+        route.setName(name);
         route.setUserId(String.valueOf(user.getUserId()));
         for (String id : customerId) {
             route.getCustomersAndProspects().add(
