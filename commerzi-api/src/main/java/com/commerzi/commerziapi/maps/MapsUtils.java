@@ -2,17 +2,29 @@ package com.commerzi.commerziapi.maps;
 
 import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
 import com.commerzi.commerziapi.model.Customer;
+import com.commerzi.commerziapi.model.maps.GPSRoute;
 import com.commerzi.commerziapi.model.PlannedRoute;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.opencagedata.jopencage.model.JOpenCageLatLng;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiFunction;
 
 public class MapsUtils {
 
     private static final double EARTH_RADIUS = 6371.0;
+
+    private static final String OSRM_URL = "https://router.project-osrm.org/route/v1/driving/%s,%s;%s,%s?overview=full&steps=true";
+
 
     /**
      * Cached calculated flying distances
@@ -116,7 +128,7 @@ public class MapsUtils {
      * @return a PlannedRoute object containing the ordered customers and the total flying travel distance
      * @throws IllegalArgumentException if the customers list is null or empty, or if the commercialHome is null
      */
-    public static void buildFullRoute(PlannedRoute initialRoute, ATravelerAlgorithm algorithm) {
+    public static void buildFullRoute(PlannedRoute initialRoute, ATravelerAlgorithm algorithm, boolean useRealDistance) throws IOException {
         if (initialRoute.getCustomersAndProspects() == null || initialRoute.getCustomersAndProspects().isEmpty()) {
             throw new IllegalArgumentException("Customer list cannot be null or empty.");
         }
@@ -147,7 +159,81 @@ public class MapsUtils {
 
         points.add(initialRoute.getEndingPoint());
         points.add(0, initialRoute.getStartingPoint());
-        initialRoute.setTotalDistance(algorithm.getFullDistanceOverPointsFunc().apply(points));
+
+        double distance;
+
+        if (useRealDistance) {
+            distance = realDistanceBetweenPoints(initialRoute.getStartingPoint(), initialRoute.getEndingPoint());
+        } else {
+            distance = algorithm.getFullDistanceOverPointsFunc().apply(points);
+        }
+
+        initialRoute.setTotalDistance(distance);
     }
 
+    /**
+     * Gets the GPS route between two points using the Open Source Routing Machine (OSRM) API.
+     * @param start the starting point
+     * @param end the ending point
+     * @return GPSRoute object containing the distance, duration and steps of the route
+     * @throws IOException
+     */
+    private static GPSRoute getGpsRoute(JOpenCageLatLng start, JOpenCageLatLng end) throws IOException {
+        String urlString = getOSRMUrl(start, end);
+
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        JsonObject jsonResponse = new JsonParser().parse(response.toString()).getAsJsonObject();
+        JsonArray routes = jsonResponse.getAsJsonArray("routes");
+        JsonObject route = routes.get(0).getAsJsonObject();
+
+        // load the route into a GPSRoute object
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        GPSRoute gpsRoute = gsonBuilder.create().fromJson(route, GPSRoute.class);
+
+        return gpsRoute;
+    }
+
+    /**
+     * Calculates the real distance between two points using the Open Source Routing Machine (OSRM) API.
+     * @param start the starting point
+     * @param end the ending point
+     * @return the real distance between the two points
+     */
+    public static double realDistanceBetweenPoints(JOpenCageLatLng start, JOpenCageLatLng end) throws IOException {
+        double distance;
+
+        distance = getGpsRoute(start, end).getDistance();
+
+        double finalDistance = distance;
+        return distanceCache.computeIfAbsent(generateCacheKey(start, end), x -> finalDistance);
+    }
+
+    /**
+     * Generates the URL for the Open Source Routing Machine (OSRM) API.
+     * @param start the starting point
+     * @param end the ending point
+     * @return the URL as a String
+     */
+    private static String getOSRMUrl(JOpenCageLatLng start, JOpenCageLatLng end) {
+
+        String startLat = String.valueOf(start.getLat()).replace(",", ".");
+        String startLng = String.valueOf(start.getLng()).replace(",", ".");
+        String endLat = String.valueOf(end.getLat()).replace(",", ".");
+        String endLng = String.valueOf(end.getLng()).replace(",", ".");
+
+        return String.format(OSRM_URL, startLat, startLng, endLat, endLng);
+    }
 }

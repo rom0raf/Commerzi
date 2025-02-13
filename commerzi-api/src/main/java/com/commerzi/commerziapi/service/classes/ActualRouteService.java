@@ -77,8 +77,8 @@ public class ActualRouteService implements IActualRouteService {
         return visits;
     }
 
-
     private static void checkActualRoute(ActualRoute route) throws IllegalArgumentException {
+
         if (route == null) {
             throw new IllegalArgumentException("Route cannot be null");
         }
@@ -104,4 +104,30 @@ public class ActualRouteService implements IActualRouteService {
             throw new IllegalArgumentException("Route current location cannot be null");
         }
     }
+
+
+    public ActualRoute updateVisit(int visitPos, String status, ActualRoute route) throws IllegalArgumentException {
+        checkActualRoute(route);
+
+        if (visitPos < 0 || visitPos >= route.getVisits().size()) {
+            throw new IllegalArgumentException("Invalid visit position");
+        }
+
+        EVisitStatus newStatus = EVisitStatus.valueOf(status);
+        if (newStatus == null) {
+            throw new IllegalArgumentException("Invalid visit status");
+        }
+
+        route.getVisits().get(visitPos).setStatus(newStatus);
+
+        if (route.getVisits().stream().allMatch(visit -> visit.getStatus() == EVisitStatus.SKIPPED
+                || visit.getStatus() == EVisitStatus.VISITED)) {
+            route.setStatus(ERouteStatus.COMPLETED);
+        }
+
+        actualRouteRepository.save(route);
+
+        return route;
+    }
+
 }

@@ -2,9 +2,11 @@ package com.commerzi.commerziapi.service.classes;
 
 import com.commerzi.commerziapi.address.CheckAddress;
 import com.commerzi.commerziapi.dao.CustomerRepository;
+import com.commerzi.commerziapi.dao.PlannedRouteRepository;
 import com.commerzi.commerziapi.model.Contact;
 import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.model.ECustomerType;
+import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.service.interfaces.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

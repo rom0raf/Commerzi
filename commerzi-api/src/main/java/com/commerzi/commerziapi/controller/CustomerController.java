@@ -128,6 +128,10 @@ public class CustomerController {
     @CommerziAuthenticated
     @PutMapping("/{id}")
     public ResponseEntity updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
+        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
+
+        customer.setUserId("" + user.getUserId());
+
         Customer existingCustomer = customerService.getCustomerById(id);
         if (existingCustomer == null) {
             return ResponseEntity.notFound().build();
@@ -135,6 +139,8 @@ public class CustomerController {
 
         try {
             customerService.updateCustomer(existingCustomer, customer);
+            System.out.println("Customer updated");
+            System.out.println(existingCustomer.getId());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

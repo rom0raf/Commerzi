@@ -1,14 +1,21 @@
 package com.commerzi.commerziapi.service.classes;
 
+import com.commerzi.commerziapi.address.CheckAddress;
+import com.commerzi.commerziapi.dao.CustomerRepository;
 import com.commerzi.commerziapi.dao.PlannedRouteRepository;
 import com.commerzi.commerziapi.maps.MapsUtils;
 import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
 import com.commerzi.commerziapi.maps.algorithms.AlgorithmType;
+import com.commerzi.commerziapi.model.CommerziUser;
+import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.service.interfaces.IPlannedRouteService;
+import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,18 +27,34 @@ public class PlannedRouteService implements IPlannedRouteService {
     @Autowired
     private PlannedRouteRepository plannedRouteRepository;
 
+    @Autowired
+    private CustomerRepository customerRepository;
+
     /**
      * Creates a new planned route.
      *
-     * @param route the planned route to create
      * @return the ID of the created planned route
      */
-    public String createRoute(PlannedRoute route) throws IllegalArgumentException {
+    public String createRoute(List<String> customerId, CommerziUser user, boolean useRealDistance) throws Exception {
+        PlannedRoute route = new PlannedRoute();
+        route.setUserId("" + user.getUserId());
+        for (String id : customerId) {
+            route.getCustomersAndProspects().add(
+                    customerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Customer not found"))
+            );
+        }
+
+        JOpenCageLatLng point = CheckAddress.getCoordinates(user.getAddress(), user.getCity());
+
+        route.setStartingPoint(point);
+        route.setEndingPoint(point);
+
         checkPlannedRoute(route);
 
         MapsUtils.buildFullRoute(
                 route,
-                ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
+                ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED),
+                useRealDistance
         );
 
         plannedRouteRepository.save(route);
