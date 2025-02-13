@@ -2,7 +2,7 @@ package com.commerzi.commerziapi.maps;
 
 import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
 import com.commerzi.commerziapi.maps.algorithms.AlgorithmType;
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -38,7 +38,7 @@ public class TravelerAlgorithmCrazyBenchmark {
     @State(Scope.Thread)
     @AuxCounters(AuxCounters.Type.EVENTS)
     public static class BenchmarkState {
-        private List<JOpenCageLatLng> sortedPoints;
+        private List<Coordinates> sortedPoints;
 
         /**
          * Calculates the total distance between the points in the sorted list.
@@ -57,10 +57,10 @@ public class TravelerAlgorithmCrazyBenchmark {
     }
 
     // The current list of points to pass to the benchmarked function
-    private List<JOpenCageLatLng> points;
+    private List<Coordinates> points;
 
     // Datasets
-    private List<List<JOpenCageLatLng>> datasets;
+    private List<List<Coordinates>> datasets;
 
     // Initialize the datasets
     @Setup(Level.Trial)
@@ -87,7 +87,7 @@ public class TravelerAlgorithmCrazyBenchmark {
      * @return the optimized list of points sorted using the nearest-neighbor heuristic
      */
     @Benchmark
-    public List<JOpenCageLatLng> benchmarkNearestNeighborHeuristic(BenchmarkState state) {
+    public List<Coordinates> benchmarkNearestNeighborHeuristic(BenchmarkState state) {
         state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.NEAREST_NEIGHBOR_HEURISTIC).apply(TravelerAlgorithmCrazyBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
@@ -100,7 +100,7 @@ public class TravelerAlgorithmCrazyBenchmark {
 //     * @return the optimized list of points sorted using the brute force method
 //     */
 //    @Benchmark
-//    public List<JOpenCageLatLng> benchmarkBruteForce(BenchmarkState state) {
+//    public List<Coordinates> benchmarkBruteForce(BenchmarkState state) {
 //        state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE).apply(TravelerAlgorithmCrazyBenchmarkData.startingPoint, points);
 //        return state.sortedPoints;
 //    }
@@ -113,7 +113,7 @@ public class TravelerAlgorithmCrazyBenchmark {
      * @return the optimized list of points sorted using the brute force method
      */
     @Benchmark
-    public List<JOpenCageLatLng> benchmarkBruteForceOptimized(BenchmarkState state) {
+    public List<Coordinates> benchmarkBruteForceOptimized(BenchmarkState state) {
         state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED).apply(TravelerAlgorithmCrazyBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
@@ -126,7 +126,7 @@ public class TravelerAlgorithmCrazyBenchmark {
       * @return the optimized list of points sorted using the brute force method
       */
     @Benchmark
-    public List<JOpenCageLatLng> benchmarkBruteForceOptimizedThreaded(BenchmarkState state) {
+    public List<Coordinates> benchmarkBruteForceOptimizedThreaded(BenchmarkState state) {
         state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
@@ -139,7 +139,7 @@ public class TravelerAlgorithmCrazyBenchmark {
      * @return the optimized list of points sorted using the brute force method
      */
     @Benchmark
-    public List<JOpenCageLatLng> benchmarkBruteForceThreaded(BenchmarkState state) {
+    public List<Coordinates> benchmarkBruteForceThreaded(BenchmarkState state) {
         state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_THREADED).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }

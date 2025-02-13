@@ -1,6 +1,6 @@
 package com.commerzi.commerziapi.model;
 
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,7 +21,7 @@ public class ActualRoute {
     private String plannedRouteId;
     private List<Visit> visits;
     private ERouteStatus status;
-    private List<JOpenCageLatLng> coordinates;
+    private List<Coordinates> coordinates;
 
     /**
      * Gets the ID of the journey.
@@ -136,7 +136,7 @@ public class ActualRoute {
      *
      * @return the current location of the journey
      */
-    public List<JOpenCageLatLng> getCoordinates() {
+    public List<Coordinates> getCoordinates() {
         return coordinates;
     }
 
@@ -145,7 +145,7 @@ public class ActualRoute {
      *
      * @param coordinates the current location to set
      */
-    public void setCoordinates(List<JOpenCageLatLng> coordinates) {
+    public void setCoordinates(List<Coordinates> coordinates) {
         this.coordinates = coordinates;
     }
 

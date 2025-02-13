@@ -1,11 +1,11 @@
 package com.commerzi.commerziapi.service;
 
 import com.commerzi.commerziapi.dao.PlannedRouteRepository;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import com.commerzi.commerziapi.model.Contact;
 import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.service.classes.PlannedRouteService;
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -37,7 +37,7 @@ class PlannedRouteServiceTest {
 
         smallCustomers = new ArrayList<>();
         smallCustomers.add(new Customer() {{
-            setGpsCoordinates( new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060); }} );
+            setGpsCoordinates( new Coordinates(40.7128, -74.0060) );
             setName("Customer 1");
             setUserId("1");
             setAddress("123 Main St");
@@ -49,7 +49,7 @@ class PlannedRouteServiceTest {
         for (int i = 0; i < 7; i++) {
             int finalI = i;
             customers.add(new Customer() {{
-                setGpsCoordinates( new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060); }} );
+                setGpsCoordinates( new Coordinates(40.7128, -74.0060) );
                 setName("Customer " + finalI);
                 setUserId("1");
                 setAddress("123 Main St");
@@ -62,7 +62,7 @@ class PlannedRouteServiceTest {
         for (int i = 0; i < 9; i++) {
             int finalI = i;
             largeCustomers.add(new Customer() {{
-                setGpsCoordinates( new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060); }} );
+                setGpsCoordinates( new Coordinates(40.7128, -74.0060) );
                 setName("Customer " + finalI);
                 setUserId("1");
                 setAddress("123 Main St");
@@ -76,17 +76,16 @@ class PlannedRouteServiceTest {
     void testCreateRoute() throws Exception {
         PlannedRoute route = new PlannedRoute();
         route.setId("1");
-        route.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route.setStartingPoint(new Coordinates(40.7128, -74.0060));
         route.setCustomersAndProspects(customers);
-        route.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
-        route.setEndingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route.setStartingPoint(new Coordinates(40.7128, -74.0060));
+        route.setEndingPoint(new Coordinates(40.7128, -74.0060));
         route.setTotalDistance(0.0);
         route.setUserId("1");
 
         when(plannedRouteRepository.save(route)).thenReturn(route);
 
-//        String id = plannedRouteService.createRoute(false);
-
+//        String id = plannedRouteService.createRoute();
 //        assertEquals("1", id);
     }
 
@@ -94,10 +93,10 @@ class PlannedRouteServiceTest {
     void testGetPlannedRouteById() {
         PlannedRoute route = new PlannedRoute();
         route.setId("1");
-        route.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route.setStartingPoint(new Coordinates(40.7128, -74.0060));
         route.setCustomersAndProspects(customers);
-        route.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
-        route.setEndingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route.setStartingPoint(new Coordinates(40.7128, -74.0060));
+        route.setEndingPoint(new Coordinates(40.7128, -74.0060));
         route.setTotalDistance(0.0);
         route.setUserId("1");
 
@@ -112,19 +111,19 @@ class PlannedRouteServiceTest {
     void testGetAll() {
         PlannedRoute route1 = new PlannedRoute();
         route1.setId("1");
-        route1.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route1.setStartingPoint(new Coordinates(40.7128, -74.0060));
         route1.setCustomersAndProspects(customers);
-        route1.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
-        route1.setEndingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route1.setStartingPoint(new Coordinates(40.7128, -74.0060));
+        route1.setEndingPoint(new Coordinates(40.7128, -74.0060));
         route1.setTotalDistance(0.0);
         route1.setUserId("1");
 
         PlannedRoute route2 = new PlannedRoute();
         route2.setId("2");
-        route2.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route2.setStartingPoint(new Coordinates(40.7128, -74.0060));
         route2.setCustomersAndProspects(customers);
-        route2.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
-        route2.setEndingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route2.setStartingPoint(new Coordinates(40.7128, -74.0060));
+        route2.setEndingPoint(new Coordinates(40.7128, -74.0060));
         route2.setTotalDistance(0.0);
         route2.setUserId("1");
 
@@ -141,10 +140,10 @@ class PlannedRouteServiceTest {
     void testUpdateRoute() throws Exception {
         PlannedRoute route = new PlannedRoute();
         route.setId("1");
-        route.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route.setStartingPoint(new Coordinates(40.7128, -74.0060));
         route.setCustomersAndProspects(customers);
-        route.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
-        route.setEndingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route.setStartingPoint(new Coordinates(40.7128, -74.0060));
+        route.setEndingPoint(new Coordinates(40.7128, -74.0060));
         route.setTotalDistance(0.0);
         route.setUserId("1");
 

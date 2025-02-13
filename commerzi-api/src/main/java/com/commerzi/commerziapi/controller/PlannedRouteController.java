@@ -42,7 +42,7 @@ public class PlannedRouteController {
         List<PlannedRoute> plannedRoutes;
 
         try {
-            plannedRoutes = plannedRouteService.getAll("" + user.getUserId());
+            plannedRoutes = plannedRouteService.getAll(String.valueOf(user.getUserId()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -74,21 +74,13 @@ public class PlannedRouteController {
      * @return the ID of the created planned route
      */
     @CommerziAuthenticated
-    @PostMapping("/{useRealDistance}?name={name}")
-    public ResponseEntity<String> createPlannedRoute(
-            @PathVariable boolean useRealDistance,
-            @PathVariable String name,
-            @RequestBody PlannedRouteDTO plannedRouteDTO) {
+    @PostMapping("/{useRealDistance}")
+    public ResponseEntity<String> createPlannedRoute(@RequestBody List<String> customersId) {
 
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
 
         try {
-            String id = plannedRouteService.createRoute(
-                    plannedRouteDTO.getCustomersId(),
-                    name,
-                    user,
-                    useRealDistance
-            );
+            String id = plannedRouteService.createRoute(customersId, user);
             return ResponseEntity.ok(id);
 
         } catch (IllegalArgumentException e) {

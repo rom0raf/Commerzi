@@ -6,11 +6,10 @@ import com.commerzi.commerziapi.dao.PlannedRouteRepository;
 import com.commerzi.commerziapi.maps.MapsUtils;
 import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
 import com.commerzi.commerziapi.maps.algorithms.AlgorithmType;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import com.commerzi.commerziapi.model.CommerziUser;
-import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.service.interfaces.IPlannedRouteService;
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,19 +34,16 @@ public class PlannedRouteService implements IPlannedRouteService {
      *
      * @return the ID of the created planned route
      */
-    public String createRoute(List<String> customerId, String name,
-                              CommerziUser user, boolean useRealDistance) throws Exception {
-
+    public String createRoute(List<String> customerId, CommerziUser user) throws Exception {
         PlannedRoute route = new PlannedRoute();
-        route.setName(name);
-        route.setUserId("" + user.getUserId());
+        route.setUserId(String.valueOf(user.getUserId()));
         for (String id : customerId) {
             route.getCustomersAndProspects().add(
                     customerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Customer not found"))
             );
         }
 
-        JOpenCageLatLng point = CheckAddress.getCoordinates(user.getAddress(), user.getCity());
+        Coordinates point = CheckAddress.getCoordinates(user.getAddress(), user.getCity());
 
         route.setStartingPoint(point);
         route.setEndingPoint(point);
@@ -56,8 +52,7 @@ public class PlannedRouteService implements IPlannedRouteService {
 
         MapsUtils.buildFullRoute(
                 route,
-                ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED),
-                useRealDistance
+                ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED)
         );
 
         plannedRouteRepository.save(route);

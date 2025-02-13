@@ -2,7 +2,7 @@ package com.commerzi.commerziapi.maps;
 
 import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
 import com.commerzi.commerziapi.maps.algorithms.AlgorithmType;
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class benchmarks the TravelerAlgorithm class's method for sorting a list of JOpenCageLatLng
+ * This class benchmarks the TravelerAlgorithm class's method for sorting a list of Coordinates
  * points using the nearest-neighbor heuristic. It uses JMH to perform accurate microbenchmarks.
  */
 @BenchmarkMode(Mode.AverageTime)
@@ -36,7 +36,7 @@ public class TravelerAlgorithmBenchmark {
     @State(Scope.Thread)
     @AuxCounters(AuxCounters.Type.EVENTS)
     public static class BenchmarkState {
-        private List<JOpenCageLatLng> sortedPoints;
+        private List<Coordinates> sortedPoints;
 
         /**
          * Calculates the total distance between the points in the sorted list.
@@ -48,17 +48,17 @@ public class TravelerAlgorithmBenchmark {
          * @return the total distance between the points in the list, divided by 3
          */
         public Double totalDistance() {
-            sortedPoints.add(0, TravelerAlgorithmCrazyBenchmarkData.startingPoint);
-            sortedPoints.add(TravelerAlgorithmCrazyBenchmarkData.startingPoint);
+            sortedPoints.add(0, TravelerAlgorithmBenchmarkData.startingPoint);
+            sortedPoints.add(TravelerAlgorithmBenchmarkData.startingPoint);
             return MapsUtils.fullFlyingDistanceOverPoints(sortedPoints) / 3;
         }
     }
 
     // The current list of points to pass to the benchmarked function
-    private List<JOpenCageLatLng> points;
+    private List<Coordinates> points;
 
     // Datasets
-    private List<List<JOpenCageLatLng>> datasets;
+    private List<List<Coordinates>> datasets;
 
     // Initialize the datasets
     @Setup(Level.Trial)
@@ -95,7 +95,7 @@ public class TravelerAlgorithmBenchmark {
      * @return the optimized list of points sorted using the nearest-neighbor heuristic
      */
     @Benchmark
-    public List<JOpenCageLatLng> benchmarkNearestNeighborHeuristic(BenchmarkState state) {
+    public List<Coordinates> benchmarkNearestNeighborHeuristic(BenchmarkState state) {
         state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.NEAREST_NEIGHBOR_HEURISTIC).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
@@ -108,7 +108,7 @@ public class TravelerAlgorithmBenchmark {
      * @return the optimized list of points sorted using the brute force method
      */
     @Benchmark
-    public List<JOpenCageLatLng> benchmarkBruteForceThreaded(BenchmarkState state) {
+    public List<Coordinates> benchmarkBruteForceThreaded(BenchmarkState state) {
         state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_THREADED).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
@@ -121,7 +121,7 @@ public class TravelerAlgorithmBenchmark {
       * @return the optimized list of points sorted using the brute force method
       */
     @Benchmark
-    public List<JOpenCageLatLng> benchmarkBruteForce(BenchmarkState state) {
+    public List<Coordinates> benchmarkBruteForce(BenchmarkState state) {
         state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
@@ -134,7 +134,7 @@ public class TravelerAlgorithmBenchmark {
       * @return the optimized list of points sorted using the brute force method
       */
     @Benchmark
-    public List<JOpenCageLatLng> benchmarkBruteForceOptimizedThreaded(BenchmarkState state) {
+    public List<Coordinates> benchmarkBruteForceOptimizedThreaded(BenchmarkState state) {
         state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }
@@ -147,7 +147,7 @@ public class TravelerAlgorithmBenchmark {
      * @return the optimized list of points sorted using the brute force method
      */
     @Benchmark
-    public List<JOpenCageLatLng> benchmarkBruteForceOptimized(BenchmarkState state) {
+    public List<Coordinates> benchmarkBruteForceOptimized(BenchmarkState state) {
         state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
         return state.sortedPoints;
     }

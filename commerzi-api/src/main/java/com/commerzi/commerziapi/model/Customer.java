@@ -1,9 +1,8 @@
 package com.commerzi.commerziapi.model;
 
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -23,8 +22,7 @@ public class Customer {
     private String address;
     private String city;
     private String description;
-//    @Field("location")
-    private JOpenCageLatLng gpsCoordinates;
+    private Coordinates gpsCoordinates;
     private Contact contact;
     private ECustomerType type;
     private String userId;
@@ -122,7 +120,7 @@ public class Customer {
      *
      * @return the GPS coordinates of the customer
      */
-    public JOpenCageLatLng getGpsCoordinates() {
+    public Coordinates getGpsCoordinates() {
         return gpsCoordinates;
     }
 
@@ -131,7 +129,7 @@ public class Customer {
      *
      * @param gpsCoordinates the GPS coordinates to set
      */
-    public void setGpsCoordinates(JOpenCageLatLng gpsCoordinates) {
+    public void setGpsCoordinates(Coordinates gpsCoordinates) {
         this.gpsCoordinates = gpsCoordinates;
     }
 
