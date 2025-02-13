@@ -17,9 +17,62 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: '17'
-        distribution: 'temurin'
+        distribution: 'corretto'
         cache: maven
 
     - name: Build with Maven
       run: mvn -B package --file pom.xml
       working-directory: commerzi-api
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17 for deploy
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'corretto'
+
+    - name: Update application.properties with MySQL credentials
+      run: |
+        # Replace placeholders in application.properties with secrets
+        sed -i 's/<db_user>/${{ secrets.MYSQL_USER }}/' commerzi-api/src/main/resources/application.properties
+        sed -i 's/<db_password>/${{ secrets.MYSQL_PASSWORD }}/' commerzi-api/src/main/resources/application.properties
+    
+    - name: Compile with skip tests
+      run: mvn -B package --file pom.xml -DskipTests
+      working-directory: commerzi-api
+
+    - name: Copy .jar to docker/api
+      run: |
+        cp commerzi-api/target/*.jar commerzi-api/docker/api/
+
+    - name: Deploy to remote server via SCP
+      uses: appleboy/scp-action@v0.1.5
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_PASSWORD }}
+        port: 22
+        source: "commerzi-api/docker/*"
+        target: "/home/ubuntu/docker/"
+        recursive: true
+
+    - name: Run Docker Compose remotely
+      run: |
+        sshpass -p ${{ secrets.REMOTE_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+          cd /home/ubuntu/docker/commerzi-api/docker/
+          sudo docker compose down
+          sudo docker compose up -d --build
+        EOF
+
+    - name: Clean up remote docker folder
+      run: |
+        sshpass -p ${{ secrets.REMOTE_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+          rm -rf /home/ubuntu/docker/*
+        EOF

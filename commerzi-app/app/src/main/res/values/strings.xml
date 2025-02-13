@@ -1,3 +1,55 @@
 <resources>
     <string name="app_name">Commerzi App</string>
+
+    <!-- ACTIONS -->
+    <string name="add">Ajouter</string>
+    <string name="validate">Valider</string>
+    <string name="login">Se connecter</string>
+    <string name="signup">S\'inscrire</string>
+
+    <string name="add_customer">Ajouter un client</string>
+    <string name="edit_customer">Modifier un client</string>
+
+    <string name="edit_profile">Modifier mon profil</string>
+
+    <!-- LABELS -->
+    <string name="signup_label">Inscription</string>
+    <string name="login_label">Connexion</string>
+    <string name="customer">Client</string>
+    <string name="customers">Clients</string>
+    <string name="prospect">Prospect</string>
+    <string name="routes">Itinéraires</string>
+    <string name="profile">Profil</string>
+
+    <!-- FIELDS -->
+    <string name="firstname">Prénom</string>
+    <string name="lastname">Nom</string>
+    <string name="email">Email</string>
+    <string name="address">Adresse</string>
+    <string name="city">Ville</string>
+    <string name="password">Mot de passe</string>
+    <string name="confirmation">Confirmation</string>
+    <string name="telephone">Téléphone</string>
+    <string name="company">Entreprise</string>
+    <string name="description">Description</string>
+
+    <!-- ERRORS -->
+    <string name="email_error">Email incorrect</string>
+    <string name="password_error">Mot de passe incorrect</string>
+    <string name="login_error_message">Impossible de vous connecter, veuillez réessayer</string>
+    <string name="signup_error">Impossible de créer un compte, veuillez réessayer </string>
+    <string name="email_password_empty">Les champs email et mot de passe ne doivent pas être vides</string>
+    <string name="credentials_error">Identifiants incorrects</string>
+    <string name="empty_field_error">Tous les champs doivent être remplis</string>
+    <string name="password_confirmation_error">La confirmation du mot de passe est invalide</string>
+    <string name="request_creation_error">Request creation error</string>
+    <string name="unexpected_error">Erreur inattentue</string>
+    <string name="select_type_error">Un type doit être sélectionné</string>
+    <string name="error_during_update">Erreur lors de la mise à jour</string>
+
+    <!-- FEEDBACK -->
+    <string name="account_creation_success">Compte créé avec succès</string>
+    <string name="customer_creation_success">Client créé avec succès</string>
+    <string name="profile_update_success">Profil mis à jour</string>
+    
 </resources>

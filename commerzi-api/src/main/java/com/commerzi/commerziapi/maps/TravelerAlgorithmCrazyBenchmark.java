@@ -119,6 +119,32 @@ public class TravelerAlgorithmCrazyBenchmark {
     }
 
     /**
+      * Benchmark for the BruteForceOptimizedThreaded class.
+      * This method measures the time it takes to sort the point and returns the optimized list.
+      *
+      * @param state the current benchmark state to count some other data
+      * @return the optimized list of points sorted using the brute force method
+      */
+    @Benchmark
+    public List<JOpenCageLatLng> benchmarkBruteForceOptimizedThreaded(BenchmarkState state) {
+        state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
+        return state.sortedPoints;
+    }
+
+    /**
+     * Benchmark for the BruteForceThreaded class.
+     * This method measures the time it takes to sort the point and returns the optimized list.
+     *
+     * @param state the current benchmark state to count some other data
+     * @return the optimized list of points sorted using the brute force method
+     */
+    @Benchmark
+    public List<JOpenCageLatLng> benchmarkBruteForceThreaded(BenchmarkState state) {
+        state.sortedPoints = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_THREADED).apply(TravelerAlgorithmBenchmarkData.startingPoint, points);
+        return state.sortedPoints;
+    }
+
+    /**
      * Main method to run the benchmark using JMH.
      * This runs the crazy benchmark.
      * It requires running through JMH harness to get proper benchmarking results.
@@ -129,9 +155,9 @@ public class TravelerAlgorithmCrazyBenchmark {
         Options options = new OptionsBuilder()
                 .include(TravelerAlgorithmCrazyBenchmark.class.getSimpleName())
                 .forks(1)
-                .warmupIterations(3)
+                .warmupIterations(2)
                 .warmupTime(TimeValue.seconds(3))
-                .measurementIterations(3)
+                .measurementIterations(2)
                 .measurementTime(TimeValue.seconds(3))
                 .resultFormat(ResultFormatType.JSON)
                 .result(benchmarkFileOutput())
