@@ -66,11 +66,11 @@ public class MapsUtils {
         }
 
         return FLYING_DISTANCE_CACHE.computeIfAbsent(CoordinatesCache.generateBothWaysCacheKey(p1, p2), x -> {
-            double lat1 = p1.latitude();
-            double lon1 = p1.longitude();
+            double lat1 = p1.getLatitude();
+            double lon1 = p1.getLongitude();
 
-            double lat2 = p2.latitude();
-            double lon2 = p2.longitude();
+            double lat2 = p2.getLatitude();
+            double lon2 = p2.getLongitude();
 
             double latitudinalDistance = Math.toRadians(lat2 - lat1);
             double longitudinalDistance = Math.toRadians(lon2 - lon1);
@@ -248,10 +248,10 @@ public class MapsUtils {
      * @return the URL as a String
      */
     private static String getOSRMUrl(Coordinates start, Coordinates end) {
-        String startLat = String.valueOf(start.latitude()).replace(",", ".");
-        String startLng = String.valueOf(start.longitude()).replace(",", ".");
-        String endLat = String.valueOf(end.latitude()).replace(",", ".");
-        String endLng = String.valueOf(end.longitude()).replace(",", ".");
+        String startLat = String.valueOf(start.getLatitude()).replace(",", ".");
+        String startLng = String.valueOf(start.getLongitude()).replace(",", ".");
+        String endLat = String.valueOf(end.getLatitude()).replace(",", ".");
+        String endLng = String.valueOf(end.getLongitude()).replace(",", ".");
 
         return String.format(OSRM_URL, startLat, startLng, endLat, endLng);
     }
