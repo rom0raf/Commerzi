@@ -63,10 +63,10 @@ public class CoordinatesCache<V> {
      */
     public static String generateBothWaysCacheKey(Coordinates p1, Coordinates p2) {
         // To ensure uniqueness, we use both directions (p1 -> p2 and p2 -> p1)
-        if (p1.latitude() < p2.latitude() || (p1.latitude() == p2.latitude() && p1.longitude() < p2.longitude())) {
-            return p1.latitude() + "," + p1.longitude() + "-" + p2.latitude() + "," + p2.longitude();
+        if (p1.getLatitude() < p2.getLatitude() || (p1.getLatitude() == p2.getLatitude() && p1.getLongitude() < p2.getLongitude())) {
+            return p1.getLatitude() + "," + p1.getLongitude() + "-" + p2.getLatitude() + "," + p2.getLongitude();
         } else {
-            return p2.latitude() + "," + p2.longitude() + "-" + p1.latitude() + "," + p1.longitude();
+            return p2.getLatitude() + "," + p2.getLongitude() + "-" + p1.getLatitude() + "," + p1.getLongitude();
         }
     }
 
@@ -80,6 +80,6 @@ public class CoordinatesCache<V> {
      */
     public static String generateCacheKey(Coordinates p1, Coordinates p2) {
         // Simply return the key in the order of p1 -> p2 without checking both directions
-        return p1.latitude() + "," + p1.longitude() + "-" + p2.latitude() + "," + p2.longitude();
+        return p1.getLatitude() + "," + p1.getLongitude() + "-" + p2.getLatitude() + "," + p2.getLongitude();
     }
 }
