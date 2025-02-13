@@ -148,10 +148,7 @@ public class MapsUtils {
         points.add(initialRoute.getEndingPoint());
         points.add(0, initialRoute.getStartingPoint());
 
-        double distance;
-
-        distance = algorithm.getFullDistanceOverPointsFunc().apply(points);
-
+        double distance = algorithm.getFullDistanceOverPointsFunc().apply(points);
         initialRoute.setTotalDistance(distance);
     }
 
@@ -212,6 +209,7 @@ public class MapsUtils {
                 distance = getGpsRoute(p1, p2).getDistance();
             } catch(IOException e) {
                 distance = -1.0;
+                e.printStackTrace();
             }
 
             return distance;

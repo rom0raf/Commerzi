@@ -2,6 +2,7 @@ package com.commerzi.app.route;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,12 +62,12 @@ public class RouteFragment extends Fragment implements View.OnClickListener {
 
     private void loadRoutes() {
         if (getActivity() == null) return;
-        
-        ArrayList<Customer> customers = new ArrayList<>();
 
         Communicator communicator = Communicator.getInstance(getActivity());
         communicator.getRoutes(new CommunicatorCallback<>(
                 response -> {
+                    Log.d("RouteFragment", "loadRoutes: " + response.routes.size());
+                    displayRoutes(response.routes);
                 },
                 error -> {
                     Toast.makeText(getActivity(), error.message, Toast.LENGTH_SHORT).show();

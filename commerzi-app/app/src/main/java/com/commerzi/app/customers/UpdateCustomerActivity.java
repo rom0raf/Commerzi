@@ -1,6 +1,7 @@
 package com.commerzi.app.customers;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -39,18 +40,18 @@ public class UpdateCustomerActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnUpdateCustomer);
 
         // Récupérer l'objet Company passé par l'intent
-        customer = (Customer) getIntent().getSerializableExtra("customer");
+        customer = (Customer) getIntent().getParcelableExtra("customer");
 
         if (customer != null) {
             etName.setText(customer.getName());
             etAddress.setText(customer.getAddress());
             etCity.setText(customer.getCity());
             etDescription.setText(customer.getDescription());
-            etFirstName.setText(customer.getContactFirstName());
-            etLastName.setText(customer.getContactLastName());
-            etPhoneNumber.setText(customer.getContactPhoneNumber());
+            etFirstName.setText(customer.getContact().getFirstName());
+            etLastName.setText(customer.getContact().getLastName());
+            etPhoneNumber.setText(customer.getContact().getPhoneNumber());
 
-            if (customer.getType().equalsIgnoreCase("client")) {
+            if (customer.getType() == ECustomerType.client) {
                 radioCustomer.setChecked(true);
             } else {
                 radioProspect.setChecked(true);
@@ -63,7 +64,24 @@ public class UpdateCustomerActivity extends AppCompatActivity {
     private void updateCustomer(Customer customer) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
-        communicator.updateCustomer(customer, new CommunicatorCallback<>(
+        ECustomerType type = radioCustomer.isChecked() ? ECustomerType.client : ECustomerType.prospect;
+        Contact ct = new Contact(
+                etFirstName.getText().toString(),
+                etLastName.getText().toString(),
+                etPhoneNumber.getText().toString()
+        );
+        Customer updatedCustomer = new Customer(
+                customer.getId(),
+                etName.getText().toString(),
+                etAddress.getText().toString(),
+                etCity.getText().toString(),
+                etDescription.getText().toString(),
+                type,
+                ct,
+                null
+        );
+
+        communicator.updateCustomer(updatedCustomer, new CommunicatorCallback<>(
                 response -> {
                     Toast.makeText(UpdateCustomerActivity.this, response.message, Toast.LENGTH_SHORT).show();
                     finish();

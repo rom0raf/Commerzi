@@ -71,8 +71,9 @@ public class CreateCustomerActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.empty_field_error, Toast.LENGTH_LONG).show();
             return;
         }
-        
-        Customer customer = new Customer(null, name, address, city, description, clientType, firstname, lastname, phoneNumber);
+        Contact contact = new Contact(firstname, lastname, phoneNumber);
+
+        Customer customer = new Customer(null, name, address, city, description, ECustomerType.valueOf(clientType), contact, null);
         createClient(customer);
     }
 

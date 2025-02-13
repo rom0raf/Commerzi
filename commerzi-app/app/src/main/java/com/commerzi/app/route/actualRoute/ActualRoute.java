@@ -1,6 +1,6 @@
 package com.commerzi.app.route.actualRoute;
 
-import com.commerzi.app.route.utils.Coordinates;
+import com.commerzi.app.customers.Coordinates;
 import com.commerzi.app.route.utils.ERouteStatus;
 import com.commerzi.app.route.visit.Visit;
 

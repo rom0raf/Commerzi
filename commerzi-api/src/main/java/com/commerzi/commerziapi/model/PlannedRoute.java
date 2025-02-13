@@ -167,6 +167,8 @@ public class PlannedRoute {
         return "PlannedRoute{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
+
+
                 ", userId='" + userId + '\'' +
                 ", customersAndProspects=" + customersAndProspects +
                 ", startingPoint=" + startingPoint +
