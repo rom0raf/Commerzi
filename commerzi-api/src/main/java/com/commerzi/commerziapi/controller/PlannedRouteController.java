@@ -7,11 +7,13 @@ import com.commerzi.commerziapi.security.CommerziAuthenticated;
 import com.commerzi.commerziapi.security.Security;
 import com.commerzi.commerziapi.service.interfaces.IAuthentificationService;
 import com.commerzi.commerziapi.service.interfaces.IPlannedRouteService;
+import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -76,14 +78,26 @@ public class PlannedRouteController {
     @CommerziAuthenticated
     @PostMapping("/{name}")
     public ResponseEntity<String> createPlannedRoute(
-            @PathVariable String name, @RequestBody PlannedRouteDTO plannedRouteDTO) {
+            @PathVariable String name, @RequestBody PlannedRouteDTO customersId) {
 
+        System.out.println("Current time");
+        System.out.println(System.nanoTime());
+
+//        return ResponseEntity.ok("Route created successfully");
+
+        if (customersId == null || customersId.getCustomersId() == null || customersId.getCustomersId().isEmpty()) {
+            return ResponseEntity.badRequest().body("No customers specified");
+        }
+        if (name == null || name.isEmpty()) {
+            return ResponseEntity.badRequest().body("No name specified");
+        }
+
+        name = URLDecoder.decode(name);
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
 
         try {
-            String id = plannedRouteService.createRoute(plannedRouteDTO.getCustomersId(), name, user);
+            String id = plannedRouteService.createRoute(customersId.getCustomersId(), name, user);
             return ResponseEntity.ok(id);
-
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {
@@ -104,15 +118,12 @@ public class PlannedRouteController {
     @CommerziAuthenticated
     @PutMapping("/")
     public ResponseEntity<String> updatePlannedRoute(@RequestBody PlannedRoute plannedRoute) {
-
         try {
             plannedRouteService.updateRoute(plannedRoute);
             return ResponseEntity.ok("Route updated successfully");
-
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
     }
 
     /**

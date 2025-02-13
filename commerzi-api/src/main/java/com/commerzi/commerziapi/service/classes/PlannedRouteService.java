@@ -8,6 +8,7 @@ import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
 import com.commerzi.commerziapi.maps.algorithms.AlgorithmType;
 import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import com.commerzi.commerziapi.model.CommerziUser;
+import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.service.interfaces.IPlannedRouteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,13 @@ public class PlannedRouteService implements IPlannedRouteService {
         PlannedRoute route = new PlannedRoute();
         route.setName(name);
         route.setUserId(String.valueOf(user.getUserId()));
+        List<Customer> customers = new ArrayList<>();
+
         for (String id : customerId) {
-            route.getCustomersAndProspects().add(
-                    customerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Customer not found"))
-            );
+            customers.add(customerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Customer not found")));
         }
+
+        route.setCustomersAndProspects(customers);
 
         Coordinates point = CheckAddress.getCoordinates(user.getAddress(), user.getCity());
 
@@ -53,11 +56,10 @@ public class PlannedRouteService implements IPlannedRouteService {
 
         MapsUtils.buildFullRoute(
                 route,
-                ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED)
+                ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
         );
 
         plannedRouteRepository.save(route);
-
         return route.getId();
     }
 

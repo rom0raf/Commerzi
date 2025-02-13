@@ -6,10 +6,12 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -22,6 +24,7 @@ import com.commerzi.app.communication.responses.CustomerResponse;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 import com.commerzi.app.communication.responses.GenericMessageResponse;
 import com.commerzi.app.route.plannedRoute.PlannedRoute;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -101,6 +104,12 @@ public class Communicator {
         // This is needed because "this" in getHeaders() is
         // the StringRequest "this" and not the actual Communicator
         String token = this.sessionToken;
+        int timeout = 10_000;
+        RetryPolicy retryPolicy = new DefaultRetryPolicy(
+                timeout,
+                0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        );
         StringRequest stringRequest = new StringRequest(method, url, listener, errorListener) {
             @Override
             public byte[] getBody() throws AuthFailureError {
@@ -138,6 +147,8 @@ public class Communicator {
                 return headers;
             }
         };
+
+        stringRequest.setRetryPolicy(retryPolicy);
 
         this.queue.add(stringRequest);
     }
@@ -235,9 +246,9 @@ public class Communicator {
             jsonBody.put("type", customer.getType());
 
             JSONObject contact = new JSONObject();
-            contact.put("firstName", customer.getContactFirstName());
-            contact.put("lastName", customer.getContactLastName());
-            contact.put("phoneNumber", customer.getContactPhoneNumber());
+            contact.put("firstName", customer.getContact().getFirstName());
+            contact.put("lastName", customer.getContact().getLastName());
+            contact.put("phoneNumber", customer.getContact().getPhoneNumber());
 
             jsonBody.put("contact", contact);
 
@@ -265,9 +276,9 @@ public class Communicator {
             jsonBody.put("type", customer.getType());
 
             JSONObject contact = new JSONObject();
-            contact.put("firstName", customer.getContactFirstName());
-            contact.put("lastName", customer.getContactLastName());
-            contact.put("phoneNumber", customer.getContactPhoneNumber());
+            contact.put("firstName", customer.getContact().getFirstName());
+            contact.put("lastName", customer.getContact().getLastName());
+            contact.put("phoneNumber", customer.getContact().getPhoneNumber());
 
             jsonBody.put("contact", contact);
 
@@ -296,19 +307,8 @@ public class Communicator {
                     for (int i = 0; i < jsonResponse.length(); i++) {
                         JSONObject customerJson = jsonResponse.getJSONObject(i);
 
-                        String id = customerJson.optString("id", "Inconnu");
-                        String name = customerJson.optString("name", "Inconnu");
-                        String address = customerJson.optString("address", "Non spécifié");
-                        String city = customerJson.optString("city", "Non spécifié");
-                        String description = customerJson.optString("description", "Non spécifiée");
-                        String type = customerJson.optString("type", "Inconnu");
-
-                        JSONObject contact = customerJson.optJSONObject("contact");
-                        String firstName = contact != null ? contact.optString("firstName", "Inconnu") : "Inconnu";
-                        String lastName = contact != null ? contact.optString("lastName", "Inconnu") : "Inconnu";
-                        String phoneNumber = contact != null ? contact.optString("phoneNumber", "Non spécifié") : "Non spécifié";
-
-                        Customer customer = new Customer(id, name, address, city, description, type, firstName, lastName, phoneNumber);
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        Customer customer = gsonBuilder.create().fromJson(customerJson.toString(), Customer.class);
                         customerList.add(customer);
                     }
 
@@ -372,10 +372,10 @@ public class Communicator {
                         for (int i = 0; i < jsonResponse.length(); i++) {
                             JSONObject routesJson = jsonResponse.getJSONObject(i);
 
-                            String customers = routesJson.optString("id", "Inconnu");
+                            GsonBuilder gsonBuilder = new GsonBuilder();
+                            PlannedRoute route = gsonBuilder.create().fromJson(routesJson.toString(), PlannedRoute.class);
 
-//                            PlannedRoute route = new PlannedRoute();
-//                            routes.add(route);
+                            routes.add(route);
                         }
 
                         callback.onSuccess(new PlannedRouteResponse(routes, null));
@@ -400,12 +400,16 @@ public class Communicator {
             for(int i = 0; i < customers.size(); i++) {
                 customersId.add(customers.get(i).getId());
             }
-            jsonBody.put("customersId", customersId);
+            jsonBody.put("customersId", new JSONArray(customersId));
+
             String encodedName = URLEncoder.encode(name);
 
             this.request(Request.Method.POST, this.buildPlannedRoutesBaseUrl() + encodedName, jsonBody, true,
-                    response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.customer_creation_success))),
-                    error -> callback.onFailure(new GenericMessageResponse(context.getString(R.string.unexpected_error)))
+                    response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.route_creation_success))),
+                    error -> {
+                        error.printStackTrace();
+                        callback.onFailure(new GenericMessageResponse(context.getString(R.string.unexpected_error)));
+                    }
             );
         } catch(Exception e) {
             e.printStackTrace();
