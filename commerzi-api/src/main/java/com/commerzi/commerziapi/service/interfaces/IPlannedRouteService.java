@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IPlannedRouteService {
 
-    String createRoute(List<String> customersId, CommerziUser user) throws Exception;
+    String createRoute(List<String> customersId, String name, CommerziUser user) throws Exception;
 
     List<PlannedRoute> getAll(String userId);
 
