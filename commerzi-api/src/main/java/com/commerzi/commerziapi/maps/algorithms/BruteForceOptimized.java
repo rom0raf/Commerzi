@@ -1,6 +1,6 @@
 package com.commerzi.commerziapi.maps.algorithms;
 
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class BruteForceOptimized extends ATravelerAlgorithm {
      * @param distanceFunc a function to calculate the distance between two points
      * @see ATravelerAlgorithm#ATravelerAlgorithm(Function, BiFunction)
      */
-    public BruteForceOptimized(Function<List<JOpenCageLatLng>, Double> fullDistanceFunc, BiFunction<JOpenCageLatLng, JOpenCageLatLng, Double> distanceFunc) {
+    public BruteForceOptimized(Function<List<Coordinates>, Double> fullDistanceFunc, BiFunction<Coordinates, Coordinates, Double> distanceFunc) {
         super(fullDistanceFunc, distanceFunc);
     }
 
@@ -43,9 +43,9 @@ public class BruteForceOptimized extends ATravelerAlgorithm {
      * @param minDistance an array containing the minimum distance found so far
      * @param currentDistance the current partial distance of the path
      */
-    private void explorePaths(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points,
-                              List<JOpenCageLatLng> currentPath, boolean[] visited,
-                              List<JOpenCageLatLng> bestPath, double[] minDistance, double currentDistance) {
+    private void explorePaths(Coordinates startingPoint, List<Coordinates> points,
+                              List<Coordinates> currentPath, boolean[] visited,
+                              List<Coordinates> bestPath, double[] minDistance, double currentDistance) {
         if (currentPath.size() == points.size()) {
             double totalDistance = currentDistance + this.distanceBetweenTwoPoints.apply(currentPath.get(currentPath.size() - 1), startingPoint);
 
@@ -91,13 +91,13 @@ public class BruteForceOptimized extends ATravelerAlgorithm {
      * @return the optimal route as a list of points, excluding the starting and ending points in the returned path
      */
     @Override
-    protected List<JOpenCageLatLng> performAlgorithm(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points) {
-        List<JOpenCageLatLng> bestPath = new ArrayList<>();
+    protected List<Coordinates> performAlgorithm(Coordinates startingPoint, List<Coordinates> points) {
+        List<Coordinates> bestPath = new ArrayList<>();
         double minDistance = Double.MAX_VALUE;
 
         double[] minDistanceArray = new double[]{minDistance};
 
-        List<JOpenCageLatLng> currentPath = new ArrayList<>();
+        List<Coordinates> currentPath = new ArrayList<>();
         boolean[] visited = new boolean[points.size()];
 
         explorePaths(startingPoint, points, currentPath, visited, bestPath, minDistanceArray, 0);

@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 
 /**
  * The BruteForceThreaded class implements the brute force algorithm for solving the Traveling Salesman Problem (TSP)
@@ -32,7 +32,7 @@ public class BruteForceThreaded extends ATravelerAlgorithm {
      * @param distanceFunc a function to calculate the distance between two points
      * @see ATravelerAlgorithm#ATravelerAlgorithm(Function, BiFunction)
      */
-    public BruteForceThreaded(Function<List<JOpenCageLatLng>, Double> fullDistanceFunc, BiFunction<JOpenCageLatLng, JOpenCageLatLng, Double> distanceFunc) {
+    public BruteForceThreaded(Function<List<Coordinates>, Double> fullDistanceFunc, BiFunction<Coordinates, Coordinates, Double> distanceFunc) {
         super(fullDistanceFunc, distanceFunc);
     }
 
@@ -44,7 +44,7 @@ public class BruteForceThreaded extends ATravelerAlgorithm {
         /**
          * The optimal path for the specific thread, excluding the start and end points.
          */
-        public final List<JOpenCageLatLng> path;
+        public final List<Coordinates> path;
 
         /**
          * The distance of the optimal path.
@@ -57,7 +57,7 @@ public class BruteForceThreaded extends ATravelerAlgorithm {
          * @param path the optimal path found by the thread
          * @param distance the distance of the optimal path
          */
-        BruteForceThreadResult(List<JOpenCageLatLng> path, double distance) {
+        BruteForceThreadResult(List<Coordinates> path, double distance) {
             this.path = path;
             this.distance = distance;
         }
@@ -71,17 +71,17 @@ public class BruteForceThreaded extends ATravelerAlgorithm {
         /**
          * The starting point of the journey for this thread.
          */
-        private JOpenCageLatLng startingPoint;
+        private final Coordinates startingPoint;
 
         /**
          * The point in the list that this thread considers as the starting point for its calculations.
          */
-        private JOpenCageLatLng listStartingPoint;
+        private final Coordinates listStartingPoint;
 
         /**
          * The list of points to be visited, excluding the starting point.
          */
-        private List<JOpenCageLatLng> points;
+        private final List<Coordinates> points;
 
         /**
          * Constructor for initializing the BruteForceThread object.
@@ -90,7 +90,7 @@ public class BruteForceThreaded extends ATravelerAlgorithm {
          * @param listStartingPoint the specific point in the list chosen as the starting point for this thread's calculations
          * @param points the list of points to visit (excluding the starting point)
          */
-        public BruteForceThread(JOpenCageLatLng startingPoint, JOpenCageLatLng listStartingPoint, List<JOpenCageLatLng> points) {
+        public BruteForceThread(Coordinates startingPoint, Coordinates listStartingPoint, List<Coordinates> points) {
             this.startingPoint = startingPoint;
             this.points = points;
             this.listStartingPoint = listStartingPoint;
@@ -104,12 +104,12 @@ public class BruteForceThreaded extends ATravelerAlgorithm {
          */
         @Override
         public BruteForceThreadResult call() {
-            List<List<JOpenCageLatLng>> permutations = BruteForceUtils.generatePermutations(points);
-            List<JOpenCageLatLng> bestPath = null;
+            List<List<Coordinates>> permutations = BruteForceUtils.generatePermutations(points);
+            List<Coordinates> bestPath = null;
             double minDistance = Double.MAX_VALUE;
 
-            for (List<JOpenCageLatLng> path : permutations) {
-                List<JOpenCageLatLng> fullPath = new ArrayList<>();
+            for (List<Coordinates> path : permutations) {
+                List<Coordinates> fullPath = new ArrayList<>();
                 fullPath.add(startingPoint);
 
                 // We need to add the actual starting point of the list too
@@ -142,18 +142,18 @@ public class BruteForceThreaded extends ATravelerAlgorithm {
      * @return the optimal path as a list of points, including the starting point at the beginning
      */
     @Override
-    protected List<JOpenCageLatLng> performAlgorithm(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points) {
+    protected List<Coordinates> performAlgorithm(Coordinates startingPoint, List<Coordinates> points) {
         ExecutorService executor = Executors.newFixedThreadPool(points.size());
         List<Future<BruteForceThreadResult>> futures = new ArrayList<>();
 
-        for (JOpenCageLatLng point : points) {
-            List<JOpenCageLatLng> pointsToVisit = new ArrayList<>(points);
+        for (Coordinates point : points) {
+            List<Coordinates> pointsToVisit = new ArrayList<>(points);
             pointsToVisit.remove(point);
             BruteForceThread task = new BruteForceThread(startingPoint, point, pointsToVisit);
             futures.add(executor.submit(task));
         }
 
-        List<JOpenCageLatLng> bestPath = null;
+        List<Coordinates> bestPath = null;
         double minDistance = Double.MAX_VALUE;
 
         try {

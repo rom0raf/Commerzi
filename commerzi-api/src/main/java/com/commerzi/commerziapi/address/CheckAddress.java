@@ -1,18 +1,19 @@
 package com.commerzi.commerziapi.address;
 
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
+import com.commerzi.commerziapi.maps.coordinates.CoordinatesCache;
+import com.commerzi.commerziapi.maps.coordinates.CoordinatesTransformer;
 import com.opencagedata.jopencage.JOpenCageGeocoder;
 import com.opencagedata.jopencage.model.JOpenCageForwardRequest;
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import com.opencagedata.jopencage.model.JOpenCageResponse;
 
-import java.util.HashMap;
 import java.util.Properties;
 
 public class CheckAddress {
 
     private static String apiKey;
-
-    private static HashMap<String, JOpenCageLatLng> cache = new HashMap<>();
+    private final static int MAX_CACHE_SIZE = 100;
+    private static final CoordinatesCache<Coordinates> cache = new CoordinatesCache(MAX_CACHE_SIZE);
 
     public static void init() {
         // read from application.properties
@@ -23,30 +24,26 @@ public class CheckAddress {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    private static JOpenCageLatLng callAPI(String address, String city) {
+    private static Coordinates callAPI(String address, String city) {
         // call the OpenCage API
         JOpenCageGeocoder jOpenCageGeocoder = new JOpenCageGeocoder(apiKey);
         JOpenCageForwardRequest request = new JOpenCageForwardRequest(address + ", " + city);
         request.setRestrictToCountryCode("fr");
 
         JOpenCageResponse response = jOpenCageGeocoder.forward(request);
-        return response.getFirstPosition();
+        return CoordinatesTransformer.from(response.getFirstPosition());
     }
 
     public static boolean isAddressInvalid(String address, String city) {
         if (address == null || address.isEmpty() || city == null || city.isEmpty()) {
             return true;
         }
-
-
-        JOpenCageLatLng coordinates = callAPI(address, city);
-        return coordinates == null;
+        return callAPI(address, city) == null;
     }
 
-    public static JOpenCageLatLng getCoordinates(String address, String city) {
+    public static Coordinates getCoordinates(String address, String city) {
         if (address == null || address.isEmpty()) {
             return null;
         }
@@ -59,7 +56,7 @@ public class CheckAddress {
             return cache.get(getCacheKey(address, city));
         }
 
-        JOpenCageLatLng coordinates = callAPI(address, city);
+        Coordinates coordinates = callAPI(address, city);
         cache.put(getCacheKey(address, city), coordinates);
         return coordinates;
     }

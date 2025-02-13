@@ -1,6 +1,8 @@
 package com.commerzi.commerziapi.maps;
 
 import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
+import com.commerzi.commerziapi.maps.coordinates.CoordinatesCache;
 import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.model.maps.GPSRoute;
 import com.commerzi.commerziapi.model.PlannedRoute;
@@ -8,7 +10,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,8 +17,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class MapsUtils {
 
@@ -25,12 +24,17 @@ public class MapsUtils {
 
     private static final String OSRM_URL = "https://router.project-osrm.org/route/v1/driving/%s,%s;%s,%s?overview=full&steps=true";
 
+    private static final int CACHE_MAX_SIZE = 10000;
 
     /**
      * Cached calculated flying distances
-     * ConcurrentMap for thread safe access
      */
-    private static final ConcurrentMap<String, Double> distanceCache = new ConcurrentHashMap<>();
+    private static final CoordinatesCache<Double> FLYING_DISTANCE_CACHE = new CoordinatesCache(CACHE_MAX_SIZE);
+
+    /**
+     * Cached calculated real distances
+     */
+    private static final CoordinatesCache<Double> REAL_DISTANCE_CACHE = new CoordinatesCache(CACHE_MAX_SIZE);
 
     /**
      * Calculates the haversine of an angle.
@@ -44,22 +48,6 @@ public class MapsUtils {
     }
 
     /**
-     * Generates a unique cache key for a pair of geographic points (latitudes and longitudes).
-     * The key ensures that the distance calculation between two points is cached regardless of the order
-     * in which the points are passed (i.e., the cache key will be the same for both directions, p1 -> p2 and p2 -> p1).
-     *
-     * @param p1 the first geographic point (latitude and longitude)
-     * @param p2 the second geographic point (latitude and longitude)
-     * @return a unique string that represents the cache key for the given pair of points
-     */
-    private static String generateCacheKey(JOpenCageLatLng p1, JOpenCageLatLng p2) {
-        // To ensure uniqueness, we use both directions (p1 -> p2 and p2 -> p1)
-        String key1 = p1.getLat() + "," + p1.getLng() + "-" + p2.getLat() + "," + p2.getLng();
-        String key2 = p2.getLat() + "," + p2.getLng() + "-" + p1.getLat() + "," + p1.getLng();
-        return key1.hashCode() < key2.hashCode() ? key1 : key2;
-    }
-
-    /**
      * This method calculates the flying distance between two points.
      * This method uses memory caching.
      *
@@ -68,7 +56,7 @@ public class MapsUtils {
      * @return flying distance between two points
      * @throws IllegalArgumentException if p1 or p2 is null
      */
-    public static double flyingDistanceBetweenTwoPoints(JOpenCageLatLng p1, JOpenCageLatLng p2) {
+    public static double flyingDistanceBetweenTwoPoints(Coordinates p1, Coordinates p2) {
         if (p1 == null || p2 == null) {
             throw new IllegalArgumentException("Point 1 or Point 2 can't be null");
         }
@@ -77,12 +65,12 @@ public class MapsUtils {
             return 0.0;
         }
 
-        return distanceCache.computeIfAbsent(generateCacheKey(p1, p2), x -> {
-            double lat1 = p1.getLat();
-            double lon1 = p1.getLng();
+        return FLYING_DISTANCE_CACHE.computeIfAbsent(CoordinatesCache.generateBothWaysCacheKey(p1, p2), x -> {
+            double lat1 = p1.latitude();
+            double lon1 = p1.longitude();
 
-            double lat2 = p2.getLat();
-            double lon2 = p2.getLng();
+            double lat2 = p2.latitude();
+            double lon2 = p2.longitude();
 
             double latitudinalDistance = Math.toRadians(lat2 - lat1);
             double longitudinalDistance = Math.toRadians(lon2 - lon1);
@@ -104,12 +92,12 @@ public class MapsUtils {
      * @return the total distance as a Double, which is the sum of distances between consecutive points
      * @throws IllegalArgumentException if the points array is null or contains fewer than two points
      */
-    public static Double fullFlyingDistanceOverPoints(List<JOpenCageLatLng> points) {
+    public static double fullFlyingDistanceOverPoints(List<Coordinates> points) {
         if (points == null || points.size() < 2) {
             throw new IllegalArgumentException("There must be at least two points to calculate distance.");
         }
 
-        Double totalDistance = 0.0;
+        double totalDistance = 0.0;
 
         for (int i = 0; i < points.size() - 1; i++) {
             totalDistance += flyingDistanceBetweenTwoPoints(points.get(i), points.get(i + 1));
@@ -128,7 +116,7 @@ public class MapsUtils {
      * @return a PlannedRoute object containing the ordered customers and the total flying travel distance
      * @throws IllegalArgumentException if the customers list is null or empty, or if the commercialHome is null
      */
-    public static void buildFullRoute(PlannedRoute initialRoute, ATravelerAlgorithm algorithm, boolean useRealDistance) throws IOException {
+    public static void buildFullRoute(PlannedRoute initialRoute, ATravelerAlgorithm algorithm) throws IOException {
         if (initialRoute.getCustomersAndProspects() == null || initialRoute.getCustomersAndProspects().isEmpty()) {
             throw new IllegalArgumentException("Customer list cannot be null or empty.");
         }
@@ -141,14 +129,14 @@ public class MapsUtils {
             throw new IllegalArgumentException("Algorithm can't be null.");
         }
 
-        List<JOpenCageLatLng> points = initialRoute.getCustomersAndProspects().stream()
+        List<Coordinates> points = initialRoute.getCustomersAndProspects().stream()
             .map(Customer::getGpsCoordinates)
             .toList();
 
         points = algorithm.apply(initialRoute.getStartingPoint(), points);
 
         List<Customer> orderedCustomers = new ArrayList<>();
-        for (JOpenCageLatLng point : points) {
+        for (Coordinates point : points) {
             initialRoute.getCustomersAndProspects().stream()
                 .filter(c -> c.getGpsCoordinates().equals(point))
                 .findFirst()
@@ -162,11 +150,7 @@ public class MapsUtils {
 
         double distance;
 
-        if (useRealDistance) {
-            distance = realDistanceBetweenPoints(initialRoute.getStartingPoint(), initialRoute.getEndingPoint());
-        } else {
-            distance = algorithm.getFullDistanceOverPointsFunc().apply(points);
-        }
+        distance = algorithm.getFullDistanceOverPointsFunc().apply(points);
 
         initialRoute.setTotalDistance(distance);
     }
@@ -178,7 +162,7 @@ public class MapsUtils {
      * @return GPSRoute object containing the distance, duration and steps of the route
      * @throws IOException
      */
-    private static GPSRoute getGpsRoute(JOpenCageLatLng start, JOpenCageLatLng end) throws IOException {
+    private static GPSRoute getGpsRoute(Coordinates start, Coordinates end) throws IOException {
         String urlString = getOSRMUrl(start, end);
 
         URL url = new URL(urlString);
@@ -208,17 +192,53 @@ public class MapsUtils {
 
     /**
      * Calculates the real distance between two points using the Open Source Routing Machine (OSRM) API.
-     * @param start the starting point
-     * @param end the ending point
+     * @param p1 the starting point
+     * @param p2 the ending point
      * @return the real distance between the two points
      */
-    public static double realDistanceBetweenPoints(JOpenCageLatLng start, JOpenCageLatLng end) throws IOException {
-        double distance;
+    public static double realDistanceBetweenPoints(Coordinates p1, Coordinates p2) {
+        if (p1 == null || p2 == null) {
+            throw new IllegalArgumentException("Point 1 or Point 2 can't be null");
+        }
 
-        distance = getGpsRoute(start, end).getDistance();
+        if (p1.equals(p2)) {
+            return 0.0;
+        }
 
-        double finalDistance = distance;
-        return distanceCache.computeIfAbsent(generateCacheKey(start, end), x -> finalDistance);
+        return REAL_DISTANCE_CACHE.computeIfAbsent(CoordinatesCache.generateCacheKey(p1, p2), x -> {
+            double distance;
+
+            try {
+                distance = getGpsRoute(p1, p2).getDistance();
+            } catch(IOException e) {
+                distance = -1.0;
+            }
+
+            return distance;
+        });
+    }
+
+    /**
+     * Calculates the total distance between a series of points.
+     * The total distance is computed by summing the real distances between
+     * each consecutive pair of points in the array.
+     *
+     * @param points a list of Coordinates objects representing the points in the route
+     * @return the total distance as a Double, which is the sum of distances between consecutive points
+     * @throws IllegalArgumentException if the points array is null or contains fewer than two points
+     */
+    public static double fullRealDistanceOverPoints(List<Coordinates> points) {
+        if (points == null || points.size() < 2) {
+            throw new IllegalArgumentException("There must be at least two points to calculate distance.");
+        }
+
+        double totalDistance = 0.0;
+
+        for (int i = 0; i < points.size() - 1; i++) {
+            totalDistance += realDistanceBetweenPoints(points.get(i), points.get(i + 1));
+        }
+
+        return totalDistance;
     }
 
     /**
@@ -227,12 +247,11 @@ public class MapsUtils {
      * @param end the ending point
      * @return the URL as a String
      */
-    private static String getOSRMUrl(JOpenCageLatLng start, JOpenCageLatLng end) {
-
-        String startLat = String.valueOf(start.getLat()).replace(",", ".");
-        String startLng = String.valueOf(start.getLng()).replace(",", ".");
-        String endLat = String.valueOf(end.getLat()).replace(",", ".");
-        String endLng = String.valueOf(end.getLng()).replace(",", ".");
+    private static String getOSRMUrl(Coordinates start, Coordinates end) {
+        String startLat = String.valueOf(start.latitude()).replace(",", ".");
+        String startLng = String.valueOf(start.longitude()).replace(",", ".");
+        String endLat = String.valueOf(end.latitude()).replace(",", ".");
+        String endLng = String.valueOf(end.longitude()).replace(",", ".");
 
         return String.format(OSRM_URL, startLat, startLng, endLat, endLng);
     }

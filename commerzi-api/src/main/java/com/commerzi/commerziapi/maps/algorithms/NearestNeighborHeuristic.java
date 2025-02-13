@@ -1,6 +1,6 @@
 package com.commerzi.commerziapi.maps.algorithms;
 
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class NearestNeighborHeuristic extends ATravelerAlgorithm {
      * @param distanceFunc a function to calculate the distance between two points
      * @see ATravelerAlgorithm#ATravelerAlgorithm(Function, BiFunction)
      */
-    public NearestNeighborHeuristic(Function<List<JOpenCageLatLng>, Double> fullDistanceFunc, BiFunction<JOpenCageLatLng, JOpenCageLatLng, Double> distanceFunc) {
+    public NearestNeighborHeuristic(Function<List<Coordinates>, Double> fullDistanceFunc, BiFunction<Coordinates, Coordinates, Double> distanceFunc) {
         super(fullDistanceFunc, distanceFunc);
     }
 
@@ -42,8 +42,8 @@ public class NearestNeighborHeuristic extends ATravelerAlgorithm {
      * @return points sorted to form the shortest possible route, starting from the specified starting point
      */
     @Override
-    protected List<JOpenCageLatLng> performAlgorithm(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points) {
-        List<JOpenCageLatLng> sortedPoints = new ArrayList<>();
+    protected List<Coordinates> performAlgorithm(Coordinates startingPoint, List<Coordinates> points) {
+        List<Coordinates> sortedPoints = new ArrayList<>();
         sortedPoints.add(startingPoint);
 
         boolean[] visited = new boolean[points.size()];

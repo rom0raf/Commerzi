@@ -1,6 +1,6 @@
 package com.commerzi.commerziapi.maps.algorithms;
 
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,61 +10,34 @@ import java.util.List;
 
 public class ATravelerAlgorithmTest {
 
-    public static ArrayList<JOpenCageLatLng> points = new ArrayList<>() {{
+    public static ArrayList<Coordinates> points = new ArrayList<>() {{
         // Toulouse
-        add(new JOpenCageLatLng() {{
-            setLat(43.6047);
-            setLng(1.4442);
-        }});
+        add(new Coordinates(43.6047, 1.4442));
 
         // Montpellier
-        add(new JOpenCageLatLng() {{
-            setLat(43.6117);
-            setLng(3.8767);
-        }});
+        add(new Coordinates(43.6117, 3.8767));
 
         // Nîmes
-        add(new JOpenCageLatLng() {{
-            setLat(43.8367);
-            setLng(4.3601);
-        }});
+        add(new Coordinates(43.8367, 4.3601));
 
         // Perpignan
-        add(new JOpenCageLatLng() {{
-            setLat(42.6977);
-            setLng(2.8956);
-        }});
+        add(new Coordinates(42.6977, 2.8956));
 
         // Carcassonne
-        add(new JOpenCageLatLng() {{
-            setLat(43.2119);
-            setLng(2.3500);
-        }});
+        add(new Coordinates(43.2119, 2.3500));
 
         // Béziers
-        add(new JOpenCageLatLng() {{
-            setLat(43.3440);
-            setLng(3.2192);
-        }});
+        add(new Coordinates(43.3440, 3.2192));
 
         // Albi
-        add(new JOpenCageLatLng() {{
-            setLat(43.9263);
-            setLng(2.1500);
-        }});
+        add(new Coordinates(43.9263, 2.1500));
 
         // Tarbes
-        add(new JOpenCageLatLng() {{
-            setLat(43.2361);
-            setLng(0.0822);
-        }});
+        add(new Coordinates(43.2361, 0.0822));
     }};
 
     // IUT de Rodez
-    public static final JOpenCageLatLng startingPoint = new JOpenCageLatLng() {{
-        setLat(44.360052);
-        setLng(2.575674);
-    }};
+    public static final Coordinates startingPoint = new Coordinates(44.360052, 2.575674);
 
     private void testIllegalArguments(ATravelerAlgorithm algorithm) {
         assertThrows(IllegalArgumentException.class, () -> {
@@ -92,17 +65,17 @@ public class ATravelerAlgorithmTest {
     @Nested
     class NearestNeighborHeuristicTests {
 
-        private ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.NEAREST_NEIGHBOR_HEURISTIC);
+        private final ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.NEAREST_NEIGHBOR_HEURISTIC);
 
         @Test
         void basic() {
-            List<JOpenCageLatLng> pointsToSort = new ArrayList<>() {{
+            List<Coordinates> pointsToSort = new ArrayList<>() {{
                 add(points.get(0)); // Toulouse
                 add(points.get(2)); // Nîmes
                 add(points.get(1)); // Montpellier
             }};
 
-            List<JOpenCageLatLng> sortedPoints = algorithm.apply(startingPoint, pointsToSort);
+            List<Coordinates> sortedPoints = algorithm.apply(startingPoint, pointsToSort);
 
             assertEquals(points.get(0), sortedPoints.get(0)); // Toulouse
             assertEquals(points.get(1), sortedPoints.get(1)); // Montpellier
@@ -111,7 +84,7 @@ public class ATravelerAlgorithmTest {
 
         @Test
         void complete() {
-            List<JOpenCageLatLng> sortedPoints = algorithm.apply(startingPoint, points);
+            List<Coordinates> sortedPoints = algorithm.apply(startingPoint, points);
 
             assertEquals(points.get(6), sortedPoints.get(0)); // Albi
             assertEquals(points.get(0), sortedPoints.get(1)); // Toulouse
@@ -132,17 +105,17 @@ public class ATravelerAlgorithmTest {
     @Nested
     class BruteForceTests {
         
-        private ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE);
+        private final ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE);
         
         @Test
         void basic() {
-            List<JOpenCageLatLng> pointsToVisit = new ArrayList<>() {{
+            List<Coordinates> pointsToVisit = new ArrayList<>() {{
                 add(points.get(0)); // Toulouse
                 add(points.get(2)); // Nîmes
                 add(points.get(1)); // Montpellier
             }};
 
-            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, pointsToVisit);
+            List<Coordinates> optimalPath = algorithm.apply(startingPoint, pointsToVisit);
 
             assertEquals(points.get(0), optimalPath.get(0)); // Toulouse
             assertEquals(points.get(1), optimalPath.get(1)); // Montpellier
@@ -151,7 +124,7 @@ public class ATravelerAlgorithmTest {
 
         @Test
         void complete() {
-            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, points);
+            List<Coordinates> optimalPath = algorithm.apply(startingPoint, points);
 
             assertEquals(points.get(2), optimalPath.get(0)); // Nimes
             assertEquals(points.get(1), optimalPath.get(1)); // Montpellier
@@ -172,27 +145,27 @@ public class ATravelerAlgorithmTest {
     @Nested
     class BruteForceOptimizedTests {
 
-        private ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED);
-        private ATravelerAlgorithm bruteAlgorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE);
+        private final ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED);
+        private final ATravelerAlgorithm bruteAlgorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE);
 
         @Test
         void basic() {
-            List<JOpenCageLatLng> pointsToVisit = new ArrayList<>() {{
+            List<Coordinates> pointsToVisit = new ArrayList<>() {{
                 add(points.get(0)); // Toulouse
                 add(points.get(2)); // Nîmes
                 add(points.get(1)); // Montpellier
             }};
 
-            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, pointsToVisit);
-            List<JOpenCageLatLng> bruteForcedPath = bruteAlgorithm.apply(startingPoint, pointsToVisit);
+            List<Coordinates> optimalPath = algorithm.apply(startingPoint, pointsToVisit);
+            List<Coordinates> bruteForcedPath = bruteAlgorithm.apply(startingPoint, pointsToVisit);
 
             assertEquals(optimalPath, bruteForcedPath);
         }
 
         @Test
         void complete() {
-            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, points);
-            List<JOpenCageLatLng> bruteForcedPath = bruteAlgorithm.apply(startingPoint, points);
+            List<Coordinates> optimalPath = algorithm.apply(startingPoint, points);
+            List<Coordinates> bruteForcedPath = bruteAlgorithm.apply(startingPoint, points);
 
             assertEquals(optimalPath, bruteForcedPath);
         }
@@ -206,27 +179,27 @@ public class ATravelerAlgorithmTest {
     @Nested
     class BruteForceThreadedTests {
 
-        private ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_THREADED);
-        private ATravelerAlgorithm bruteAlgorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED);
+        private final ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_THREADED);
+        private final ATravelerAlgorithm bruteAlgorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED);
 
         @Test
         void basic() {
-            List<JOpenCageLatLng> pointsToVisit = new ArrayList<>() {{
+            List<Coordinates> pointsToVisit = new ArrayList<>() {{
                 add(points.get(0)); // Toulouse
                 add(points.get(2)); // Nîmes
                 add(points.get(1)); // Montpellier
             }};
 
-            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, pointsToVisit);
-            List<JOpenCageLatLng> bruteForcedPath = bruteAlgorithm.apply(startingPoint, pointsToVisit);
+            List<Coordinates> optimalPath = algorithm.apply(startingPoint, pointsToVisit);
+            List<Coordinates> bruteForcedPath = bruteAlgorithm.apply(startingPoint, pointsToVisit);
 
             assertEquals(optimalPath, bruteForcedPath);
         }
 
         @Test
         void complete() {
-            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, points);
-            List<JOpenCageLatLng> bruteForcedPath = bruteAlgorithm.apply(startingPoint, points);
+            List<Coordinates> optimalPath = algorithm.apply(startingPoint, points);
+            List<Coordinates> bruteForcedPath = bruteAlgorithm.apply(startingPoint, points);
 
             assertEquals(optimalPath, bruteForcedPath);
         }
@@ -240,27 +213,27 @@ public class ATravelerAlgorithmTest {
     @Nested
     class BruteForceOptimizedThreadedTests {
 
-        private ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED);
-        private ATravelerAlgorithm bruteAlgorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED);
+        private final ATravelerAlgorithm algorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED);
+        private final ATravelerAlgorithm bruteAlgorithm = ATravelerAlgorithm.getAlgorithmWithFlyingDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED);
 
         @Test
         void basic() {
-            List<JOpenCageLatLng> pointsToVisit = new ArrayList<>() {{
+            List<Coordinates> pointsToVisit = new ArrayList<>() {{
                 add(points.get(0)); // Toulouse
                 add(points.get(2)); // Nîmes
                 add(points.get(1)); // Montpellier
             }};
 
-            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, pointsToVisit);
-            List<JOpenCageLatLng> bruteForcedPath = bruteAlgorithm.apply(startingPoint, pointsToVisit);
+            List<Coordinates> optimalPath = algorithm.apply(startingPoint, pointsToVisit);
+            List<Coordinates> bruteForcedPath = bruteAlgorithm.apply(startingPoint, pointsToVisit);
 
             assertEquals(optimalPath, bruteForcedPath);
         }
 
         @Test
         void complete() {
-            List<JOpenCageLatLng> optimalPath = algorithm.apply(startingPoint, points);
-            List<JOpenCageLatLng> bruteForcedPath = bruteAlgorithm.apply(startingPoint, points);
+            List<Coordinates> optimalPath = algorithm.apply(startingPoint, points);
+            List<Coordinates> bruteForcedPath = bruteAlgorithm.apply(startingPoint, points);
 
             assertEquals(optimalPath, bruteForcedPath);
         }

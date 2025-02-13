@@ -1,10 +1,10 @@
 package com.commerzi.commerziapi.controller;
 
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import com.commerzi.commerziapi.model.ActualRoute;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
 import com.commerzi.commerziapi.service.interfaces.IActualRouteService;
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -78,7 +78,7 @@ public class ActualRouteController {
 
     @CommerziAuthenticated
     @PostMapping("/{id}")
-    public ResponseEntity updateRouteCoordinates(@RequestBody List<JOpenCageLatLng> newCoordinates, @PathVariable String id) {
+    public ResponseEntity updateRouteCoordinates(@RequestBody List<Coordinates> newCoordinates, @PathVariable String id) {
         ActualRoute actualRoute = actualRouteService.getActualRouteById(id);
         if (actualRoute == null) {
             return ResponseEntity.notFound().build();

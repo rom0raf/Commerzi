@@ -1,6 +1,6 @@
 package com.commerzi.commerziapi.model;
 
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,8 +17,8 @@ public class PlannedRoute {
     private String id;
     private String userId;
     private List<Customer> customersAndProspects;
-    private JOpenCageLatLng startingPoint;
-    private JOpenCageLatLng endingPoint;
+    private Coordinates startingPoint;
+    private Coordinates endingPoint;
     private double totalDistance;
 
     public PlannedRoute() {
@@ -96,7 +96,7 @@ public class PlannedRoute {
      *
      * @return the starting point of the route
      */
-    public JOpenCageLatLng getStartingPoint() {
+    public Coordinates getStartingPoint() {
         return startingPoint;
     }
 
@@ -105,7 +105,7 @@ public class PlannedRoute {
      *
      * @param startingPoint the starting point to set
      */
-    public void setStartingPoint(JOpenCageLatLng startingPoint) {
+    public void setStartingPoint(Coordinates startingPoint) {
         this.startingPoint = startingPoint;
     }
 
@@ -114,7 +114,7 @@ public class PlannedRoute {
      *
      * @return the ending point of the route
      */
-    public JOpenCageLatLng getEndingPoint() {
+    public Coordinates getEndingPoint() {
         return endingPoint;
     }
 
@@ -123,7 +123,7 @@ public class PlannedRoute {
      *
      * @param endingPoint the ending point to set
      */
-    public void setEndingPoint(JOpenCageLatLng endingPoint) {
+    public void setEndingPoint(Coordinates endingPoint) {
         this.endingPoint = endingPoint;
     }
 

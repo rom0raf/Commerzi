@@ -1,6 +1,6 @@
 package com.commerzi.commerziapi.maps.algorithms;
 
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class BruteForce extends ATravelerAlgorithm {
      * @param distanceFunc a function to calculate the distance between two points
      * @see ATravelerAlgorithm#ATravelerAlgorithm(Function, BiFunction)
      */
-    public BruteForce(Function<List<JOpenCageLatLng>, Double> fullDistanceFunc, BiFunction<JOpenCageLatLng, JOpenCageLatLng, Double> distanceFunc) {
+    public BruteForce(Function<List<Coordinates>, Double> fullDistanceFunc, BiFunction<Coordinates, Coordinates, Double> distanceFunc) {
         super(fullDistanceFunc, distanceFunc);
     }
 
@@ -46,15 +46,15 @@ public class BruteForce extends ATravelerAlgorithm {
      * @return the optimal path as a list of points with the shortest distance, including the starting point at the beginning
      */
     @Override
-    protected List<JOpenCageLatLng> performAlgorithm(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points) {
-        List<JOpenCageLatLng> pointsToVisit = new ArrayList<>(points);
-        List<List<JOpenCageLatLng>> permutations = BruteForceUtils.generatePermutations(pointsToVisit);
+    protected List<Coordinates> performAlgorithm(Coordinates startingPoint, List<Coordinates> points) {
+        List<Coordinates> pointsToVisit = new ArrayList<>(points);
+        List<List<Coordinates>> permutations = BruteForceUtils.generatePermutations(pointsToVisit);
 
-        List<JOpenCageLatLng> bestPath = null;
+        List<Coordinates> bestPath = null;
         double minDistance = Double.MAX_VALUE;
 
-        for (List<JOpenCageLatLng> path : permutations) {
-            List<JOpenCageLatLng> fullPath = new ArrayList<>();
+        for (List<Coordinates> path : permutations) {
+            List<Coordinates> fullPath = new ArrayList<>();
             fullPath.add(startingPoint);
             fullPath.addAll(path);
             fullPath.add(startingPoint);

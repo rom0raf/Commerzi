@@ -1,6 +1,6 @@
 package com.commerzi.commerziapi.model;
 
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ public class PlannedRouteTest {
     void testUpdateRouteInvalidCustomers() {
         PlannedRoute route = new PlannedRoute();
         route.setId("1");
-        route.setStartingPoint(new JOpenCageLatLng() {{ setLat(40.7128); setLng(-74.0060);}});
+        route.setStartingPoint(new Coordinates(40.7128, -74.0060));
 
         // invalid customers with setter
 
@@ -41,8 +41,8 @@ public class PlannedRouteTest {
         PlannedRoute route = new PlannedRoute();
         route.setId("1");
         route.setUserId("user1");
-        route.setStartingPoint(new JOpenCageLatLng() {{setLat(40.7128); setLng(-74.006); }});
-        route.setEndingPoint(new JOpenCageLatLng() {{setLat(34.0522); setLng(118.2437); }});
+        route.setStartingPoint(new Coordinates(40.7128, -74.006));
+        route.setEndingPoint(new Coordinates(34.0522, 118.2437));
         route.setTotalDistance(3940.0);
 
         List<Customer> customers = new ArrayList<>();
@@ -57,8 +57,8 @@ public class PlannedRouteTest {
 
         assertEquals("1", route.getId());
         assertEquals("user1", route.getUserId());
-//        assertEquals(new JOpenCageLatLng() {{setLat(40.7128); setLng(-74.0060); }}, route.getStartingPoint());
-//        assertEquals(new JOpenCageLatLng() {{setLat(34.0522); setLng(-118.2437); }}, route.getEndingPoint());
+        assertEquals(new Coordinates(40.7128, -74.0060), route.getStartingPoint());
+        assertEquals(new Coordinates(34.0522, 118.2437), route.getEndingPoint());
         assertEquals(3940.0, route.getTotalDistance());
         assertEquals(2, route.getCustomersAndProspects().size());
         assertEquals("John Doe", route.getCustomersAndProspects().get(0).getName());

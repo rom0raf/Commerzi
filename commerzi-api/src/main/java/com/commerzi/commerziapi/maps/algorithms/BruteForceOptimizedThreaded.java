@@ -1,6 +1,6 @@
 package com.commerzi.commerziapi.maps.algorithms;
 
-import com.opencagedata.jopencage.model.JOpenCageLatLng;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -32,7 +32,7 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
      * @param distanceFunc a function to calculate the distance between two points
      * @see ATravelerAlgorithm#ATravelerAlgorithm(Function, BiFunction)
      */
-    public BruteForceOptimizedThreaded(Function<List<JOpenCageLatLng>, Double> fullDistanceFunc, BiFunction<JOpenCageLatLng, JOpenCageLatLng, Double> distanceFunc) {
+    public BruteForceOptimizedThreaded(Function<List<Coordinates>, Double> fullDistanceFunc, BiFunction<Coordinates, Coordinates, Double> distanceFunc) {
         super(fullDistanceFunc, distanceFunc);
     }
 
@@ -43,7 +43,7 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
     private static class ThreadSafeResult {
         private final Object lock = new Object();
         private double minDistance = Double.MAX_VALUE;
-        private List<JOpenCageLatLng> bestPath = new ArrayList<>();
+        private final List<Coordinates> bestPath = new ArrayList<>();
 
         /**
          * Updates the best path and distance if a new shorter path is found.
@@ -51,7 +51,7 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
          * @param newDistance the new total distance of the path
          * @param newPath the new path being evaluated
          */
-        public void update(double newDistance, List<JOpenCageLatLng> newPath) {
+        public void update(double newDistance, List<Coordinates> newPath) {
             synchronized (lock) {
                 if (newDistance < minDistance) {
                     minDistance = newDistance;
@@ -77,7 +77,7 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
          *
          * @return the best path
          */
-        public List<JOpenCageLatLng> getBestPath() {
+        public List<Coordinates> getBestPath() {
             synchronized (lock) {
                 return bestPath;
             }
@@ -89,24 +89,24 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
      * Each thread independently explores paths starting from a specific point, allowing parallelism to speed up the search.
      */
     private class BruteForceActualThread implements Callable<Void> {
-        private final JOpenCageLatLng startingPoint;
-        private final List<JOpenCageLatLng> points;
-        private final List<JOpenCageLatLng> currentPath;
+        private final Coordinates startingPoint;
+        private final List<Coordinates> points;
+        private final List<Coordinates> currentPath;
         private final boolean[] visited;
         private final ThreadSafeResult result;
         private double currentDistance;
 
          /**
-         * Constructs a BruteForceActualThread instance for a given starting point, points to visit, and current path.
-         *
-         * @param startingPoint the starting point of the journey
-         * @param points the list of points to visit
-         * @param currentPath the current path being evaluated
-         * @param visited an array to track which points have been visited
-         * @param result a thread-safe result object to store the best path and distance
-         * @param currentDistance the current distance of the path
-         */
-        public BruteForceActualThread(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points, List<JOpenCageLatLng> currentPath,
+          * Constructs a BruteForceActualThread instance for a given starting point, points to visit, and current path.
+          *
+          * @param startingPoint the starting point of the journey
+          * @param points the list of points to visit
+          * @param currentPath the current path being evaluated
+          * @param visited an array to track which points have been visited
+          * @param result a thread-safe result object to store the best path and distance
+          * @param currentDistance the current distance of the path
+          */
+        public BruteForceActualThread(Coordinates startingPoint, List<Coordinates> points, List<Coordinates> currentPath,
                                       boolean[] visited, ThreadSafeResult result, double currentDistance) {
             this.startingPoint = startingPoint;
             this.points = points;
@@ -141,7 +141,7 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
             for (int i = 0; i < points.size(); i++) {
                 if (!visited[i]) {
                     visited[i] = true;
-                    JOpenCageLatLng point = points.get(i);
+                    Coordinates point = points.get(i);
 
                     Double distanceToAdd = distanceBetweenTwoPoints.apply(currentPath.get(currentPath.size() - 1), point);
                     currentDistance += distanceToAdd;
@@ -167,17 +167,17 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
      * @return the optimal route as a list of points, excluding the starting and ending points in the returned path
      */
     @Override
-    protected List<JOpenCageLatLng> performAlgorithm(JOpenCageLatLng startingPoint, List<JOpenCageLatLng> points) {
+    protected List<Coordinates> performAlgorithm(Coordinates startingPoint, List<Coordinates> points) {
         ThreadSafeResult result = new ThreadSafeResult();
         ExecutorService executor = Executors.newFixedThreadPool(points.size());
 
         List<BruteForceActualThread> tasks = new ArrayList<>();
         for (int i = 0; i < points.size(); i++) {
-            List<JOpenCageLatLng> pointsToVisit = new ArrayList<>(points);
+            List<Coordinates> pointsToVisit = new ArrayList<>(points);
             pointsToVisit.remove(i);
             boolean[] visited = new boolean[pointsToVisit.size()];
 
-            List<JOpenCageLatLng> currentPath = new ArrayList<>();
+            List<Coordinates> currentPath = new ArrayList<>();
             currentPath.add(points.get(i));
 
             tasks.add(new BruteForceActualThread(startingPoint, pointsToVisit, new ArrayList<>(currentPath), visited, result, distanceBetweenTwoPoints.apply(startingPoint, points.get(i))));
