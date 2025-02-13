@@ -122,13 +122,13 @@ public class CustomerService implements ICustomerService {
      * @param userId the ID of the user
      * @return a list of customers near the user
      */
-    public List<Customer> getNearCustomers(String userId, GeoJsonPoint location, double distance) {
-        return customerRepository.findByLocationNear(
-                userId,
-                location,
-                new Distance(distance)
-        );
-    }
+//    public List<Customer> getNearCustomers(String userId, GeoJsonPoint location, double distance) {
+//        return customerRepository.findByLocationNear(
+//                userId,
+//                location,
+//                new Distance(distance)
+//        );
+//    }
 
     /**
      * Verifies the validity of a customer.

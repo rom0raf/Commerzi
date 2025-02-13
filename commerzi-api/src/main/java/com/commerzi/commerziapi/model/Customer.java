@@ -23,7 +23,7 @@ public class Customer {
     private String address;
     private String city;
     private String description;
-    @Field("location")
+//    @Field("location")
     private JOpenCageLatLng gpsCoordinates;
     private Contact contact;
     private ECustomerType type;
