@@ -9,6 +9,9 @@ import com.commerzi.commerziapi.model.ECustomerType;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.service.interfaces.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -112,6 +115,20 @@ public class CustomerService implements ICustomerService {
         customerRepository.delete(existingCustomer);
         return existingCustomer;
     }
+
+    /**
+     * Retrieves all customers near the user.
+     *
+     * @param userId the ID of the user
+     * @return a list of customers near the user
+     */
+//    public List<Customer> getNearCustomers(String userId, GeoJsonPoint location, double distance) {
+//        return customerRepository.findByLocationNear(
+//                userId,
+//                location,
+//                new Distance(distance)
+//        );
+//    }
 
     /**
      * Verifies the validity of a customer.

@@ -1,5 +1,6 @@
 package com.commerzi.commerziapi.controller;
 
+import com.commerzi.commerziapi.dto.PlannedRouteDTO;
 import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
