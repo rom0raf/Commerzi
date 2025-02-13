@@ -43,6 +43,7 @@ jobs:
         # Replace placeholders in application.properties with secrets
         sed -i 's/<db_user>/${{ secrets.MYSQL_USER }}/' commerzi-api/src/main/resources/application.properties
         sed -i 's/<db_password>/${{ secrets.MYSQL_PASSWORD }}/' commerzi-api/src/main/resources/application.properties
+        sed -i 's/<jopencage_api_key>/${{ secrets.JOPENCAGE_API_KEY }}/' commerzi-api/src/main/resources/application.properties
     
     - name: Compile with skip tests
       run: mvn -B package --file pom.xml -DskipTests
