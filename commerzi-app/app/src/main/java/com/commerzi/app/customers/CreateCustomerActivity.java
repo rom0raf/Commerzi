@@ -24,7 +24,7 @@ public class CreateCustomerActivity extends AppCompatActivity {
     EditText txtPhoneNumber;
     EditText txtFirstname;
     EditText txtLastname;
-    RadioGroup radioGroupCustomerType; // Ajout du RadioGroup
+    RadioGroup radioGroupCustomerType;
     Button btnCreateNewClient;
 
     @Override

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
+import com.commerzi.app.customers.CustomerAdapter;
 
 import java.util.ArrayList;
 
@@ -70,7 +71,7 @@ public class CustomerFragment extends Fragment implements View.OnClickListener {
     private void displayCustomers(ArrayList<Customer> customerList) {
         RecyclerView recyclerView = getView().findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        CustomerAdapter adapter = new CustomerAdapter(customerList, this.getContext());
+        com.commerzi.app.customers.CustomerAdapter adapter = new CustomerAdapter(customerList, this.getContext());
         recyclerView.setAdapter(adapter);
     }
 

@@ -16,6 +16,8 @@ public class CommunicatorProperties {
     public static final String AUTH_URL = "auth_url";
     public static final String USER_URL = "user_url";
     public static final String CUSTOMER_URL = "customer_url";
+    public static final String PLANNED_ROUTE_URL = "planned_route_url";
+    public static final String ACTUAL_ROUTE_URL = "actual_route_url";
 
     public CommunicatorProperties(Context context) throws IOException {
         this.properties = new Properties();
