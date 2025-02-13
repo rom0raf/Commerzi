@@ -22,5 +22,5 @@ public interface ICustomerService {
 
     Customer deleteCustomer(String id);
 
-    List<Customer> getNearCustomers(String userId, GeoJsonPoint location, double distance);
+//    List<Customer> getNearCustomers(String userId, GeoJsonPoint location, double distance);
 }

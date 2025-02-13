@@ -166,24 +166,24 @@ public class CustomerController {
         return ResponseEntity.ok(result);
     }
 
-    @CommerziAuthenticated
-    @GetMapping("/near?distance={distance}")
-    public ResponseEntity<List<Customer>> getNearCustomers(
-            @RequestBody GeoJsonPoint location, @RequestParam(defaultValue = "1000.0") double distance) {
-
-        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
-
-        if (user == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        List<Customer> nearCustomers = customerService.getNearCustomers(
-                "" + user.getUserId(),
-                location,
-                distance
-        );
-        return ResponseEntity.ok(nearCustomers);
-    }
+//    @CommerziAuthenticated
+//    @GetMapping("/near?distance={distance}")
+//    public ResponseEntity<List<Customer>> getNearCustomers(
+//            @RequestBody GeoJsonPoint location, @RequestParam(defaultValue = "1000.0") double distance) {
+//
+//        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
+//
+//        if (user == null) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//
+//        List<Customer> nearCustomers = customerService.getNearCustomers(
+//                "" + user.getUserId(),
+//                location,
+//                distance
+//        );
+//        return ResponseEntity.ok(nearCustomers);
+//    }
 
     /**
      * Endpoint to check if the Customer API is working.

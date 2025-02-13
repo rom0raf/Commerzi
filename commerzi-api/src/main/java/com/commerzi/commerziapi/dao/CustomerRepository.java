@@ -14,6 +14,6 @@ public interface CustomerRepository extends MongoRepository<Customer, String> {
 
     List<Customer> findByTypeAndUserId(String type, String userId);
 
-    List<Customer> findByLocationNear(String userId, GeoJsonPoint location, Distance distance);
+//    List<Customer> findByLocationNear(String userId, GeoJsonPoint location, Distance distance);
 
 }
