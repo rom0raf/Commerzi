@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class CommerziApiApplication {
 
 	public static void main(String[] args) {
+
 		CheckAddress.init();
 		SpringApplication.run(CommerziApiApplication.class, args);
 	}

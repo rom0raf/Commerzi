@@ -2,10 +2,12 @@ package com.commerzi.commerziapi.maps;
 
 import com.commerzi.commerziapi.maps.algorithms.ATravelerAlgorithm;
 import com.commerzi.commerziapi.maps.coordinates.Coordinates;
-import com.commerzi.commerziapi.maps.coordinates.CoordinatesCache;
 import com.commerzi.commerziapi.model.Customer;
 import com.commerzi.commerziapi.model.maps.GPSRoute;
 import com.commerzi.commerziapi.model.PlannedRoute;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -17,24 +19,93 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
+/**
+ * Utility class for map-related operations such as calculating distances between geographical coordinates.
+ * This class provides methods to calculate both flying (great-circle) distances and real-world road distances using OSRM.
+ * The distances are cached to improve performance.
+ */
 public class MapsUtils {
 
+    /**
+     * The radius of the Earth in kilometers.
+     */
     private static final double EARTH_RADIUS = 6371.0;
 
+    /**
+     * The URL for OSRM's routing service, which provides real-world road distances.
+     */
     private static final String OSRM_URL = "https://router.project-osrm.org/route/v1/driving/%s,%s;%s,%s?overview=full&steps=true";
 
-    private static final int CACHE_MAX_SIZE = 10000;
+    /**
+     * The maximum number of entries allowed in the cache.
+     */
+    private static final int MAX_CACHE_SIZE = 1000;
 
     /**
-     * Cached calculated flying distances
+     * A record that holds a pair of coordinates.
+     * Used for caching flying distances between two coordinates.
      */
-    private static final CoordinatesCache<Double> FLYING_DISTANCE_CACHE = new CoordinatesCache(CACHE_MAX_SIZE);
+    private record CoordinatePair(Coordinates c1, Coordinates c2) {}
 
     /**
-     * Cached calculated real distances
+     * A record that holds a normalized pair of coordinates.
+     * Ensures that the first coordinate always has a lower latitude or lexicographically smaller longitude.
      */
-    private static final CoordinatesCache<Double> REAL_DISTANCE_CACHE = new CoordinatesCache(CACHE_MAX_SIZE);
+    private record NormalizedCoordinatePair(Coordinates c1, Coordinates c2) {
+        private NormalizedCoordinatePair {
+            if (c1.getLatitude() > c2.getLatitude() ||
+                (c1.getLatitude() == c2.getLatitude() && c1.getLongitude() > c2.getLongitude())) {
+                Coordinates temp = c1;
+                c1 = c2;
+                c2 = temp;
+            }
+        }
+    }
+
+    /**
+     * A cache for storing flying distances between two coordinates.
+     * The cache is limited to {@link #MAX_CACHE_SIZE} entries and expires after 1 hour of inactivity.
+     */
+    private static final LoadingCache<NormalizedCoordinatePair, Double> FLYING_DISTANCE_CACHE = CacheBuilder.newBuilder()
+            .maximumSize(MAX_CACHE_SIZE)
+            .expireAfterAccess(1, TimeUnit.HOURS)
+            .build(new CacheLoader<NormalizedCoordinatePair, Double>() {
+                @Override
+                public Double load(NormalizedCoordinatePair key) throws Exception {
+                    double lat1 = key.c1.getLatitude();
+                    double lon1 = key.c1.getLongitude();
+
+                    double lat2 = key.c2.getLatitude();
+                    double lon2 = key.c2.getLongitude();
+
+                    double latitudinalDistance = Math.toRadians(lat2 - lat1);
+                    double longitudinalDistance = Math.toRadians(lon2 - lon1);
+
+                    // Haversine formula: Calculates the great-circle distance between two points
+                    double a = haversine(latitudinalDistance) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * haversine(longitudinalDistance);
+
+                    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    return EARTH_RADIUS * c;
+                }
+            });
+
+    /**
+     * A cache for storing real-world road distances between two coordinates.
+     * The cache is limited to {@link #MAX_CACHE_SIZE} entries and expires after 1 hour of inactivity.
+     */
+    private static final LoadingCache<CoordinatePair, Double> REAL_DISTANCE_CACHE = CacheBuilder.newBuilder()
+            .maximumSize(MAX_CACHE_SIZE)
+            .expireAfterAccess(1, TimeUnit.HOURS)
+            .build(new CacheLoader<CoordinatePair, Double>() {
+                @Override
+                public Double load(CoordinatePair key) throws Exception {
+                    // Calls OSRM API to get the distance between two coordinates
+                    return getGpsRoute(key.c1, key.c2).getDistance();
+                }
+            });
 
     /**
      * Calculates the haversine of an angle.
@@ -56,7 +127,7 @@ public class MapsUtils {
      * @return flying distance between two points
      * @throws IllegalArgumentException if p1 or p2 is null
      */
-    public static double flyingDistanceBetweenTwoPoints(Coordinates p1, Coordinates p2) {
+    public static Double flyingDistanceBetweenTwoPoints(Coordinates p1, Coordinates p2) {
         if (p1 == null || p2 == null) {
             throw new IllegalArgumentException("Point 1 or Point 2 can't be null");
         }
@@ -65,22 +136,11 @@ public class MapsUtils {
             return 0.0;
         }
 
-        return FLYING_DISTANCE_CACHE.computeIfAbsent(CoordinatesCache.generateBothWaysCacheKey(p1, p2), x -> {
-            double lat1 = p1.getLatitude();
-            double lon1 = p1.getLongitude();
-
-            double lat2 = p2.getLatitude();
-            double lon2 = p2.getLongitude();
-
-            double latitudinalDistance = Math.toRadians(lat2 - lat1);
-            double longitudinalDistance = Math.toRadians(lon2 - lon1);
-
-            // Haversine formula https://en.wikipedia.org/wiki/Haversine_formula
-            double a = haversine(latitudinalDistance) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * haversine(longitudinalDistance);
-
-            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return EARTH_RADIUS * c;
-        });
+        try {
+            return FLYING_DISTANCE_CACHE.get(new NormalizedCoordinatePair(p1, p2));
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -92,18 +152,118 @@ public class MapsUtils {
      * @return the total distance as a Double, which is the sum of distances between consecutive points
      * @throws IllegalArgumentException if the points array is null or contains fewer than two points
      */
-    public static double fullFlyingDistanceOverPoints(List<Coordinates> points) {
+    public static Double fullFlyingDistanceOverPoints(List<Coordinates> points) {
         if (points == null || points.size() < 2) {
             throw new IllegalArgumentException("There must be at least two points to calculate distance.");
         }
 
-        double totalDistance = 0.0;
+        Double totalDistance = 0.0;
 
         for (int i = 0; i < points.size() - 1; i++) {
             totalDistance += flyingDistanceBetweenTwoPoints(points.get(i), points.get(i + 1));
         }
 
         return totalDistance;
+    }
+
+    /**
+     * Gets the GPS route between two points using the Open Source Routing Machine (OSRM) API.
+     *
+     * @param start the starting point
+     * @param end the ending point
+     * @return GPSRoute object containing the distance, duration and steps of the route
+     * @throws IOException
+     */
+    private static GPSRoute getGpsRoute(Coordinates start, Coordinates end) throws IOException {
+        String urlString = getOSRMUrl(start, end);
+
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+
+        StringBuilder response = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+
+        in.close();
+
+        JsonObject jsonResponse = new JsonParser().parse(response.toString()).getAsJsonObject();
+        JsonArray routes = jsonResponse.getAsJsonArray("routes");
+        JsonObject route = routes.get(0).getAsJsonObject();
+
+        // load the route into a GPSRoute object
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        GPSRoute gpsRoute = gsonBuilder.create().fromJson(route, GPSRoute.class);
+
+        return gpsRoute;
+    }
+
+    /**
+     * Calculates the real distance between two points using the Open Source Routing Machine (OSRM) API.
+     *
+     * @param p1 the starting point
+     * @param p2 the ending point
+     * @return the real distance between the two points
+     */
+    public static Double realDistanceBetweenPoints(Coordinates p1, Coordinates p2) {
+        if (p1 == null || p2 == null) {
+            throw new IllegalArgumentException("Point 1 or Point 2 can't be null");
+        }
+
+        if (p1.equals(p2)) {
+            return 0.0;
+        }
+
+        try {
+            return REAL_DISTANCE_CACHE.get(new CoordinatePair(p1, p2));
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Calculates the total distance between a series of points.
+     * The total distance is computed by summing the real distances between
+     * each consecutive pair of points in the array.
+     *
+     * @param points a list of Coordinates objects representing the points in the route
+     * @return the total distance as a Double, which is the sum of distances between consecutive points
+     * @throws IllegalArgumentException if the points array is null or contains fewer than two points
+     */
+    public static Double fullRealDistanceOverPoints(List<Coordinates> points) {
+        if (points == null || points.size() < 2) {
+            throw new IllegalArgumentException("There must be at least two points to calculate distance.");
+        }
+
+        Double totalDistance = 0.0;
+
+        for (int i = 0; i < points.size() - 1; i++) {
+            totalDistance += realDistanceBetweenPoints(points.get(i), points.get(i + 1));
+        }
+
+        return totalDistance;
+    }
+
+    /**
+     * Generates the URL for the Open Source Routing Machine (OSRM) API.
+     *
+     * @param start the starting point
+     * @param end the ending point
+     * @return the URL as a String
+     */
+    private static String getOSRMUrl(Coordinates start, Coordinates end) {
+        String startLat = String.valueOf(start.getLatitude()).replace(",", ".");
+        String startLng = String.valueOf(start.getLongitude()).replace(",", ".");
+        String endLat = String.valueOf(end.getLatitude()).replace(",", ".");
+        String endLng = String.valueOf(end.getLongitude()).replace(",", ".");
+
+        return String.format(OSRM_URL, startLat, startLng, endLat, endLng);
     }
 
     /**
@@ -153,106 +313,5 @@ public class MapsUtils {
         distance = algorithm.getFullDistanceOverPointsFunc().apply(points);
 
         initialRoute.setTotalDistance(distance);
-    }
-
-    /**
-     * Gets the GPS route between two points using the Open Source Routing Machine (OSRM) API.
-     * @param start the starting point
-     * @param end the ending point
-     * @return GPSRoute object containing the distance, duration and steps of the route
-     * @throws IOException
-     */
-    private static GPSRoute getGpsRoute(Coordinates start, Coordinates end) throws IOException {
-        String urlString = getOSRMUrl(start, end);
-
-        URL url = new URL(urlString);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setConnectTimeout(5000);
-        connection.setReadTimeout(5000);
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-
-        JsonObject jsonResponse = new JsonParser().parse(response.toString()).getAsJsonObject();
-        JsonArray routes = jsonResponse.getAsJsonArray("routes");
-        JsonObject route = routes.get(0).getAsJsonObject();
-
-        // load the route into a GPSRoute object
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        GPSRoute gpsRoute = gsonBuilder.create().fromJson(route, GPSRoute.class);
-
-        return gpsRoute;
-    }
-
-    /**
-     * Calculates the real distance between two points using the Open Source Routing Machine (OSRM) API.
-     * @param p1 the starting point
-     * @param p2 the ending point
-     * @return the real distance between the two points
-     */
-    public static double realDistanceBetweenPoints(Coordinates p1, Coordinates p2) {
-        if (p1 == null || p2 == null) {
-            throw new IllegalArgumentException("Point 1 or Point 2 can't be null");
-        }
-
-        if (p1.equals(p2)) {
-            return 0.0;
-        }
-
-        return REAL_DISTANCE_CACHE.computeIfAbsent(CoordinatesCache.generateCacheKey(p1, p2), x -> {
-            double distance;
-
-            try {
-                distance = getGpsRoute(p1, p2).getDistance();
-            } catch(IOException e) {
-                distance = -1.0;
-            }
-
-            return distance;
-        });
-    }
-
-    /**
-     * Calculates the total distance between a series of points.
-     * The total distance is computed by summing the real distances between
-     * each consecutive pair of points in the array.
-     *
-     * @param points a list of Coordinates objects representing the points in the route
-     * @return the total distance as a Double, which is the sum of distances between consecutive points
-     * @throws IllegalArgumentException if the points array is null or contains fewer than two points
-     */
-    public static double fullRealDistanceOverPoints(List<Coordinates> points) {
-        if (points == null || points.size() < 2) {
-            throw new IllegalArgumentException("There must be at least two points to calculate distance.");
-        }
-
-        double totalDistance = 0.0;
-
-        for (int i = 0; i < points.size() - 1; i++) {
-            totalDistance += realDistanceBetweenPoints(points.get(i), points.get(i + 1));
-        }
-
-        return totalDistance;
-    }
-
-    /**
-     * Generates the URL for the Open Source Routing Machine (OSRM) API.
-     * @param start the starting point
-     * @param end the ending point
-     * @return the URL as a String
-     */
-    private static String getOSRMUrl(Coordinates start, Coordinates end) {
-        String startLat = String.valueOf(start.getLatitude()).replace(",", ".");
-        String startLng = String.valueOf(start.getLongitude()).replace(",", ".");
-        String endLat = String.valueOf(end.getLatitude()).replace(",", ".");
-        String endLng = String.valueOf(end.getLongitude()).replace(",", ".");
-
-        return String.format(OSRM_URL, startLat, startLng, endLat, endLng);
     }
 }
