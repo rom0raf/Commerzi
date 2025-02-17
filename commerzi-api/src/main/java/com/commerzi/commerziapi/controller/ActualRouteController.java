@@ -1,10 +1,16 @@
 package com.commerzi.commerziapi.controller;
 
+import com.commerzi.commerziapi.dto.RouteAndGpsDto;
 import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import com.commerzi.commerziapi.model.ActualRoute;
+import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.model.PlannedRoute;
+import com.commerzi.commerziapi.model.maps.GPSRoute;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
+import com.commerzi.commerziapi.security.Security;
+import com.commerzi.commerziapi.service.classes.ActualRouteService;
 import com.commerzi.commerziapi.service.interfaces.IActualRouteService;
+import com.commerzi.commerziapi.service.interfaces.IAuthentificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +27,9 @@ public class ActualRouteController {
     @Autowired
     private IActualRouteService actualRouteService;
 
+    @Autowired
+    private IAuthentificationService authentificationService;
+
     /**
      * Retrieves an actual route by its ID.
      *
@@ -31,6 +40,8 @@ public class ActualRouteController {
     @GetMapping("/{id}")
     public ResponseEntity getActualRoutes(@PathVariable String id) {
         ActualRoute actualRoute = actualRouteService.getActualRouteById(id);
+
+
 
         if (actualRoute == null) {
             return ResponseEntity.notFound().build();
@@ -48,13 +59,29 @@ public class ActualRouteController {
     @CommerziAuthenticated
     @PostMapping("/")
     public ResponseEntity getActualRoutes(@RequestBody PlannedRoute plannedRoute) {
+
+        CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
+
         ActualRoute actualRoute = actualRouteService.createActualRouteFromPlannedRoute(plannedRoute);
+        actualRoute.setUserId("" + user.getUserId());
+
+        List<GPSRoute> gpsRoutes = actualRouteService.getGPSRoutes(actualRoute);
+
         try {
-            actualRouteService.saveActualRoute(actualRoute);
+            String id = actualRouteService.saveActualRoute(actualRoute);
+            actualRoute.setId(id);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("An error occurred while creating the actual route.");
         }
-        return ResponseEntity.ok(actualRoute);
+
+        RouteAndGpsDto routeAndGpsDto = new RouteAndGpsDto(
+                actualRoute, gpsRoutes
+        );
+
+        return ResponseEntity.ok(routeAndGpsDto);
     }
 
     /**
@@ -71,6 +98,9 @@ public class ActualRouteController {
             id = actualRouteService.saveActualRoute(actualRoute);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("An error occurred while saving the actual route.");
         }
 
         return ResponseEntity.ok(id);
@@ -86,7 +116,12 @@ public class ActualRouteController {
 
         actualRoute.getCoordinates().addAll(newCoordinates);
 
-        actualRouteService.saveActualRoute(actualRoute);
+        try {
+            actualRouteService.saveActualRoute(actualRoute);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("An error occurred while updating the route coordinates.");
+        }
         return ResponseEntity.ok(actualRoute);
     }
 

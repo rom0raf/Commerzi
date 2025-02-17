@@ -1,11 +1,15 @@
 package com.commerzi.commerziapi.service.classes;
 
 import com.commerzi.commerziapi.dao.ActualRouteRepository;
+import com.commerzi.commerziapi.maps.MapsUtils;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import com.commerzi.commerziapi.model.*;
+import com.commerzi.commerziapi.model.maps.GPSRoute;
 import com.commerzi.commerziapi.service.interfaces.IActualRouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +29,13 @@ public class ActualRouteService implements IActualRouteService {
      * @param actualRoute the actual route to save
      * @return the ID of the saved actual route
      */
-    public String saveActualRoute(ActualRoute actualRoute) throws IllegalArgumentException {
+    public String saveActualRoute(ActualRoute actualRoute) throws Exception {
+        ActualRoute existingRoute = actualRouteRepository.findByPlannedRouteId(actualRoute.getRouteId());
+
+        if (existingRoute != null) {
+            return existingRoute.getId();
+        }
+
         checkActualRoute(actualRoute);
         actualRouteRepository.save(actualRoute);
         return actualRoute.getId();
@@ -48,6 +58,7 @@ public class ActualRouteService implements IActualRouteService {
      * @return the created actual route
      */
     public ActualRoute createActualRouteFromPlannedRoute(PlannedRoute plannedRoute) {
+
         PlannedRouteService.checkPlannedRoute(plannedRoute);
 
         ActualRoute actualRoute = new ActualRoute();
@@ -60,13 +71,36 @@ public class ActualRouteService implements IActualRouteService {
                 getVisitFromPlannedRoute(plannedRoute)
         );
 
-        actualRoute.setCoordinates(
-                new ArrayList<>()
-        );
+
+        List<Coordinates> coordinates = new ArrayList<>();
+//        coordinates.add(plannedRoute.getStartingPoint());
+
+        plannedRoute.getCustomersAndProspects().forEach(customer -> {
+            coordinates.add(customer.getGpsCoordinates());
+        });
+
+//        coordinates.add(plannedRoute.getStartingPoint());
+
+        actualRoute.setCoordinates(coordinates);
 
         actualRoute.setStatus(ERouteStatus.IN_PROGRESS);
 
         return actualRoute;
+    }
+
+    public List<GPSRoute> getGPSRoutes(ActualRoute route) {
+        List<GPSRoute> gpsRoutes = new ArrayList<>();
+        List<Coordinates> coordinates = route.getCoordinates();
+        try {
+            for (int i = 0; i < coordinates.size() - 1; i++) {
+                GPSRoute gpsRoute = MapsUtils.getGpsRoute(coordinates.get(i), coordinates.get(i + 1));
+                gpsRoutes.add(gpsRoute);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return gpsRoutes;
     }
 
     private static List<Visit> getVisitFromPlannedRoute(PlannedRoute plannedRoute) {

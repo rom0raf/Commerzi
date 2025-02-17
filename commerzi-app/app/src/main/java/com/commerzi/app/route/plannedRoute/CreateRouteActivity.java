@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.commerzi.app.HomeActivity;
 import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
@@ -86,6 +87,8 @@ public class CreateRouteActivity extends AppCompatActivity {
         communicator.createRoute(name, route, new CommunicatorCallback<>(
                 response -> {
                     Toast.makeText(getApplicationContext(), response.message, Toast.LENGTH_SHORT).show();
+                    Intent intention = new Intent(CreateRouteActivity.this, HomeActivity.class);
+                    startActivity(intention);
                 },
                 error -> {
                     Toast.makeText(getApplicationContext(), error.message, Toast.LENGTH_SHORT).show();

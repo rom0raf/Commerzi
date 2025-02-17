@@ -6,14 +6,20 @@
     <string name="validate">Valider</string>
     <string name="login">Se connecter</string>
     <string name="signup">S\'inscrire</string>
+    <string name="update">Mettre à jour</string>
 
     <string name="add_customer">Ajouter un client</string>
     <string name="edit_customer">Modifier un client</string>
     <string name="select_customers">Sélectionner des clients</string>
     
     <string name="add_route">Ajouter un itinéraire</string>
+    <string name="edit_route">Modifier un itinéraire</string>
 
     <string name="edit_profile">Modifier mon profil</string>
+
+    <string name="demarrer_route">Démarrer l\'itinéraire</string>
+
+    <string name="prochaine_visite">Prochaine visite : </string>
 
     <!-- LABELS -->
     <string name="signup_label">Inscription</string>
@@ -46,18 +52,30 @@
     <string name="credentials_error">Identifiants incorrects</string>
     <string name="empty_field_error">Tous les champs doivent être remplis</string>
     <string name="password_confirmation_error">La confirmation du mot de passe est invalide</string>
-    <string name="request_creation_error">Request creation error</string>
-    <string name="unexpected_error">Erreur inattentue</string>
+    <string name="request_creation_error">Erreur lors de la création de la requête</string>
+    <string name="unexpected_error">Erreur inattendue</string>
     <string name="select_type_error">Un type doit être sélectionné</string>
     <string name="error_during_update">Erreur lors de la mise à jour</string>
     <string name="error_no_route_name">Veuillez entrer un nom d\'itinéraire</string>
-    <string name="error_not_enough_customers">Merci de selectionner au moins 2 clients/prospects</string>
+    <string name="error_not_enough_customers">Merci de sélectionner au moins 2 clients/prospects</string>
     <string name="error_too_much_customers">Vous pouvez renseigner un maximum de 8 clients/prospects</string>
+    <string name="actual_route_error">Erreur lors du chargement de l\'itinéraire</string>
+    <string name="data_processing_error">Erreur de traitement des données</string>
+    <string name="routes_fetching_error">Impossible de charger les itinéraires</string>
+    <string name="customers_fetching_error">Impossible de charger les clients</string>
+    <string name="update_error">Erreur lors de la mise à jour</string>
+    <string name="delete_error">Erreur lors de la suppression</string>
+    <string name="geojson_error">Erreur lors de la conversion en GeoJSON</string>
 
     <!-- FEEDBACK -->
     <string name="account_creation_success">Compte créé avec succès</string>
     <string name="customer_creation_success">Client créé avec succès</string>
+    <string name="customer_update_success">Client mis à jour</string>
+    <string name="customer_delete_success">Client supprimé avec succès</string>
     <string name="profile_update_success">Profil mis à jour</string>
     <string name="route_creation_success">Itinéraire créé avec succès</string>
+    <string name="route_updated_success">Itinéraire modifié avec succès</string>
+    <string name="route_delete_success">Itinéraire supprimé avec succès</string>
+    <string name="actual_route_success">Itinéraire chargé avec succès</string>
     
 </resources>

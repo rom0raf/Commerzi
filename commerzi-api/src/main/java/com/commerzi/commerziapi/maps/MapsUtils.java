@@ -22,7 +22,7 @@ public class MapsUtils {
 
     private static final double EARTH_RADIUS = 6371.0;
 
-    private static final String OSRM_URL = "https://router.project-osrm.org/route/v1/driving/%s,%s;%s,%s?overview=full&steps=true";
+    private static final String OSRM_URL = "https://router.project-osrm.org/route/v1/driving/%s,%s;%s,%s?overview=full&steps=true&geometries=geojson";
 
     private static final int CACHE_MAX_SIZE = 10000;
 
@@ -159,7 +159,7 @@ public class MapsUtils {
      * @return GPSRoute object containing the distance, duration and steps of the route
      * @throws IOException
      */
-    private static GPSRoute getGpsRoute(Coordinates start, Coordinates end) throws IOException {
+    public static GPSRoute getGpsRoute(Coordinates start, Coordinates end) throws IOException {
         String urlString = getOSRMUrl(start, end);
 
         URL url = new URL(urlString);

@@ -1,4 +1,4 @@
-package com.commerzi.commerziapi.model.maps;
+package com.commerzi.app.route.actualRoute.maps;
 
 import java.util.List;
 

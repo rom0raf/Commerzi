@@ -19,7 +19,9 @@ import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 import com.commerzi.app.customers.Customer;
 import com.commerzi.app.customers.UpdateCustomerActivity;
+import com.commerzi.app.route.actualRoute.NavigationActivity;
 import com.commerzi.app.route.plannedRoute.PlannedRoute;
+import com.commerzi.app.route.plannedRoute.UpdatePlannedRouteActivity;
 
 import java.util.ArrayList;
 
@@ -74,12 +76,18 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
             }
         });
 
-//        holder.btnDelete.setOnClickListener(v -> deleteRoute(route, position));
-//        holder.btnEdit.setOnClickListener(v -> {
-//            Intent intent = new Intent(context, UpdateRouteActivity.class);
-//            intent.putExtra("route", route);
-//            context.startActivity(intent);
-//        });
+        holder.btnStart.setOnClickListener(v -> {
+            Intent intent = new Intent(context, NavigationActivity.class);
+            intent.putExtra("route", route);
+            context.startActivity(intent);
+        });
+
+       holder.btnDelete.setOnClickListener(v -> deleteRoute(route, position));
+       holder.btnEdit.setOnClickListener(v -> {
+           Intent intent = new Intent(context, UpdatePlannedRouteActivity.class);
+           intent.putExtra("route", route);
+           context.startActivity(intent);
+       });
     }
 
     @Override
@@ -92,6 +100,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
         LinearLayout detailsContainer;
         Button btnDelete;
         Button btnEdit;
+        Button btnStart;
 
         public RouteViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -99,22 +108,23 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
             tvCustomers = itemView.findViewById(R.id.tvCustomers);
             tvDistance = itemView.findViewById(R.id.tvDistance);
             detailsContainer = itemView.findViewById(R.id.detailsContainer);
-            btnDelete = itemView.findViewById(R.id.btnDelete);
-            btnEdit = itemView.findViewById(R.id.btnEdit);
+            btnDelete = itemView.findViewById(R.id.btnDeleteRoute);
+            btnEdit = itemView.findViewById(R.id.btnEditRoute);
+            btnStart = itemView.findViewById(R.id.startRoute);
         }
     }
 
-//    private void deleteRoute(PlannedRoute route, int position) {
-//        Communicator communicator = Communicator.getInstance(context);
-//        communicator.deleteRoute(route, new CommunicatorCallback<>(
-//                response -> {
-//                    Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show();
-//                    routeList.remove(position);
-//                    notifyItemRemoved(position);
-//                },
-//                error -> {
-//                    Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show();
-//                }
-//        ));
-//    }
+   private void deleteRoute(PlannedRoute route, int position) {
+       Communicator communicator = Communicator.getInstance(context);
+       communicator.deletePlannedRoute(route, new CommunicatorCallback<>(
+               response -> {
+                   Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show();
+                   routeList.remove(position);
+                   notifyItemRemoved(position);
+               },
+               error -> {
+                   Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show();
+               }
+       ));
+   }
 }

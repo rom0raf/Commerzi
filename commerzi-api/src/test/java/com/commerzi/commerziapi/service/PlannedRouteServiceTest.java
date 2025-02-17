@@ -149,7 +149,8 @@ class PlannedRouteServiceTest {
 
         when(plannedRouteRepository.save(route)).thenReturn(route);
 
-        plannedRouteService.updateRoute(route);
+        String name = "Route 1";
+        plannedRouteService.updateRoute(name, route);
 
         verify(plannedRouteRepository, times(1)).save(route);
     }

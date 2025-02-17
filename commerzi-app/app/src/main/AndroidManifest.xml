@@ -40,8 +40,16 @@
         <activity
             android:name=".route.plannedRoute.CreateRouteActivity">
         </activity>
+        <activity
+            android:name=".route.actualRoute.NavigationActivity">
+        </activity>
+        <activity
+            android:name=".route.plannedRoute.UpdatePlannedRouteActivity">
+        </activity>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>

@@ -58,6 +58,10 @@ public class Customer implements Parcelable {
         return contact;
     }
 
+    public Coordinates getGpsCoordinates() {
+        return gpsCoordinates;
+    }
+
     @Override
     public int describeContents() {
         return 0;

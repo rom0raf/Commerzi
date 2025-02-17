@@ -36,6 +36,10 @@ public class PlannedRouteService implements IPlannedRouteService {
      * @return the ID of the created planned route
      */
     public String createRoute(List<String> customerId, String name, CommerziUser user) throws Exception {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+
         PlannedRoute route = new PlannedRoute();
         route.setName(name);
         route.setUserId(String.valueOf(user.getUserId()));
@@ -87,11 +91,21 @@ public class PlannedRouteService implements IPlannedRouteService {
      *
      * @param route the planned route to update
      */
-    public void updateRoute(PlannedRoute route) throws IllegalArgumentException {
+    public PlannedRoute updateRoute(String name, PlannedRoute route) throws Exception {
+
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
 
         checkPlannedRoute(route);
 
-        plannedRouteRepository.save(route);
+        route.setName(name);
+        MapsUtils.buildFullRoute(
+                route,
+                ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
+        );
+
+        return plannedRouteRepository.save(route);
     }
 
     /**
@@ -108,9 +122,9 @@ public class PlannedRouteService implements IPlannedRouteService {
             throw new IllegalArgumentException("Too many customers");
         }
 
-        if (route.getCustomersAndProspects().size() < 2) {
-            throw new IllegalArgumentException("Too few customers");
-        }
+//        if (route.getCustomersAndProspects().size() < 2) {
+//            throw new IllegalArgumentException("Too few customers");
+//        }
 
         if (route.getCustomersAndProspects().stream().anyMatch(c -> c.getGpsCoordinates() == null)) {
             throw new IllegalArgumentException("Customer coordinates missing");

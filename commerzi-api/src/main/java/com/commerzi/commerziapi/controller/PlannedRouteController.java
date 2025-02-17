@@ -79,13 +79,7 @@ public class PlannedRouteController {
     @PostMapping("/{name}")
     public ResponseEntity<String> createPlannedRoute(
             @PathVariable String name, @RequestBody PlannedRouteDTO customersId) {
-
-        System.out.println("Current time");
-        System.out.println(System.nanoTime());
-
-//        return ResponseEntity.ok("Route created successfully");
-
-        if (customersId == null || customersId.getCustomersId() == null || customersId.getCustomersId().isEmpty()) {
+        if (customersId == null || customersId.getCustomersId().isEmpty()) {
             return ResponseEntity.badRequest().body("No customers specified");
         }
         if (name == null || name.isEmpty()) {
@@ -116,13 +110,24 @@ public class PlannedRouteController {
      * @return a response indicating the update status
      */
     @CommerziAuthenticated
-    @PutMapping("/")
-    public ResponseEntity<String> updatePlannedRoute(@RequestBody PlannedRoute plannedRoute) {
+    @PutMapping("/{name}")
+    public ResponseEntity<String> updatePlannedRoute(
+            @PathVariable String name,
+            @RequestBody PlannedRoute plannedRoute) {
+
+        name = URLDecoder.decode(name);
+
         try {
-            plannedRouteService.updateRoute(plannedRoute);
+            plannedRouteService.updateRoute(name, plannedRoute);
             return ResponseEntity.ok("Route updated successfully");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body("Error while fetching real distances");
+        } catch (Exception e) {
+            String message = "An unexpected error occurred while updating the route\n";
+            message += e.getMessage() != null ? ": " + e.getMessage() : "";
+            return ResponseEntity.internalServerError().body(message);
         }
     }
 

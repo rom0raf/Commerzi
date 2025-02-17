@@ -1,5 +1,8 @@
 package com.commerzi.app.route.actualRoute;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.commerzi.app.customers.Coordinates;
 import com.commerzi.app.route.utils.ERouteStatus;
 import com.commerzi.app.route.visit.Visit;
@@ -9,7 +12,7 @@ import java.util.List;
 /**
  * Model class representing an itinerary in the Commerzi application.
  */
-public class ActualRoute {
+public class ActualRoute implements Parcelable {
     private String id;
     private String date;
     private String userId;
@@ -155,5 +158,43 @@ public class ActualRoute {
                 ", status=" + status +
                 ", coordinates=" + coordinates +
                 '}';
+    }
+
+    public ActualRoute(Parcel in) {
+        id = in.readString();
+        date = in.readString();
+        userId = in.readString();
+        plannedRouteId = in.readString();
+        visits = in.readArrayList(Visit.class.getClassLoader());
+        status = ERouteStatus.valueOf(in.readString());
+        coordinates = in.createTypedArrayList(Coordinates.CREATOR);
+    }
+
+    public static final Creator<ActualRoute> CREATOR = new Creator<ActualRoute>() {
+        @Override
+        public ActualRoute createFromParcel(Parcel in) {
+            return new ActualRoute(in);
+        }
+
+        @Override
+        public ActualRoute[] newArray(int size) {
+            return new ActualRoute[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(date);
+        dest.writeString(userId);
+        dest.writeString(plannedRouteId);
+        dest.writeList(visits);
+        dest.writeString(status.name());
+        dest.writeTypedList(coordinates);
     }
 }
