@@ -82,6 +82,13 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- Pour le cache -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>33.4.0-jre</version>
+		</dependency>
+
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
