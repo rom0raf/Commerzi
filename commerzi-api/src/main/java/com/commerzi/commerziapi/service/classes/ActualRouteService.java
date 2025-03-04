@@ -30,7 +30,7 @@ public class ActualRouteService implements IActualRouteService {
      * @return the ID of the saved actual route
      */
     public String saveActualRoute(ActualRoute actualRoute) throws Exception {
-        ActualRoute existingRoute = actualRouteRepository.findByPlannedRouteId(actualRoute.getRouteId());
+        ActualRoute existingRoute = actualRouteRepository.findByPlannedRouteId(actualRoute.getPlannedRouteId());
 
         if (existingRoute != null) {
             return existingRoute.getId();
@@ -65,7 +65,7 @@ public class ActualRouteService implements IActualRouteService {
 
         actualRoute.setDate(LocalDate.now().toString());
         actualRoute.setUserId(plannedRoute.getUserId());
-        actualRoute.setRouteId(plannedRoute.getId());
+        actualRoute.setPlannedRouteId(plannedRoute.getId());
 
         actualRoute.setVisits(
                 getVisitFromPlannedRoute(plannedRoute)
@@ -73,13 +73,13 @@ public class ActualRouteService implements IActualRouteService {
 
 
         List<Coordinates> coordinates = new ArrayList<>();
-//        coordinates.add(plannedRoute.getStartingPoint());
+        coordinates.add(plannedRoute.getStartingPoint());
 
         plannedRoute.getCustomersAndProspects().forEach(customer -> {
             coordinates.add(customer.getGpsCoordinates());
         });
 
-//        coordinates.add(plannedRoute.getStartingPoint());
+        coordinates.add(plannedRoute.getStartingPoint());
 
         actualRoute.setCoordinates(coordinates);
 
@@ -122,7 +122,7 @@ public class ActualRouteService implements IActualRouteService {
         if (route.getUserId() == null) {
             throw new IllegalArgumentException("Route user ID cannot be null");
         }
-        if (route.getRouteId() == null) {
+        if (route.getPlannedRouteId() == null) {
             throw new IllegalArgumentException("Route ID cannot be null");
         }
         if (route.getVisits() == null) {

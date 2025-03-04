@@ -66,6 +66,7 @@
     <string name="update_error">Erreur lors de la mise à jour</string>
     <string name="delete_error">Erreur lors de la suppression</string>
     <string name="geojson_error">Erreur lors de la conversion en GeoJSON</string>
+    <string name="session_expired">Session expirée</string>
 
     <!-- FEEDBACK -->
     <string name="account_creation_success">Compte créé avec succès</string>
@@ -77,5 +78,6 @@
     <string name="route_updated_success">Itinéraire modifié avec succès</string>
     <string name="route_delete_success">Itinéraire supprimé avec succès</string>
     <string name="actual_route_success">Itinéraire chargé avec succès</string>
+    <string name="visit_updated_success">Validation effectuée avec succès</string>
     
 </resources>

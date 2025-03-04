@@ -168,6 +168,8 @@ public class MapsUtils {
         connection.setConnectTimeout(5000);
         connection.setReadTimeout(5000);
 
+        System.out.println("Sending request to OSRM API: " + urlString);
+
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
         StringBuilder response = new StringBuilder();
@@ -251,6 +253,6 @@ public class MapsUtils {
         String endLat = String.valueOf(end.getLatitude()).replace(",", ".");
         String endLng = String.valueOf(end.getLongitude()).replace(",", ".");
 
-        return String.format(OSRM_URL, startLat, startLng, endLat, endLng);
+        return String.format(OSRM_URL, startLng, startLat, endLng, endLat);
     }
 }

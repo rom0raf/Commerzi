@@ -22,9 +22,12 @@ import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 import com.commerzi.app.customers.Coordinates;
 import com.commerzi.app.customers.Customer;
+import com.commerzi.app.dto.UpdateLocationDTO;
+import com.commerzi.app.dto.UpdateVisitDTO;
 import com.commerzi.app.route.actualRoute.maps.GPSRoute;
 import com.commerzi.app.route.actualRoute.maps.Geometry;
 import com.commerzi.app.route.plannedRoute.PlannedRoute;
+import com.commerzi.app.route.utils.ERouteStatus;
 import com.commerzi.app.route.visit.EVisitStatus;
 import com.commerzi.app.route.visit.Visit;
 
@@ -46,6 +49,10 @@ public class NavigationActivity extends AppCompatActivity {
     private Button btn_valider;
     private Button btn_passer;
     private List<Visit> visits;
+
+    private int visitIndex = 0;
+
+    private List<Coordinates> coordinatesToSend;
 
     private PlannedRoute plannedRoute;
     private RouteAndGpsDto routeAndGpsDtoData;
@@ -70,8 +77,7 @@ public class NavigationActivity extends AppCompatActivity {
         btn_valider.setOnClickListener(v -> validateVisit());
         btn_passer.setOnClickListener(v -> skipVisit());
 
-        Log.d(TAG, "onCreate: ");
-        Log.d(TAG, "MapView: " + mapView);
+        coordinatesToSend = new ArrayList<>();
 
         Configuration.getInstance().setUserAgentValue(getPackageName());
 
@@ -88,8 +94,11 @@ public class NavigationActivity extends AppCompatActivity {
         plannedRoute = (PlannedRoute) getIntent().getParcelableExtra("route");
 
         if (plannedRoute != null) {
-            Toast.makeText(this, "Not null", Toast.LENGTH_SHORT).show();
-            getActualRoute();
+            if (routeAndGpsDtoData != null && routeAndGpsDtoData.getRoute().getStatus() == ERouteStatus.IN_PROGRESS) {
+                getActualRouteById(routeAndGpsDtoData.getRoute().getId());
+            } else {
+                getActualRoute();
+            }
         } else {
             Toast.makeText(this, "Planned route is null", Toast.LENGTH_SHORT).show();
         }
@@ -132,35 +141,57 @@ public class NavigationActivity extends AppCompatActivity {
 
     private void validateVisit() {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
-        Visit current = visits.get(0);
-        current.setStatus(EVisitStatus.VISITED);
-//        communicator.updateVisit(current, new CommunicatorCallback<>(
-//                response -> {
-//                    visits.remove(0);
-//                    displayVisit();
-//                },
-//                error -> {
-//                    Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
-//                    Log.e(TAG, "validateVisit: " + error.message);
-//                }
-//        ));
+
+        UpdateVisitDTO updateVisitDTO = new UpdateVisitDTO(routeAndGpsDtoData.getRoute(),visitIndex, EVisitStatus.VISITED);
+
+        communicator.updateVisit(updateVisitDTO, new CommunicatorCallback<>(
+                response -> {
+                    visits.get(visitIndex).setStatus(EVisitStatus.VISITED);
+                    visitIndex++;
+                    displayVisit();
+                },
+                error -> {
+                    Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "validateVisit: " + error.message);
+                }
+        ));
     }
 
     private void skipVisit() {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
-        Visit current = visits.get(0);
-        current.setStatus(EVisitStatus.SKIPPED);
 
-//        communicator.updateVisit(current, new CommunicatorCallback<>(
-//                response -> {
-//                    visits.remove(0);
-//                    displayVisit();
-//                },
-//                error -> {
-//                    Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
-//                    Log.e(TAG, "skipVisit: " + error.message);
-//                }
-//        ));
+        UpdateVisitDTO updateVisitDTO = new UpdateVisitDTO(routeAndGpsDtoData.getRoute(),visitIndex, EVisitStatus.SKIPPED);
+
+        communicator.updateVisit(updateVisitDTO, new CommunicatorCallback<>(
+                response -> {
+                    visits.get(visitIndex).setStatus(EVisitStatus.SKIPPED);
+                    visitIndex++;
+                    displayVisit();
+                },
+                error -> {
+                    Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "skipVisit: " + error.message);
+                }
+        ));
+    }
+
+    private void getActualRouteById(String actualRouteId) {
+        Communicator communicator = Communicator.getInstance(getApplicationContext());
+
+        communicator.getActualRouteById(actualRouteId, new CommunicatorCallback<>(
+                response -> {
+                    routeAndGpsDtoData = response.actualRoute;
+                    Log.d(TAG, "getActualRouteById: " + routeAndGpsDtoData);
+                    visitIndex = getVisitIndex(routeAndGpsDtoData.getRoute().getVisits());
+                    displayVisit();
+                    displayRoute();
+                },
+                error -> {
+                    Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "getActualRouteById: " + error.message);
+                    Log.d(TAG, "getActualRouteById: " + error.actualRoute);
+                }
+        ));
     }
 
     private void getActualRoute() {
@@ -175,6 +206,7 @@ public class NavigationActivity extends AppCompatActivity {
                     response -> {
                         routeAndGpsDtoData = response.actualRoute;
                         Log.d(TAG, "getActualRoute: " + routeAndGpsDtoData);
+                        visitIndex = getVisitIndex(routeAndGpsDtoData.getRoute().getVisits());
                         displayVisit();
                         displayRoute();
                     },
@@ -187,18 +219,31 @@ public class NavigationActivity extends AppCompatActivity {
         );
     }
 
+    private int getVisitIndex(List<Visit> visits) {
+        for (int i = 0; i < visits.size(); i++) {
+            if (visits.get(i).getStatus() == EVisitStatus.NOT_VISITED) {
+                System.out.println("Visit index: " + i);
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private void displayVisit() {
         visits = routeAndGpsDtoData.getRoute().getVisits();
 
+        visits.forEach(System.out::println);
+
         Visit current;
         Customer customer;
-        for (Visit visit : visits) {
-            while (visit.getStatus() == EVisitStatus.VISITED
-                    || visit.getStatus() == EVisitStatus.SKIPPED) {
-                visits.remove(visit);
+
+        for (int i = 0; i < visits.size(); i++) {
+            current = visits.get(i);
+
+            if (current.getStatus() == EVisitStatus.VISITED || current.getStatus() == EVisitStatus.SKIPPED) {
+                continue;
             }
 
-            current = visit;
             customer = current.getCustomer();
 
             tvCustomerName.setText(
@@ -224,7 +269,7 @@ public class NavigationActivity extends AppCompatActivity {
         for (int i = 0; i < visitNumber; i++) {
             visit = route.getVisits().get(i);
             customer = visit.getCustomer();
-            coordinates = route.getCoordinates().get(i);
+            coordinates = customer.getGpsCoordinates();
 
             // Ajout d'un marqueur pour chaque visite
             Marker marker = new Marker(mapView);
@@ -264,6 +309,9 @@ public class NavigationActivity extends AppCompatActivity {
         if (userMarker != null) {
             mapView.getOverlays().remove(userMarker);
         }
+
+        coordinatesToSend.add(new Coordinates(location.getLatitude(), location.getLongitude()));
+        sendUserLocation();
 
         // Create a new marker at the user's location
         GeoPoint userGeoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
@@ -305,6 +353,26 @@ public class NavigationActivity extends AppCompatActivity {
 
         mapView.getOverlays().add(userMarker);
         mapView.invalidate(); // Redraw the map
+    }
+
+    private void sendUserLocation() {
+        if (routeAndGpsDtoData == null) {
+            return;
+        }
+
+        String routeId = routeAndGpsDtoData.getRoute().getId();
+        UpdateLocationDTO updateLocationDTO = new UpdateLocationDTO(routeId, coordinatesToSend);
+
+        Communicator communicator = Communicator.getInstance(getApplicationContext());
+        communicator.sendUserLocation(updateLocationDTO, new CommunicatorCallback<>(
+                response -> {
+                    coordinatesToSend.clear();
+                },
+                error -> {
+                    Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "sendUserLocation: " + error.message);
+                }
+        ));
     }
 
 }

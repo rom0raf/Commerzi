@@ -2,6 +2,7 @@ package com.commerzi.app.route;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.commerzi.app.route.plannedRoute.PlannedRoute;
 import com.commerzi.app.route.plannedRoute.UpdatePlannedRouteActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
 
@@ -82,7 +84,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
             context.startActivity(intent);
         });
 
-       holder.btnDelete.setOnClickListener(v -> deleteRoute(route, position));
+       holder.btnDelete.setOnClickListener(v -> deleteRoute(position));
        holder.btnEdit.setOnClickListener(v -> {
            Intent intent = new Intent(context, UpdatePlannedRouteActivity.class);
            intent.putExtra("route", route);
@@ -114,17 +116,29 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
         }
     }
 
-   private void deleteRoute(PlannedRoute route, int position) {
+     private void deleteRoute(int position) {
+       Log.d("Planned route", "deleteRoute: " + position);
+
+       // delete the route from server and local list
+
+       PlannedRoute route = routeList.get(position);
+
+         routeList.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, routeList.size());
+
+
        Communicator communicator = Communicator.getInstance(context);
        communicator.deletePlannedRoute(route, new CommunicatorCallback<>(
                response -> {
                    Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show();
-                   routeList.remove(position);
-                   notifyItemRemoved(position);
+
+                   //
                },
                error -> {
                    Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show();
                }
-       ));
-   }
+               ));
+
+    }
 }

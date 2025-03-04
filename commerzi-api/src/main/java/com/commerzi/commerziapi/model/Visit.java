@@ -8,7 +8,10 @@ public class Visit {
     private Customer customer; // "client" or "prospect"
     private EVisitStatus status;
 
-    private static final int idCounter = 0;
+    private static int idCounter = 0;
+
+    public Visit() {
+    }
 
     public Visit(Customer customer) {
         if (customer == null) {
@@ -16,6 +19,7 @@ public class Visit {
         }
 
         this.id = "visit_" + idCounter;
+        idCounter++;
         this.customer = customer;
         this.status = EVisitStatus.NOT_VISITED;
     }

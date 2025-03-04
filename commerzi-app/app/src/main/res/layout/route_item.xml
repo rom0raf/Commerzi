@@ -42,13 +42,12 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:padding="4dp"/>
-
-
+        
         <!-- Boutons pour modifier et supprimer l'entreprise -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingTop="8dp"
             android:gravity="center">
 
@@ -67,7 +66,7 @@
                 android:backgroundTint="@color/blue"
                 android:textColor="@android:color/white"
                 android:layout_marginEnd="8dp" />
-
+            
             <!-- Bouton Supprimer -->
             <Button
                 android:id="@+id/btnDeleteRoute"

@@ -41,8 +41,6 @@ public class ActualRouteController {
     public ResponseEntity getActualRoutes(@PathVariable String id) {
         ActualRoute actualRoute = actualRouteService.getActualRouteById(id);
 
-
-
         if (actualRoute == null) {
             return ResponseEntity.notFound().build();
         }
@@ -70,6 +68,7 @@ public class ActualRouteController {
         try {
             String id = actualRouteService.saveActualRoute(actualRoute);
             actualRoute.setId(id);
+            actualRoute.setPlannedRouteId(plannedRoute.getId());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -126,8 +125,8 @@ public class ActualRouteController {
     }
 
     @CommerziAuthenticated
-    @PutMapping("/{visitIndex}?status={status}")
-    public ResponseEntity skipVisit(@PathVariable int visitIndex, @PathVariable String status, @RequestBody ActualRoute actualRoute) {
+    @PutMapping("/{visitIndex}")
+    public ResponseEntity skipVisit(@PathVariable int visitIndex, @RequestParam String status, @RequestBody ActualRoute actualRoute) {
         if (actualRoute == null) {
             return ResponseEntity.notFound().build();
         }
