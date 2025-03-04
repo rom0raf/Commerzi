@@ -2,6 +2,7 @@ package com.commerzi.app.customers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +46,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<com.commerzi.app.custo
         holder.tvAddress.setText("Adresse : " + customer.getAddress());
         holder.tvCity.setText("Ville : " + customer.getCity());
         holder.tvDescription.setText("Description : " + customer.getDescription());
-        holder.tvContact.setText("Contact : " + customer.getContactInfo());
+        holder.tvContact.setText("Contact : " + customer.getContact().getCleanInfos());
 
         // Logique d'affichage/dépliage
         holder.itemView.setOnClickListener(v -> {
@@ -67,6 +68,7 @@ public class CustomerAdapter extends RecyclerView.Adapter<com.commerzi.app.custo
         });
 
         holder.btnDelete.setOnClickListener(v -> deleteCustomer(customer, position));
+        Log.d("CustomerAdapter", "onBindViewHolder: " + customer.getName());
         holder.btnEdit.setOnClickListener(v -> {
             Intent intent = new Intent(context, UpdateCustomerActivity.class);
             intent.putExtra("customer", customer);

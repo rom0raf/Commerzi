@@ -1,7 +1,7 @@
 package com.commerzi.app.route.plannedRoute;
 
+import com.commerzi.app.customers.Coordinates;
 import com.commerzi.app.customers.Customer;
-import com.commerzi.app.route.utils.Coordinates;
 
 import java.util.List;
 

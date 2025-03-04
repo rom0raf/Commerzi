@@ -62,9 +62,25 @@ public class CreateRouteActivity extends AppCompatActivity {
     }
 
     private void onValidateButtonClicked(View view) {
+        Log.d("CreateRouteActivity", "onValidateButtonClicked");
         ArrayList<Customer> customersList = new ArrayList<>(selectedItems);
         String name = routeNameField.getText().toString();
         PlannedRoute route = new PlannedRoute(name, customersList);
+
+        if (name.isEmpty()) {
+            Toast.makeText(getApplicationContext(), R.string.error_no_route_name, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (customersList.isEmpty() || customersList.size() < 2) {
+            Toast.makeText(getApplicationContext(), R.string.error_not_enough_customers, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (customersList.size() > 8) {
+            Toast.makeText(getApplicationContext(), R.string.error_too_much_customers, Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         Communicator communicator = Communicator.getInstance(getApplicationContext());
         communicator.createRoute(name, route, new CommunicatorCallback<>(
@@ -122,12 +138,15 @@ public class CreateRouteActivity extends AppCompatActivity {
         // Listen for click on the close icon of the chip
         chip.setOnCloseIconClickListener(v -> removeItem(item));
 
+        dropdownItems.remove(item);
+
         chipGroup.addView(chip); // Add the chip to the ChipGroup
     }
 
     // Method to remove an item from the selected items and update the UI
     private void removeItem(Customer item) {
-        selectedItems.remove(item.getName());
+        selectedItems.remove(item);
+        dropdownItems.add(item);
         removeChip(item);
         adapter.notifyDataSetChanged();
     }
@@ -138,7 +157,7 @@ public class CreateRouteActivity extends AppCompatActivity {
             View child = chipGroup.getChildAt(i);
             if (child instanceof Chip) {
                 Chip chip = (Chip) child;
-                if (chip.getText().toString().equals(item)) {
+                if (chip.getText().toString().equals(item.getName())) {
                     chipGroup.removeView(chip);
                     break;
                 }

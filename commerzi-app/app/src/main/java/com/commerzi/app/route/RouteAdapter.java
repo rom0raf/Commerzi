@@ -45,7 +45,15 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
         PlannedRoute route = routeList.get(position);
 
         holder.tvRouteName.setText(route.getName());
-        holder.tvDistance.setText("Distance : " + route.getTotalDistance());
+        holder.tvDistance.setText("Distance : " + route.getTotalDistance() / 1000 + " km");
+
+        // add a list of customers to the route view
+        StringBuilder customers = new StringBuilder();
+        for (Customer customer : route.getCustomersAndProspects()) {
+            customers.append(customer.getName()).append(", ").append(customer.getContact().getCleanInfos()).append("\n");
+        }
+
+        holder.tvCustomers.setText(customers.toString());
 
         // Logique d'affichage/dépliage
         holder.itemView.setOnClickListener(v -> {

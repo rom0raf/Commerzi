@@ -167,6 +167,52 @@ public class MapsUtils {
     }
 
     /**
+     * Builds a full route by ordering customers based on the shortest flying distance, starting and ending at the commercial home.
+     * The method uses any custom sorting class (see {@link ATravelerAlgorithm} class) to arrange the customers in the optimal order,
+     * and then calculates the total flying travel distance of the route.
+     *
+     * @param initialRoute the original PlannedRoute that contains all the data about the Route
+     * @param algorithm allows to sort the points via optimised algorithms of the developer choice
+     * @return a PlannedRoute object containing the ordered customers and the total flying travel distance
+     * @throws IllegalArgumentException if the customers list is null or empty, or if the commercialHome is null
+     */
+    public static void buildFullRoute(PlannedRoute initialRoute, ATravelerAlgorithm algorithm) throws IOException {
+        if (initialRoute.getCustomersAndProspects() == null || initialRoute.getCustomersAndProspects().isEmpty()) {
+            throw new IllegalArgumentException("Customer list cannot be null or empty.");
+        }
+
+        if (initialRoute.getStartingPoint() == null) {
+            throw new IllegalArgumentException("Commercial home can't be null.");
+        }
+
+        if (algorithm == null) {
+            throw new IllegalArgumentException("Algorithm can't be null.");
+        }
+
+        List<Coordinates> points = initialRoute.getCustomersAndProspects().stream()
+            .map(Customer::getGpsCoordinates)
+            .toList();
+
+        points = algorithm.apply(initialRoute.getStartingPoint(), points);
+
+        List<Customer> orderedCustomers = new ArrayList<>();
+        for (Coordinates point : points) {
+            initialRoute.getCustomersAndProspects().stream()
+                .filter(c -> c.getGpsCoordinates().equals(point))
+                .findFirst()
+                .ifPresent(orderedCustomers::add);
+        }
+
+        initialRoute.setCustomersAndProspects(orderedCustomers);
+
+        points.add(initialRoute.getEndingPoint());
+        points.add(0, initialRoute.getStartingPoint());
+
+        double distance = algorithm.getFullDistanceOverPointsFunc().apply(points);
+        initialRoute.setTotalDistance(distance);
+    }
+
+    /**
      * Gets the GPS route between two points using the Open Source Routing Machine (OSRM) API.
      *
      * @param start the starting point
