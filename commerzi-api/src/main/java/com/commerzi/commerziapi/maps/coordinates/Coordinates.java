@@ -29,13 +29,10 @@ public class Coordinates {
 
     @Override
     public boolean equals(Object obj) {
-
         if (!(obj instanceof Coordinates)) {
             return false;
         }
-
         Coordinates other = (Coordinates) obj;
-
         return this.latitude == other.latitude && this.longitude == other.longitude;
     }
 

@@ -43,16 +43,16 @@ public class TravelerAlgorithmCrazyBenchmark {
         /**
          * Calculates the total distance between the points in the sorted list.
          * The distance is computed by calling {@link MapsUtils#fullFlyingDistanceOverPoints(List)}
-         * and dividing the result by 3 (likely for normalization or scaling purposes).
+         * and dividing the result by 2 (2 iterations for the benchmark).
          *
          * This function takes into account the starting point (and end point).
          *
-         * @return the total distance between the points in the list, divided by 3
+         * @return the total distance between the points in the list, divided by 2
          */
         public Double totalDistance() {
-            sortedPoints.add(0, TravelerAlgorithmCrazyBenchmarkData.startingPoint);
-            sortedPoints.add(TravelerAlgorithmCrazyBenchmarkData.startingPoint);
-            return MapsUtils.fullFlyingDistanceOverPoints(sortedPoints) / 3;
+            sortedPoints.add(0, TravelerAlgorithmBenchmarkData.startingPoint);
+            sortedPoints.add(TravelerAlgorithmBenchmarkData.startingPoint);
+            return MapsUtils.fullFlyingDistanceOverPoints(sortedPoints) / 2;
         }
     }
 
