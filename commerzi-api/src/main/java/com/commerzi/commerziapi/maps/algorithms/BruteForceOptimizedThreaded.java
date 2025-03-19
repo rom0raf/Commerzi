@@ -3,7 +3,6 @@ package com.commerzi.commerziapi.maps.algorithms;
 import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -88,7 +87,7 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
      * A thread that performs the actual brute force search for a given set of points.
      * Each thread independently explores paths starting from a specific point, allowing parallelism to speed up the search.
      */
-    private class BruteForceActualThread implements Callable<Void> {
+    private class BruteForceActualThread implements Runnable {
         private final Coordinates startingPoint;
         private final List<Coordinates> points;
         private final List<Coordinates> currentPath;
@@ -117,9 +116,8 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
         }
 
         @Override
-        public Void call() {
+        public void run() {
             explorePaths();
-            return null;
         }
 
         /**
@@ -169,9 +167,8 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
     @Override
     protected List<Coordinates> performAlgorithm(Coordinates startingPoint, List<Coordinates> points) {
         ThreadSafeResult result = new ThreadSafeResult();
-        ExecutorService executor = Executors.newFixedThreadPool(points.size());
+        List<Thread> threads = new ArrayList<>();
 
-        List<BruteForceActualThread> tasks = new ArrayList<>();
         for (int i = 0; i < points.size(); i++) {
             List<Coordinates> pointsToVisit = new ArrayList<>(points);
             pointsToVisit.remove(i);
@@ -180,15 +177,17 @@ public class BruteForceOptimizedThreaded extends ATravelerAlgorithm {
             List<Coordinates> currentPath = new ArrayList<>();
             currentPath.add(points.get(i));
 
-            tasks.add(new BruteForceActualThread(startingPoint, pointsToVisit, new ArrayList<>(currentPath), visited, result, distanceBetweenTwoPoints.apply(startingPoint, points.get(i))));
+            Thread thread = new Thread(new BruteForceActualThread(startingPoint, pointsToVisit, new ArrayList<>(currentPath), visited, result, distanceBetweenTwoPoints.apply(startingPoint, points.get(i))));
+            thread.start();
+            threads.add(thread);
         }
 
         try {
-            executor.invokeAll(tasks);
+            for (Thread thread : threads) {
+                thread.join();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
-        } finally {
-            executor.shutdown();
         }
 
         return result.getBestPath();

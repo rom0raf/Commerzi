@@ -66,7 +66,7 @@ public class PlannedRouteService implements IPlannedRouteService {
                 try {
                     MapsUtils.buildFullRoute(
                             route,
-                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
+                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED)
                     );
                     plannedRouteRepository.save(route);
                 } catch (IOException e) {
@@ -117,7 +117,7 @@ public class PlannedRouteService implements IPlannedRouteService {
                 try {
                     MapsUtils.buildFullRoute(
                             route,
-                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
+                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED)
                     );
                     plannedRouteRepository.save(route);
                 } catch (IOException e) {
