@@ -75,18 +75,6 @@ public class MapsUtils {
                 c2 = temp;
             }
         }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof CoordinatePair that)) return false;
-            return c1.equals(that.c1) && c2.equals(that.c2);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(c1, c2);
-        }
     }
 
     /**
