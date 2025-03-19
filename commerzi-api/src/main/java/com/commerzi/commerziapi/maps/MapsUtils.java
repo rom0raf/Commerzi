@@ -78,33 +78,6 @@ public class MapsUtils {
     }
 
     /**
-     * A cache for storing flying distances between two coordinates.
-     * The cache is limited to {@link #MAX_CACHE_SIZE} entries and expires after 1 hour of inactivity.
-     */
-    private static final LoadingCache<NormalizedCoordinatePair, Double> FLYING_DISTANCE_CACHE = CacheBuilder.newBuilder()
-            .maximumSize(MAX_CACHE_SIZE)
-            .expireAfterAccess(1, TimeUnit.HOURS)
-            .build(new CacheLoader<NormalizedCoordinatePair, Double>() {
-                @Override
-                public Double load(NormalizedCoordinatePair key) throws Exception {
-                    double lat1 = key.c1.getLatitude();
-                    double lon1 = key.c1.getLongitude();
-
-                    double lat2 = key.c2.getLatitude();
-                    double lon2 = key.c2.getLongitude();
-
-                    double latitudinalDistance = Math.toRadians(lat2 - lat1);
-                    double longitudinalDistance = Math.toRadians(lon2 - lon1);
-
-                    // Haversine formula: Calculates the great-circle distance between two points
-                    double a = haversine(latitudinalDistance) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * haversine(longitudinalDistance);
-
-                    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                    return EARTH_RADIUS * c;
-                }
-            });
-
-    /**
      * A cache for storing real-world road distances between two coordinates.
      * The cache is limited to {@link #MAX_CACHE_SIZE} entries and expires after 1 hour of inactivity.
      */
@@ -132,7 +105,8 @@ public class MapsUtils {
 
     /**
      * This method calculates the flying distance between two points.
-     * This method uses memory caching.
+     * This method does not use any memory caching as the calculations are already fast and caching will actually
+     * slow down the calculation.
      *
      * @param p1 the first point
      * @param p2 the second point
@@ -148,11 +122,20 @@ public class MapsUtils {
             return 0.0;
         }
 
-        try {
-            return FLYING_DISTANCE_CACHE.get(new NormalizedCoordinatePair(p1, p2));
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        double lat1 = p1.getLatitude();
+        double lon1 = p1.getLongitude();
+
+        double lat2 = p2.getLatitude();
+        double lon2 = p2.getLongitude();
+
+        double latitudinalDistance = Math.toRadians(lat2 - lat1);
+        double longitudinalDistance = Math.toRadians(lon2 - lon1);
+
+        // Haversine formula: Calculates the great-circle distance between two points
+        double a = haversine(latitudinalDistance) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * haversine(longitudinalDistance);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return EARTH_RADIUS * c;
     }
 
     /**
