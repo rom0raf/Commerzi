@@ -48,7 +48,19 @@ public class MapsUtils {
      * A record that holds a pair of coordinates.
      * Used for caching flying distances between two coordinates.
      */
-    private record CoordinatePair(Coordinates c1, Coordinates c2) {}
+    private record CoordinatePair(Coordinates c1, Coordinates c2) {
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof CoordinatePair that)) return false;
+            return c1.equals(that.c1) && c2.equals(that.c2);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(c1, c2);
+        }
+    }
 
     /**
      * A record that holds a normalized pair of coordinates.
@@ -62,6 +74,18 @@ public class MapsUtils {
                 c1 = c2;
                 c2 = temp;
             }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof CoordinatePair that)) return false;
+            return c1.equals(that.c1) && c2.equals(that.c2);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(c1, c2);
         }
     }
 
@@ -291,26 +315,25 @@ public class MapsUtils {
             throw new IllegalArgumentException("Algorithm can't be null.");
         }
 
-        List<Coordinates> points = initialRoute.getCustomersAndProspects().stream()
+        final List<Coordinates> points = initialRoute.getCustomersAndProspects().stream()
             .map(Customer::getGpsCoordinates)
             .toList();
 
-        points = algorithm.apply(initialRoute.getStartingPoint(), points);
+        List<Coordinates> newPoints = algorithm.apply(initialRoute.getStartingPoint(), points);
 
         List<Customer> orderedCustomers = new ArrayList<>();
-        for (Coordinates point : points) {
+        for (Coordinates point : newPoints) {
             initialRoute.getCustomersAndProspects().stream()
-                .filter(c -> c.getGpsCoordinates().equals(point))
-                .findFirst()
-                .ifPresent(orderedCustomers::add);
+                    .filter(c -> c.getGpsCoordinates().equals(point))
+                    .findFirst().ifPresent(orderedCustomers::add);
         }
 
         initialRoute.setCustomersAndProspects(orderedCustomers);
 
-        points.add(initialRoute.getEndingPoint());
-        points.add(0, initialRoute.getStartingPoint());
+        newPoints.add(initialRoute.getEndingPoint());
+        newPoints.add(0, initialRoute.getStartingPoint());
 
-        double distance = algorithm.getFullDistanceOverPointsFunc().apply(points);
+        double distance = algorithm.getFullDistanceOverPointsFunc().apply(newPoints);
         initialRoute.setTotalDistance(distance);
     }
 }

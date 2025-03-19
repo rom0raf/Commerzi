@@ -33,8 +33,8 @@ services:
       dockerfile: Dockerfile
     container_name: mongo_commerzi
 #   si on a besoin d'accéder à la base depuis l'extérieur
-#    ports:
-#      - "27017:27017"
+    ports:
+      - "27017:27017"
     volumes:
       - mongo_data:/data/db
     networks:
@@ -52,8 +52,8 @@ services:
       MYSQL_USER:
       MYSQL_PASSWORD:
 #   si on a besoin d'accéder à la base depuis l'extérieur
-#    ports:
-#      - "3306:3306"
+    ports:
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:

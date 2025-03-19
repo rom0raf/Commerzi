@@ -164,4 +164,47 @@ public class ActualRouteService implements IActualRouteService {
         return route;
     }
 
+    public ActualRoute skipVisit(ActualRoute route) {
+        Visit toUpadte = route.getVisits().stream()
+                .filter(visit -> visit.getStatus() == EVisitStatus.NOT_VISITED)
+                .findFirst()
+                .orElse(null);
+
+        if (toUpadte == null) {
+            return route;
+        }
+
+        toUpadte.setStatus(EVisitStatus.SKIPPED);
+
+        route.getVisits().set(route.getVisits().indexOf(toUpadte), toUpadte);
+
+        if (route.getVisits().stream().allMatch(visit -> visit.getStatus() == EVisitStatus.SKIPPED
+                || visit.getStatus() == EVisitStatus.VISITED)) {
+            route.setStatus(ERouteStatus.COMPLETED);
+        }
+
+        return actualRouteRepository.save(route);
+    }
+
+    public ActualRoute confirmVisit(ActualRoute route) {
+        Visit toUpadte = route.getVisits().stream()
+                .filter(visit -> visit.getStatus() == EVisitStatus.NOT_VISITED)
+                .findFirst()
+                .orElse(null);
+
+        if (toUpadte == null) {
+            return route;
+        }
+
+        toUpadte.setStatus(EVisitStatus.VISITED);
+
+        route.getVisits().set(route.getVisits().indexOf(toUpadte), toUpadte);
+
+        if (route.getVisits().stream().allMatch(visit -> visit.getStatus() == EVisitStatus.SKIPPED
+                || visit.getStatus() == EVisitStatus.VISITED)) {
+            route.setStatus(ERouteStatus.COMPLETED);
+        }
+
+        return actualRouteRepository.save(route);
+    }
 }

@@ -78,8 +78,8 @@ public class PlannedRouteController {
     @CommerziAuthenticated
     @PostMapping("/{name}")
     public ResponseEntity<String> createPlannedRoute(
-            @PathVariable String name, @RequestBody PlannedRouteDTO customersId) {
-        if (customersId == null || customersId.getCustomersId().isEmpty()) {
+            @PathVariable String name, @RequestBody PlannedRouteDTO plannedRouteDTO) {
+        if (plannedRouteDTO == null || plannedRouteDTO.getCustomersId().isEmpty()) {
             return ResponseEntity.badRequest().body("No customers specified");
         }
         if (name == null || name.isEmpty()) {
@@ -90,7 +90,7 @@ public class PlannedRouteController {
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
 
         try {
-            String id = plannedRouteService.createRoute(customersId.getCustomersId(), name, user);
+            String id = plannedRouteService.createRoute(plannedRouteDTO.getCustomersId(), name, user);
             return ResponseEntity.ok(id);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

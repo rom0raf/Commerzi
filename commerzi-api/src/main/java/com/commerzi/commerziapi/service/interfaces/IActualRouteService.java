@@ -17,4 +17,8 @@ public interface IActualRouteService {
     ActualRoute updateVisit(int visitId, String status, ActualRoute route);
 
     List<GPSRoute> getGPSRoutes(ActualRoute route);
+
+    ActualRoute skipVisit(ActualRoute route);
+
+    ActualRoute confirmVisit(ActualRoute route);
 }

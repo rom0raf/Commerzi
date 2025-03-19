@@ -125,14 +125,31 @@ public class ActualRouteController {
     }
 
     @CommerziAuthenticated
-    @PutMapping("/{visitIndex}")
-    public ResponseEntity skipVisit(@PathVariable int visitIndex, @RequestParam String status, @RequestBody ActualRoute actualRoute) {
+    @PutMapping("/skip}")
+    public ResponseEntity skipVisit(@RequestBody ActualRoute actualRoute) {
         if (actualRoute == null) {
             return ResponseEntity.notFound().build();
         }
 
         try {
-            actualRoute = actualRouteService.updateVisit(visitIndex, status, actualRoute);
+            actualRoute = actualRouteService.skipVisit(actualRoute);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        return ResponseEntity.ok(actualRoute);
+    }
+
+     @CommerziAuthenticated
+    @PutMapping("/confirm")
+    public ResponseEntity confirmVisit(@RequestBody ActualRoute actualRoute) {
+        if (actualRoute == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            actualRoute = actualRouteService.confirmVisit(actualRoute);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

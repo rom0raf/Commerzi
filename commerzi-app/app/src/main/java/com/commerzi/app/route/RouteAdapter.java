@@ -49,7 +49,19 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHol
         PlannedRoute route = routeList.get(position);
 
         holder.tvRouteName.setText(route.getName());
-        holder.tvDistance.setText("Distance : " + route.getTotalDistance() / 1000 + " km");
+
+        double distanceKM = route.getTotalDistance() / 1000;
+        // round to 2 decimal places
+        distanceKM = Math.round(distanceKM * 100.0) / 100.0;
+
+        if (route.getTotalDistance() < 0) {
+            holder.tvDistance.setText("Distance : Calculating...");
+            // wait 2 seconds and query api
+            Communicator communicator = Communicator.getInstance(context);
+            
+        } else {
+            holder.tvDistance.setText("Distance : " + distanceKM + " km");
+        }
 
         // add a list of customers to the route view
         StringBuilder customers = new StringBuilder();

@@ -450,6 +450,27 @@ public class Communicator {
         }
     }
 
+    public void getPlannedRouteById(String id, CommunicatorCallback<PlannedRouteResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        this.request(Request.Method.GET, this.buildPlannedRoutesBaseUrl() + id, null, true,
+            response -> {
+                try {
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    PlannedRoute route = gsonBuilder.create().fromJson(response, PlannedRoute.class);
+
+                
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callback.onFailure(new PlannedRouteResponse(null, context.getString(R.string.data_processing_error)));
+                }
+            },
+            error -> callback.onFailure(new PlannedRouteResponse(null, context.getString(R.string.route_fetching_error)))
+        );
+    }
+
     public void updateRoute(PlannedRoute route, CommunicatorCallback<GenericMessageResponse> callback){
         if (callback == null) {
             throw new IllegalArgumentException("Callback can't be null.");

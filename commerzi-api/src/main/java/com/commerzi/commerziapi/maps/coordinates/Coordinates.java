@@ -1,5 +1,7 @@
 package com.commerzi.commerziapi.maps.coordinates;
 
+import java.util.Objects;
+
 public class Coordinates {
     private double latitude;
     private double longitude;
@@ -34,6 +36,11 @@ public class Coordinates {
         }
         Coordinates other = (Coordinates) obj;
         return this.latitude == other.latitude && this.longitude == other.longitude;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(latitude, longitude);
     }
 
     @Override

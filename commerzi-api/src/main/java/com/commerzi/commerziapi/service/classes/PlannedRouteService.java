@@ -57,13 +57,24 @@ public class PlannedRouteService implements IPlannedRouteService {
         route.setEndingPoint(point);
 
         checkPlannedRoute(route);
-
-        MapsUtils.buildFullRoute(
-                route,
-                ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
-        );
-
+        route.setTotalDistance(-1);
         plannedRouteRepository.save(route);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    MapsUtils.buildFullRoute(
+                            route,
+                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
+                    );
+                    plannedRouteRepository.save(route);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+
         return route.getId();
     }
 
@@ -92,18 +103,28 @@ public class PlannedRouteService implements IPlannedRouteService {
      * @param route the planned route to update
      */
     public PlannedRoute updateRoute(String name, PlannedRoute route) throws Exception {
-
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name cannot be empty");
         }
 
         checkPlannedRoute(route);
-
         route.setName(name);
-        MapsUtils.buildFullRoute(
-                route,
-                ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
-        );
+        route.setTotalDistance(-1);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    MapsUtils.buildFullRoute(
+                            route,
+                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
+                    );
+                    plannedRouteRepository.save(route);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
 
         return plannedRouteRepository.save(route);
     }
