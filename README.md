@@ -16,6 +16,12 @@ Notre mission est de faciliter le travail des commerciaux sur le terrain en leur
 
 ---
 
+## Github Project
+
+Pour ce projet nous avons utilisé un Github Project pour le suivi des tâches: https://github.com/users/rom0raf/projects/3
+
+---
+
 ## Contexte du Projet
 
 Ce projet a été demandé par notre école dans le cadre d'une **Situation d'Apprentissage Évaluée** (**SAE**). 
