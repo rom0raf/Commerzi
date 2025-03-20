@@ -1,5 +1,9 @@
 package com.commerzi.app.route.actualRoute;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -7,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
@@ -15,17 +20,19 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
+import com.commerzi.app.communication.responses.ActualRouteNavigationResponse;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 import com.commerzi.app.customers.Coordinates;
 import com.commerzi.app.customers.Customer;
 import com.commerzi.app.dto.UpdateLocationDTO;
 import com.commerzi.app.dto.UpdateVisitDTO;
-import com.commerzi.app.route.actualRoute.maps.GPSRoute;
-import com.commerzi.app.route.actualRoute.maps.Geometry;
 import com.commerzi.app.route.plannedRoute.PlannedRoute;
 import com.commerzi.app.route.utils.ERouteStatus;
 import com.commerzi.app.route.visit.EVisitStatus;
@@ -35,6 +42,7 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +68,6 @@ public class NavigationActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private LocationListener locationListener;
     private Marker userMarker;
-
 
 
     @Override
@@ -91,16 +98,22 @@ public class NavigationActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: MapView set up");
 
-        plannedRoute = (PlannedRoute) getIntent().getParcelableExtra("route");
+        Intent routeIntent = getIntent();
 
-        if (plannedRoute != null) {
-            if (routeAndGpsDtoData != null && routeAndGpsDtoData.getRoute().getStatus() == ERouteStatus.IN_PROGRESS) {
-                getActualRouteById(routeAndGpsDtoData.getRoute().getId());
-            } else {
-                getActualRoute();
-            }
+        Parcelable routeParcelable = routeIntent.getParcelableExtra("route");
+
+        if (routeParcelable instanceof PlannedRoute) {
+            System.out.println("PlannedRoute reçue");
+            plannedRoute = (PlannedRoute) routeParcelable;
+            handlePlannedRoute();
+        } else if (routeParcelable instanceof ActualRoute) {
+            System.out.println("ActualRoute reçue");
+            ActualRoute actualRoute = (ActualRoute) routeParcelable;
+            routeAndGpsDtoData = new RouteAndGpsDto(actualRoute, null);
+            handleActualRoute(actualRoute);
         } else {
-            Toast.makeText(this, "Planned route is null", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Aucune route valide reçue", Toast.LENGTH_SHORT).show();
+            finish();
         }
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -120,14 +133,18 @@ public class NavigationActivity extends AppCompatActivity {
                     Log.d(TAG, "Location: " + location.getLatitude() + ", " + location.getLongitude() + " Accuracy: " + location.getAccuracy());
                     updateUserLocation(location);
                 }
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {}
 
                 @Override
-                public void onProviderEnabled(@NonNull String provider) {}
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                }
 
                 @Override
-                public void onProviderDisabled(@NonNull String provider) {}
+                public void onProviderEnabled(@NonNull String provider) {
+                }
+
+                @Override
+                public void onProviderDisabled(@NonNull String provider) {
+                }
             };
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 10, locationListener);
@@ -139,15 +156,35 @@ public class NavigationActivity extends AppCompatActivity {
         }
     }
 
+    private void handlePlannedRoute() {
+        if (routeAndGpsDtoData != null && routeAndGpsDtoData.getRoute().getStatus() == ERouteStatus.IN_PROGRESS) {
+            getActualRouteById(routeAndGpsDtoData.getRoute().getId());
+        } else {
+            getActualRoute();
+        }
+    }
+
+    private void handleActualRoute(ActualRoute actualRoute) {
+        visits = actualRoute.getVisits();
+        displayVisit();
+        System.out.println("ActualRoute reçue");
+        System.out.println(actualRoute);
+        displayRoute(actualRoute);
+    }
+
     private void validateVisit() {
+
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
-        UpdateVisitDTO updateVisitDTO = new UpdateVisitDTO(routeAndGpsDtoData.getRoute(),visitIndex, EVisitStatus.VISITED);
+        System.out.println("Route: " + routeAndGpsDtoData);
 
-        communicator.updateVisit(updateVisitDTO, new CommunicatorCallback<>(
+        communicator.confirmVisit(routeAndGpsDtoData.getRoute(), new CommunicatorCallback<ActualRouteNavigationResponse>(
                 response -> {
-                    visits.get(visitIndex).setStatus(EVisitStatus.VISITED);
+                    ActualRoute route = response.actualRoute.getRoute();
+                    routeAndGpsDtoData.setRoute(route);
+                    visits = route.getVisits();
                     visitIndex++;
+                    Toast.makeText(this, "Visite validée", Toast.LENGTH_SHORT).show();
                     displayVisit();
                 },
                 error -> {
@@ -160,12 +197,15 @@ public class NavigationActivity extends AppCompatActivity {
     private void skipVisit() {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
-        UpdateVisitDTO updateVisitDTO = new UpdateVisitDTO(routeAndGpsDtoData.getRoute(),visitIndex, EVisitStatus.SKIPPED);
+        UpdateVisitDTO updateVisitDTO = new UpdateVisitDTO(routeAndGpsDtoData.getRoute(), visitIndex, EVisitStatus.SKIPPED);
 
-        communicator.updateVisit(updateVisitDTO, new CommunicatorCallback<>(
+        communicator.skipVisit(routeAndGpsDtoData.getRoute(), new CommunicatorCallback<ActualRouteNavigationResponse>(
                 response -> {
-                    visits.get(visitIndex).setStatus(EVisitStatus.SKIPPED);
+                    ActualRoute route = response.actualRoute.getRoute();
+                    routeAndGpsDtoData.setRoute(route);
+                    visits = route.getVisits();
                     visitIndex++;
+                    Toast.makeText(this, "Visite passée", Toast.LENGTH_SHORT).show();
                     displayVisit();
                 },
                 error -> {
@@ -181,10 +221,13 @@ public class NavigationActivity extends AppCompatActivity {
         communicator.getActualRouteById(actualRouteId, new CommunicatorCallback<>(
                 response -> {
                     routeAndGpsDtoData = response.actualRoute;
+                    System.out.println("Route reçue");
                     Log.d(TAG, "getActualRouteById: " + routeAndGpsDtoData);
                     visitIndex = getVisitIndex(routeAndGpsDtoData.getRoute().getVisits());
+                    visits = routeAndGpsDtoData.getRoute().getVisits();
                     displayVisit();
-                    displayRoute();
+                    ActualRoute route = routeAndGpsDtoData.getRoute();
+                    displayRoute(route);
                 },
                 error -> {
                     Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
@@ -203,18 +246,20 @@ public class NavigationActivity extends AppCompatActivity {
         clone.setEndingPoint(plannedRoute.getEndingPoint());
         clone.setTotalDistance(plannedRoute.getTotalDistance());
         communicator.createActualRoute(clone, new CommunicatorCallback<>(
-                    response -> {
-                        routeAndGpsDtoData = response.actualRoute;
-                        Log.d(TAG, "getActualRoute: " + routeAndGpsDtoData);
-                        visitIndex = getVisitIndex(routeAndGpsDtoData.getRoute().getVisits());
-                        displayVisit();
-                        displayRoute();
-                    },
-                    error -> {
-                        Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "getActualRoute: " + error.message);
-                        Log.d(TAG, "getActualRoute: " + error.actualRoute);
-                    }
+                response -> {
+                    routeAndGpsDtoData = response.actualRoute;
+                    Log.d(TAG, "getActualRoute: " + routeAndGpsDtoData);
+                    visitIndex = getVisitIndex(routeAndGpsDtoData.getRoute().getVisits());
+                    visits = routeAndGpsDtoData.getRoute().getVisits();
+                    displayVisit();
+                    ActualRoute route = routeAndGpsDtoData.getRoute();
+                    displayRoute(route);
+                },
+                error -> {
+                    Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "getActualRoute: " + error.message);
+                    Log.d(TAG, "getActualRoute: " + error.actualRoute);
+                }
                 )
         );
     }
@@ -230,37 +275,47 @@ public class NavigationActivity extends AppCompatActivity {
     }
 
     private void displayVisit() {
-        visits = routeAndGpsDtoData.getRoute().getVisits();
-
         visits.forEach(System.out::println);
 
         Visit current;
         Customer customer;
 
+        System.out.println("Visit index: " + visitIndex);
+
         for (int i = 0; i < visits.size(); i++) {
-            current = visits.get(i);
-
-            if (current.getStatus() == EVisitStatus.VISITED || current.getStatus() == EVisitStatus.SKIPPED) {
-                continue;
+            if (i == visitIndex) {
+                current = visits.get(i);
+                customer = current.getCustomer();
+                tvCustomerName.setText(customer.getName());
+                tvContactInfo.setText(
+                        customer.getAddress() + " - " + customer.getCity()
+                                + "\n" +
+                                customer.getContact().getCleanInfos()
+                );
+                break;
             }
-
-            customer = current.getCustomer();
-
-            tvCustomerName.setText(
-                    getString(R.string.prochaine_visite)
-                    + " " + customer.getName()
-                    + "\n" + customer.getType()
-                    + "\n" + customer.getAddress()
-                    + " - " + customer.getCity()
-            );
-            tvContactInfo.setText(customer.getContact().getCleanInfos());
         }
 
 
+        if (routeAndGpsDtoData != null && routeAndGpsDtoData.getRoute().getStatus() == ERouteStatus.COMPLETED) {
+            tvCustomerName.setText("Toutes les visites ont été effectuées");
+            tvContactInfo.setText("");
+
+            // bouton pour terminer la route, revenir à la liste des routes
+            Button btnTerminer = new Button(this);
+            btnTerminer.setText("Terminer la route");
+
+            btnTerminer.setOnClickListener(v -> {
+                finish();
+            });
+
+            sendNotification("Route Completed", "All visits have been completed.");
+
+        }
+
     }
 
-    private void displayRoute() {
-        ActualRoute route = routeAndGpsDtoData.getRoute();
+    private void displayRoute(ActualRoute route) {
 
         int visitNumber = route.getVisits().size();
         Visit visit;
@@ -276,7 +331,7 @@ public class NavigationActivity extends AppCompatActivity {
             marker.setPosition(new GeoPoint(coordinates.getLatitude(), coordinates.getLongitude()));
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             marker.setTitle(customer.getName() + "\n" + customer.getType()
-                            + "\n" + customer.getAddress() + " - " + customer.getCity()
+                    + "\n" + customer.getAddress() + " - " + customer.getCity()
             );
             mapView.getOverlays().add(marker);
 
@@ -332,25 +387,6 @@ public class NavigationActivity extends AppCompatActivity {
             userMarker.setSubDescription("Accuracy: " + location.getAccuracy() + "m");
         }
 
-        if (routeAndGpsDtoData != null) {
-            // draw a line between visited clients and between the user and the last client visited
-            List<GeoPoint> geoPoints = new ArrayList<>();
-            for (Visit visit : routeAndGpsDtoData.getRoute().getVisits()) {
-                Customer customer = visit.getCustomer();
-                Coordinates coordinates = customer.getGpsCoordinates();
-                geoPoints.add(new GeoPoint(coordinates.getLatitude(), coordinates.getLongitude()));
-            }
-
-            // Add the user's location to the list of points
-            geoPoints.add(userGeoPoint);
-
-            // Create a polyline from the list of points
-            org.osmdroid.views.overlay.Polyline polyline = new org.osmdroid.views.overlay.Polyline();
-            polyline.setPoints(geoPoints);
-            mapView.getOverlayManager().add(polyline);
-
-        }
-
         mapView.getOverlays().add(userMarker);
         mapView.invalidate(); // Redraw the map
     }
@@ -367,12 +403,82 @@ public class NavigationActivity extends AppCompatActivity {
         communicator.sendUserLocation(updateLocationDTO, new CommunicatorCallback<>(
                 response -> {
                     coordinatesToSend.clear();
+
+                    displayNearbyCustomers(response.customers);
+
                 },
                 error -> {
-                    Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "message: " + error.message, Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "sendUserLocation: " + error.message);
                 }
         ));
+    }
+
+    private void displayNearbyCustomers(List<Customer> customers) {
+        // display customers that are not in the route (visits list)
+        // display a marker for each customer with a different icon
+        // display a notification for each customer
+
+        for (Customer customer : customers) {
+            if (visits.stream().anyMatch(visit -> visit.getCustomer().getId().equals(customer.getId()))) {
+                continue;
+            }
+
+            Coordinates coordinates = customer.getGpsCoordinates();
+            Marker marker = new Marker(mapView);
+            marker.setPosition(new GeoPoint(coordinates.getLatitude(), coordinates.getLongitude()));
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setIcon(getResources().getDrawable(R.drawable.customer, null));
+            marker.setTitle(customer.getName() + "\n" + customer.getType()
+                    + "\n" + customer.getAddress() + " - " + customer.getCity()
+            );
+            mapView.getOverlays().add(marker);
+
+            sendNotification(
+                    "Nearby Customer",
+                    "You are near " + customer.getContact().getCleanInfos()
+            );
+        }
+
+    }
+
+    private void sendNotification(String title, String message) {
+        String channelId = "route_completion_channel";
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            CharSequence name = "Route Completion";
+            String description = "Notifications for route completion";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        // Create an explicit intent for an Activity in your app
+        Intent intent = new Intent(this, NavigationActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_route)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                // Set the intent that will fire when the user taps the notification
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        // notificationId is a unique int for each notification that you must define
+        int notificationId = 1;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        notificationManager.notify(notificationId, builder.build());
     }
 
 }

@@ -9,18 +9,8 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <Button
-            android:id="@+id/btnGoToCreateRoute"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/add_route"
-            android:backgroundTint="@color/grey"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="16dp"
-            android:visibility="gone" />
-
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewRoute"
+            android:id="@+id/recyclerViewActualRoute"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
@@ -28,17 +18,16 @@
             android:layout_marginBottom="32dp"/>
 
         <TextView
-            android:id="@+id/tvNoPlannedRoute"
+            android:id="@+id/tvNoActualRoute"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/no_planned_route"
+            android:text="@string/no_actual_route"
             android:textSize="16sp"
             android:textColor="@color/black"
             android:gravity="center"
             android:padding="16dp"
             android:visibility="gone"/>
 
-        
     </LinearLayout>
 </ScrollView>
 

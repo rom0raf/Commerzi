@@ -12,9 +12,13 @@ public interface IActualRouteService {
 
     ActualRoute getActualRouteById(String actualRouteId);
 
+    List<ActualRoute> getActualRoutesForUser(String userId);
+
     ActualRoute createActualRouteFromPlannedRoute(PlannedRoute plannedRoute);
 
     ActualRoute updateVisit(int visitId, String status, ActualRoute route);
+
+    ActualRoute delete(ActualRoute route);
 
     List<GPSRoute> getGPSRoutes(ActualRoute route);
 

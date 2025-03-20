@@ -3,6 +3,9 @@ package com.commerzi.commerziapi.model;
 import com.commerzi.commerziapi.maps.coordinates.Coordinates;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -22,6 +25,7 @@ public class Customer {
     private String address;
     private String city;
     private String description;
+    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private Coordinates gpsCoordinates;
     private Contact contact;
     private ECustomerType type;

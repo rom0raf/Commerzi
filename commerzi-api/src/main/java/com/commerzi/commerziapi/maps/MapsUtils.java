@@ -171,14 +171,13 @@ public class MapsUtils {
      */
     public static GPSRoute getGpsRoute(Coordinates start, Coordinates end) throws IOException {
         String urlString = getOSRMUrl(start, end);
+        System.out.println("Sending request to OSRM API: " + urlString);
 
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
-        connection.setConnectTimeout(5000);
-        connection.setReadTimeout(5000);
-
-        System.out.println("Sending request to OSRM API: " + urlString);
+        connection.setConnectTimeout(2_000_000_000);
+        connection.setReadTimeout(2_000_000_000);
 
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
@@ -274,17 +273,7 @@ public class MapsUtils {
      * @throws IllegalArgumentException if the customers list is null or empty, or if the commercialHome is null
      */
     public static void buildFullRoute(PlannedRoute initialRoute, ATravelerAlgorithm algorithm) throws IOException {
-        if (initialRoute.getCustomersAndProspects() == null || initialRoute.getCustomersAndProspects().isEmpty()) {
-            throw new IllegalArgumentException("Customer list cannot be null or empty.");
-        }
-
-        if (initialRoute.getStartingPoint() == null) {
-            throw new IllegalArgumentException("Commercial home can't be null.");
-        }
-
-        if (algorithm == null) {
-            throw new IllegalArgumentException("Algorithm can't be null.");
-        }
+        check(initialRoute, algorithm);
 
         final List<Coordinates> points = initialRoute.getCustomersAndProspects().stream()
             .map(Customer::getGpsCoordinates)
@@ -306,5 +295,19 @@ public class MapsUtils {
 
         double distance = algorithm.getFullDistanceOverPointsFunc().apply(newPoints);
         initialRoute.setTotalDistance(distance);
+    }
+
+    public static void check(PlannedRoute initialRoute, ATravelerAlgorithm algorithm) {
+        if (initialRoute.getCustomersAndProspects() == null || initialRoute.getCustomersAndProspects().isEmpty()) {
+            throw new IllegalArgumentException("Customer list cannot be null or empty.");
+        }
+
+        if (initialRoute.getStartingPoint() == null) {
+            throw new IllegalArgumentException("Commercial home can't be null.");
+        }
+
+        if (algorithm == null) {
+            throw new IllegalArgumentException("Algorithm can't be null.");
+        }
     }
 }

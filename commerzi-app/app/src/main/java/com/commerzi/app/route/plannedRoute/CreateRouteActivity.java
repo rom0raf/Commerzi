@@ -135,21 +135,23 @@ public class CreateRouteActivity extends AppCompatActivity {
     // Method to add a chip to the ChipGroup
     private void addChip(Customer item) {
         Chip chip = new Chip(this);
-        chip.setText(item.getName());
+        chip.setText(item.getName() + "  (" + item.getCity() + ")");
         chip.setCloseIconVisible(true);
 
         // Listen for click on the close icon of the chip
         chip.setOnCloseIconClickListener(v -> removeItem(item));
 
-        dropdownItems.remove(item);
+        adapter.removeCustomer(item);
+
 
         chipGroup.addView(chip); // Add the chip to the ChipGroup
     }
 
     // Method to remove an item from the selected items and update the UI
     private void removeItem(Customer item) {
+        System.out.println("Remove item: " + item.getName());
         selectedItems.remove(item);
-        dropdownItems.add(item);
+        adapter.addCustomer(item);
         removeChip(item);
         adapter.notifyDataSetChanged();
     }
@@ -160,7 +162,7 @@ public class CreateRouteActivity extends AppCompatActivity {
             View child = chipGroup.getChildAt(i);
             if (child instanceof Chip) {
                 Chip chip = (Chip) child;
-                if (chip.getText().toString().equals(item.getName())) {
+                if (chip.getText().toString().equals(item.getName() + "  (" + item.getCity() + ")")) {
                     chipGroup.removeView(chip);
                     break;
                 }
@@ -177,6 +179,18 @@ public class CreateRouteActivity extends AppCompatActivity {
             this.data = data;
             this.originalData = new ArrayList<>(data);
         }
+
+        void removeCustomer(Customer customer) {
+            originalData.remove(customer);
+            data.remove(customer);
+            notifyDataSetChanged();
+        }
+
+        void addCustomer(Customer customer) {
+            originalData.add(customer);
+            notifyDataSetChanged();
+        }
+
 
         @Override
         public int getCount() {
@@ -200,7 +214,7 @@ public class CreateRouteActivity extends AppCompatActivity {
                 convertView = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_dropdown_item_1line, parent, false);
             }
             TextView textView = convertView.findViewById(android.R.id.text1);
-            textView.setText(getItem(position).getName()); // Set the text of the dropdown item to the current item in the filtered data
+            textView.setText(getItem(position).getName() + " (" + getItem(position).getCity() + ")");
             return convertView;
         }
 

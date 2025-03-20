@@ -51,6 +51,10 @@ public class ActualRouteService implements IActualRouteService {
         return actualRouteRepository.findById(plannedRouteId).orElse(null);
     }
 
+    public List<ActualRoute> getActualRoutesForUser(String userId) {
+        return actualRouteRepository.findByUserId(userId);
+    }
+
     /**
      * Creates an actual route from a planned route.
      *
@@ -103,6 +107,11 @@ public class ActualRouteService implements IActualRouteService {
         return gpsRoutes;
     }
 
+    public ActualRoute delete(ActualRoute route) {
+        actualRouteRepository.delete(route);
+        return route;
+    }
+
     private static List<Visit> getVisitFromPlannedRoute(PlannedRoute plannedRoute) {
         List<Visit> visits = new ArrayList<>();
         for (Customer customer : plannedRoute.getCustomersAndProspects()) {
@@ -139,7 +148,6 @@ public class ActualRouteService implements IActualRouteService {
         }
     }
 
-
     public ActualRoute updateVisit(int visitPos, String status, ActualRoute route) throws IllegalArgumentException {
         checkActualRoute(route);
 
@@ -165,18 +173,10 @@ public class ActualRouteService implements IActualRouteService {
     }
 
     public ActualRoute skipVisit(ActualRoute route) {
-        Visit toUpadte = route.getVisits().stream()
+        route.getVisits().stream()
                 .filter(visit -> visit.getStatus() == EVisitStatus.NOT_VISITED)
                 .findFirst()
-                .orElse(null);
-
-        if (toUpadte == null) {
-            return route;
-        }
-
-        toUpadte.setStatus(EVisitStatus.SKIPPED);
-
-        route.getVisits().set(route.getVisits().indexOf(toUpadte), toUpadte);
+                .ifPresent(visit -> visit.setStatus(EVisitStatus.SKIPPED));
 
         if (route.getVisits().stream().allMatch(visit -> visit.getStatus() == EVisitStatus.SKIPPED
                 || visit.getStatus() == EVisitStatus.VISITED)) {
@@ -187,18 +187,10 @@ public class ActualRouteService implements IActualRouteService {
     }
 
     public ActualRoute confirmVisit(ActualRoute route) {
-        Visit toUpadte = route.getVisits().stream()
+        route.getVisits().stream()
                 .filter(visit -> visit.getStatus() == EVisitStatus.NOT_VISITED)
                 .findFirst()
-                .orElse(null);
-
-        if (toUpadte == null) {
-            return route;
-        }
-
-        toUpadte.setStatus(EVisitStatus.VISITED);
-
-        route.getVisits().set(route.getVisits().indexOf(toUpadte), toUpadte);
+                .ifPresent(visit -> visit.setStatus(EVisitStatus.VISITED));
 
         if (route.getVisits().stream().allMatch(visit -> visit.getStatus() == EVisitStatus.SKIPPED
                 || visit.getStatus() == EVisitStatus.VISITED)) {

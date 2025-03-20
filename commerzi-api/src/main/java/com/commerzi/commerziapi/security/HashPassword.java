@@ -32,12 +32,12 @@ public class HashPassword {
     /**
      * Name of the hashing algorithm.
      */
-    public static final String NOM_ALGORITHME = "PBKDF2WithHmacSHA256";
+    public static final String ALGORITHM_NAME = "PBKDF2WithHmacSHA256";
 
     /**
      * Secure random number generator.
      */
-    public static final SecureRandom GENERATEUR_ALEATOIRE = new SecureRandom();
+    public static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     /**
      * Hashes a password using PBKDF2 with HMAC SHA-256.
@@ -49,12 +49,12 @@ public class HashPassword {
     public static String hash(String password) throws RuntimeException {
         // Generate a salt for the password
         byte[] salt = new byte[SALT_BYTES];
-        GENERATEUR_ALEATOIRE.nextBytes(salt);
+        SECURE_RANDOM.nextBytes(salt);
 
         // Create the hash with the password and the salt
         try {
             byte[] hash = execute_algorithm(password, salt);
-            return byteToHexa(salt) + ":" + byteToHexa(hash);
+            return byteToHex(salt) + ":" + byteToHex(hash);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
@@ -70,12 +70,12 @@ public class HashPassword {
      */
     public static boolean validateHash(String password, String validHash) {
         String[] params = validHash.split(":");
-        byte[] salt = hexaToByte(params[0]);
+        byte[] salt = hexToByte(params[0]);
         String realHash = params[1];
 
         try {
             byte[] realHashToCompare = execute_algorithm(password, salt);
-            return realHash.equals(byteToHexa(realHashToCompare));
+            return realHash.equals(byteToHex(realHashToCompare));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
@@ -84,13 +84,13 @@ public class HashPassword {
     /**
      * Converts a hexadecimal string to a byte array.
      *
-     * @param hexa the hexadecimal string
+     * @param hex the hexadecimal string
      * @return the byte array
      */
-    private static byte[] hexaToByte(String hexa) {
-        byte[] binary = new byte[hexa.length() / 2];
+    private static byte[] hexToByte(String hex) {
+        byte[] binary = new byte[hex.length() / 2];
         for(int i = 0; i < binary.length; i++) {
-            binary[i] = (byte)Integer.parseInt(hexa.substring(2*i, 2*i+2), 16);
+            binary[i] = (byte)Integer.parseInt(hex.substring(2*i, 2*i+2), 16);
         }
         return binary;
     }
@@ -107,7 +107,7 @@ public class HashPassword {
     private static byte[] execute_algorithm(String password, byte[] salt)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         PBEKeySpec pbeKeySpec = new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, HASH_BYTES * 8);
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(NOM_ALGORITHME);
+        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM_NAME);
         return secretKeyFactory.generateSecret(pbeKeySpec).getEncoded();
     }
 
@@ -117,7 +117,7 @@ public class HashPassword {
      * @param array the byte array
      * @return the hexadecimal string
      */
-    private static String byteToHexa(byte[] array) {
+    private static String byteToHex(byte[] array) {
         BigInteger bi = new BigInteger(1, array);
         String hex = bi.toString(16);
         int paddingLength = (array.length * 2) - hex.length();

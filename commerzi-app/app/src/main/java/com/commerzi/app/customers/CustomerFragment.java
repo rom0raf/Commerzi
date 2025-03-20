@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,9 +71,18 @@ public class CustomerFragment extends Fragment implements View.OnClickListener {
 
     private void displayCustomers(ArrayList<Customer> customerList) {
         RecyclerView recyclerView = getView().findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        com.commerzi.app.customers.CustomerAdapter adapter = new CustomerAdapter(customerList, this.getContext());
-        recyclerView.setAdapter(adapter);
+        TextView noCustomerMessage = getView().findViewById(R.id.tvNoCustomer);
+
+        if (customerList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            noCustomerMessage.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            noCustomerMessage.setVisibility(View.GONE);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            com.commerzi.app.customers.CustomerAdapter adapter = new CustomerAdapter(customerList, this.getContext());
+            recyclerView.setAdapter(adapter);
+        }
     }
 
 }

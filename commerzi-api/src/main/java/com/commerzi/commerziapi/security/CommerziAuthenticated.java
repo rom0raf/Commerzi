@@ -6,25 +6,25 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * L'annotation {@code CommerziAuthenticated} est utilisée pour marquer une méthode comme nécessitant un utilisateur authentifié.
+ * The {@code CommerziAuthenticated} annotation is used to mark a method as requiring an authenticated user.
  * <p>
- * Cette annotation est utilisé dans un contexte spring, sur des mapping
+ * This annotation is used in a Spring context, on mapping methods.
  * </p>
- * 
+ *
  * <p>
- * Exemple d'utilisation :
+ * Example of usage:
  * </p>
- * 
+ *
  * <pre>
  * {@code
- * @GetMapping("/") // Ou tout autre mapping spring
+ * @GetMapping("/") // Or any other Spring mapping
  * @CommerziAuthenticated
- * public void maMethodeSecuriisee() {
- *     // Méthode nécessitant une authentification
+ * public void mySecureMethod() {
+ *     // Method that requires authentication
  * }
  * }
  * </pre>
- * 
+ *
  * @see java.lang.annotation.ElementType#METHOD
  * @see java.lang.annotation.RetentionPolicy#RUNTIME
  */

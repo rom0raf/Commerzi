@@ -1,15 +1,17 @@
 package com.commerzi.app.route.visit;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.commerzi.app.customers.Customer;
 
 /**
  * Model class representing a visit in the Commerzi application.
  */
-public class Visit {
+public class Visit implements Parcelable {
     private String id;
     private Customer customer; // "client" or "prospect"
     private EVisitStatus status;
-
     private static final int idCounter = 0;
 
     public Visit(Customer customer) {
@@ -22,59 +24,61 @@ public class Visit {
         this.status = EVisitStatus.NOT_VISITED;
     }
 
-    /**
-     * Gets the ID of the visit.
-     *
-     * @return the ID of the visit
-     */
     public String getId() {
         return id;
     }
 
-    /**
-     * Sets the ID of the visit.
-     *
-     * @param id the ID to set
-     */
     public void setId(String id) {
         this.id = id;
     }
 
-    /**
-     * Gets the type of the visit.
-     *
-     * @return the type of the visit
-     */
     public Customer getCustomer() {
         return customer;
     }
 
-    /**
-     * Sets the type of the visit.
-     *
-     * @param customer the type to set
-     */
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
-    /**
-     * Gets the status of the visit.
-     *
-     * @return the status of the visit
-     */
     public EVisitStatus getStatus() {
         return status;
     }
 
-    /**
-     * Sets the status of the visit.
-     *
-     * @param status the status to set
-     */
     public void setStatus(EVisitStatus status) {
         this.status = status;
     }
+
+    protected Visit(Parcel in) {
+        id = in.readString();
+        customer = in.readParcelable(Customer.class.getClassLoader());
+        status = EVisitStatus.valueOf(in.readString());
+    }
+
+    public static final Creator<Visit> CREATOR = new Creator<Visit>() {
+        @Override
+        public Visit createFromParcel(Parcel in) {
+            return new Visit(in);
+        }
+
+        @Override
+        public Visit[] newArray(int size) {
+            return new Visit[size];
+        }
+    };
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeParcelable(customer, flags);
+        dest.writeString(status.name());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    // Getters and setters...
 
     @Override
     public String toString() {

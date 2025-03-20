@@ -117,7 +117,7 @@ public class PlannedRouteService implements IPlannedRouteService {
                 try {
                     MapsUtils.buildFullRoute(
                             route,
-                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED)
+                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
                     );
                     plannedRouteRepository.save(route);
                 } catch (IOException e) {

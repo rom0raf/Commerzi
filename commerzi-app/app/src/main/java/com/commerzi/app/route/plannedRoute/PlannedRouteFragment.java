@@ -1,4 +1,4 @@
-package com.commerzi.app.route;
+package com.commerzi.app.route.plannedRoute;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,12 +25,12 @@ import com.commerzi.app.route.plannedRoute.PlannedRoute;
 
 import java.util.ArrayList;
 
-public class RouteFragment extends Fragment implements View.OnClickListener {
+public class PlannedRouteFragment extends Fragment implements View.OnClickListener {
     
     Button btnAddRoute;
 
-    public static RouteFragment newInstance() {
-        RouteFragment fragment = new RouteFragment();
+    public static PlannedRouteFragment newInstance() {
+        PlannedRouteFragment fragment = new PlannedRouteFragment();
         return fragment;
     }
 
@@ -41,6 +42,7 @@ public class RouteFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.route_list, container, false);
         btnAddRoute = fragmentView.findViewById(R.id.btnGoToCreateRoute);
+        checkCustomerExistence();
         btnAddRoute.setOnClickListener(this);
         loadRoutes();
         return fragmentView;
@@ -60,6 +62,18 @@ public class RouteFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    private void checkCustomerExistence(){
+        Communicator communicator = Communicator.getInstance(getActivity());
+        communicator.getCustomers(new CommunicatorCallback<>(
+                response -> {
+                    if (!response.customers.isEmpty()) btnAddRoute.setVisibility(View.VISIBLE);
+                },
+                error -> {
+                    Toast.makeText(getActivity(), error.message, Toast.LENGTH_SHORT).show();
+                }
+        ));
+    }
+
     private void loadRoutes() {
         if (getActivity() == null) return;
 
@@ -77,9 +91,32 @@ public class RouteFragment extends Fragment implements View.OnClickListener {
 
     private void displayRoutes(ArrayList<PlannedRoute> routeList) {
         RecyclerView recyclerView = getView().findViewById(R.id.recyclerViewRoute);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        com.commerzi.app.route.RouteAdapter adapter = new RouteAdapter(routeList, this.getContext());
-        recyclerView.setAdapter(adapter);
+        TextView noPlannedRouteMessage = getView().findViewById(R.id.tvNoPlannedRoute);
+
+        if (routeList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            noPlannedRouteMessage.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            noPlannedRouteMessage.setVisibility(View.GONE);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            PlannedRouteAdapter adapter = new PlannedRouteAdapter(routeList, this.getContext());
+            recyclerView.setAdapter(adapter);
+        }
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                for (PlannedRoute route : routeList) {
+                    if (route.getTotalDistance() < 0) {
+                        loadRoutes();
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
     }
 
 }

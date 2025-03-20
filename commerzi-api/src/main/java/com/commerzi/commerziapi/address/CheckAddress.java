@@ -9,6 +9,7 @@ import com.opencagedata.jopencage.JOpenCageGeocoder;
 import com.opencagedata.jopencage.model.JOpenCageForwardRequest;
 import com.opencagedata.jopencage.model.JOpenCageResponse;
 
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +33,17 @@ public class CheckAddress {
     /**
      * A record that holds the full address (address and city) for caching purposes.
      */
-    private record FullAddress(String address, String city) {}
+    private record FullAddress(String address, String city) {
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof FullAddress other && address.equals(other.address) && city.equals(other.city);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(address, city);
+        }
+    }
 
     /**
      * A cache for storing coordinates corresponding to a full address (address + city).

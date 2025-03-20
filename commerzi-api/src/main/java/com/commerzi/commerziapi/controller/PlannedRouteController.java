@@ -95,8 +95,10 @@ public class PlannedRouteController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().body("Error while fetching real distances");
         } catch (Exception e) {
+            e.printStackTrace();
             String message = "An unexpected error occurred while creating the route\n";
             message += e.getMessage() != null ? ": " + e.getMessage() : "";
             return ResponseEntity.internalServerError().body(message);

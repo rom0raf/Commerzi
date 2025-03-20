@@ -34,10 +34,14 @@ public class HomeActivity extends AppCompatActivity {
                     title.setText(getString(R.string.routes));
                     break;
                 case 1:
+                    icon.setImageResource(R.drawable.ic_route);
+                    title.setText(getString(R.string.actual_routes));
+                    break;
+                case 2:
                     icon.setImageResource(R.drawable.ic_company);
                     title.setText(getString(R.string.customers));
                     break;
-                case 2:
+                case 3:
                     icon.setImageResource(R.drawable.ic_avatar);
                     title.setText(getString(R.string.profile));
                     break;

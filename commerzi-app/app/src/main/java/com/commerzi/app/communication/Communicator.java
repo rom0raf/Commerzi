@@ -18,7 +18,9 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.commerzi.app.auth.LoginActivity;
+import com.commerzi.app.communication.responses.ActualRouteNavigationResponse;
 import com.commerzi.app.communication.responses.ActualRouteResponse;
+import com.commerzi.app.communication.responses.NearbyCustomersResponse;
 import com.commerzi.app.communication.responses.PlannedRouteResponse;
 import com.commerzi.app.customers.Coordinates;
 import com.commerzi.app.customers.Customer;
@@ -28,6 +30,7 @@ import com.commerzi.app.communication.responses.AuthResponse;
 import com.commerzi.app.communication.responses.CustomerResponse;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 import com.commerzi.app.communication.responses.GenericMessageResponse;
+import com.commerzi.app.dto.NearbyCustomersDTO;
 import com.commerzi.app.dto.UpdateLocationDTO;
 import com.commerzi.app.dto.UpdateVisitDTO;
 import com.commerzi.app.route.actualRoute.ActualRoute;
@@ -504,7 +507,7 @@ public class Communicator {
         );
     }
 
-    public void createActualRoute(PlannedRoute plannedRoute, CommunicatorCallback<ActualRouteResponse> callback) {
+    public void createActualRoute(PlannedRoute plannedRoute, CommunicatorCallback<ActualRouteNavigationResponse> callback) {
         if (callback == null) {
             throw new IllegalArgumentException("Callback can't be null.");
         }
@@ -522,17 +525,17 @@ public class Communicator {
                     RouteAndGpsDto actualRoute = gsonBuilder.create().fromJson(response, RouteAndGpsDto.class);
 
                     actualRoute.getRoute().setRouteId(plannedRoute.getId());
-                    callback.onSuccess(new ActualRouteResponse(actualRoute, null));
+                    callback.onSuccess(new ActualRouteNavigationResponse(actualRoute, null));
                 },
-                error -> callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.actual_route_error)))
+                error -> callback.onFailure(new ActualRouteNavigationResponse(null, context.getString(R.string.actual_route_error)))
             );
         } catch(Exception e) {
             e.printStackTrace();
-            callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.request_creation_error)));
+            callback.onFailure(new ActualRouteNavigationResponse(null, context.getString(R.string.request_creation_error)));
         }
     }
 
-    public void getActualRouteById(String actualRouteId, CommunicatorCallback<ActualRouteResponse> callback) {
+    public void getActualRouteById(String actualRouteId, CommunicatorCallback<ActualRouteNavigationResponse> callback) {
 
         if (callback == null) {
             throw new IllegalArgumentException("Callback can't be null.");
@@ -544,19 +547,19 @@ public class Communicator {
                     GsonBuilder gsonBuilder = new GsonBuilder();
                     RouteAndGpsDto actualRoute = gsonBuilder.create().fromJson(response, RouteAndGpsDto.class);
 
-                    callback.onSuccess(new ActualRouteResponse(actualRoute, null));
+                    callback.onSuccess(new ActualRouteNavigationResponse(actualRoute, null));
                 },
-                error -> callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.actual_route_error)))
+                error -> callback.onFailure(new ActualRouteNavigationResponse(null, context.getString(R.string.actual_route_error)))
             );
 
         } catch(Exception e) {
             e.printStackTrace();
-            callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.request_creation_error)));
+            callback.onFailure(new ActualRouteNavigationResponse(null, context.getString(R.string.request_creation_error)));
         }
 
     }
 
-    public void sendUserLocation(UpdateLocationDTO locationDTO, CommunicatorCallback<ActualRouteResponse> callback) {
+    public void sendUserLocation(UpdateLocationDTO locationDTO, CommunicatorCallback<NearbyCustomersResponse> callback) {
         
         if (callback == null) {
             throw new IllegalArgumentException("Callback can't be null.");
@@ -564,41 +567,46 @@ public class Communicator {
         
         try {
             GsonBuilder gBuilder = new GsonBuilder();
-            String body = gBuilder.create().toJson(locationDTO.getCoordinates());
+            String body = gBuilder.create().toJson(locationDTO);
+            System.out.println(body);
             JSONObject jsonBody = new JSONObject(body);
-            
+
+
             this.request(Request.Method.POST, this.buildActualRoutesbaseUrl() + locationDTO.getRouteId(), jsonBody, true,
                 response -> {
                     GsonBuilder gsonBuilder = new GsonBuilder();
-                    RouteAndGpsDto actualRoute = gsonBuilder.create().fromJson(response, RouteAndGpsDto.class);
-                    
-                    callback.onSuccess(new ActualRouteResponse(actualRoute, null));
+                    NearbyCustomersDTO nearCustomers = gsonBuilder.create().fromJson(response, NearbyCustomersDTO.class);
+                    callback.onSuccess(new NearbyCustomersResponse(nearCustomers.getCustomers(), null));
                 },
-                error -> callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.actual_route_error)))
+                error -> callback.onFailure(new NearbyCustomersResponse(null, context.getString(R.string.actual_route_error)))
             );
             
         } catch(Exception e) {
             e.printStackTrace();
-            callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.request_creation_error)));
+            callback.onFailure(new NearbyCustomersResponse(null, context.getString(R.string.request_creation_error)));
         }
         
     }
 
     
-    public void updateVisit(UpdateVisitDTO updateVisitDTO, CommunicatorCallback<GenericMessageResponse> callback) {
+    public void skipVisit(ActualRoute toUpdate, CommunicatorCallback<ActualRouteNavigationResponse> callback) {
         if (callback == null) {
             throw new IllegalArgumentException("Callback can't be null.");
         }
 
         try {
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            String body = gsonBuilder.create().toJson(updateVisitDTO.getActualRoute());
-            
-            String urlParam = updateVisitDTO.getVisitIndex() + "?status=" + updateVisitDTO.getNewStatus();
+            GsonBuilder gBuilder = new GsonBuilder();
+            String body = gBuilder.create().toJson(toUpdate);
+            JSONObject jsonBody = new JSONObject(body);
 
-            this.request(Request.Method.PUT, this.buildActualRoutesbaseUrl() + urlParam, new JSONObject(body), true,
+            this.request(Request.Method.PUT, this.buildActualRoutesbaseUrl() + "skip", jsonBody, true,
                 response -> {
-                    callback.onSuccess(new GenericMessageResponse(context.getString(R.string.visit_updated_success)));
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    ActualRoute actualRoute = gsonBuilder.create().fromJson(response, ActualRoute.class);
+                    RouteAndGpsDto routeAndGpsDto = new RouteAndGpsDto();
+                    routeAndGpsDto.setRoute(actualRoute);
+
+                    callback.onSuccess(new ActualRouteNavigationResponse(routeAndGpsDto, null));
                 },
                 error -> {
                     String errorMessage = error.networkResponse != null ? new String(error.networkResponse.data) : context.getString(R.string.error_during_update);
@@ -606,13 +614,87 @@ public class Communicator {
                     System.out.println(errorMessage);
 
                     error.printStackTrace();
-                    callback.onFailure(new GenericMessageResponse(context.getString(R.string.error_during_update)));
+                    callback.onFailure(new ActualRouteNavigationResponse(null, context.getString(R.string.error_during_update)));
                 }
             );
         } catch(Exception e) {
             e.printStackTrace();
-            callback.onFailure(new GenericMessageResponse(context.getString(R.string.request_creation_error)));
+            callback.onFailure(new ActualRouteNavigationResponse(null, context.getString(R.string.request_creation_error)));
         }
+    }
+
+
+    public void confirmVisit(ActualRoute toUpdate, CommunicatorCallback<ActualRouteNavigationResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        try {
+            GsonBuilder gBuilder = new GsonBuilder();
+            String body = gBuilder.create().toJson(toUpdate);
+            JSONObject jsonBody = new JSONObject(body);
+
+            this.request(Request.Method.PUT, this.buildActualRoutesbaseUrl() + "confirm", jsonBody, true,
+                response -> {
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    ActualRoute actualRoute = gsonBuilder.create().fromJson(response, ActualRoute.class);
+                    RouteAndGpsDto routeAndGpsDto = new RouteAndGpsDto();
+                    routeAndGpsDto.setRoute(actualRoute);
+
+                    callback.onSuccess(new ActualRouteNavigationResponse(routeAndGpsDto, null));
+                },
+                error -> {
+                    String errorMessage = error.networkResponse != null ? new String(error.networkResponse.data) : context.getString(R.string.error_during_update);
+
+                    System.out.println(errorMessage);
+                }
+            );
+
+        } catch(Exception e) {
+            e.printStackTrace();
+            callback.onFailure(new ActualRouteNavigationResponse(null, context.getString(R.string.request_creation_error)));
+        }
+    }
+
+    public void deleteActualRoute(ActualRoute route, CommunicatorCallback<GenericMessageResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        this.request(Request.Method.DELETE, this.buildActualRoutesbaseUrl() + route.getId(), null, true,
+            response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.route_delete_success))),
+            error -> callback.onFailure(new GenericMessageResponse(context.getString(R.string.delete_error)))
+        );
+    }
+
+    public void getActualRoutes(CommunicatorCallback<ActualRouteResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        this.request(Request.Method.GET, this.buildActualRoutesbaseUrl(), null, true,
+                response -> {
+                    ArrayList<ActualRoute> routes = new ArrayList<>();
+                    try {
+                        JSONArray jsonResponse = new JSONArray(response);
+
+                        for (int i = 0; i < jsonResponse.length(); i++) {
+                            JSONObject routesJson = jsonResponse.getJSONObject(i);
+
+                            GsonBuilder gsonBuilder = new GsonBuilder();
+                            ActualRoute route = gsonBuilder.create().fromJson(routesJson.toString(), ActualRoute.class);
+
+                            routes.add(route);
+                        }
+
+                        callback.onSuccess(new ActualRouteResponse(routes, null));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.data_processing_error)));
+                    }
+                },
+                error -> callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.routes_fetching_error)))
+        );
     }
 
 }

@@ -18,6 +18,7 @@
     <string name="edit_profile">Modifier mon profil</string>
 
     <string name="demarrer_route">Démarrer l\'itinéraire</string>
+    <string name="restart_route">Reprendre ce parcours</string>
 
     <string name="prochaine_visite">Prochaine visite : </string>
 
@@ -30,6 +31,11 @@
     <string name="route_name">Nom de l\'itinéraire</string>
     <string name="routes">Itinéraires</string>
     <string name="profile">Profil</string>
+
+    <!-- EMPTY STATES -->
+    <string name="no_actual_route">Aucun parcours disponible.\nLancez un itinéraire pour créer un parcours</string>
+    <string name="no_planned_route">Aucun itinéraire créé.</string>
+    <string name="no_customer">Aucun client créé.</string>
 
     <!-- FIELDS -->
     <string name="firstname">Prénom</string>
@@ -67,6 +73,7 @@
     <string name="delete_error">Erreur lors de la suppression</string>
     <string name="geojson_error">Erreur lors de la conversion en GeoJSON</string>
     <string name="session_expired">Session expirée</string>
+    <string name="route_fetching_error">Erreur lors de la récupération des routes</string>
 
     <!-- FEEDBACK -->
     <string name="account_creation_success">Compte créé avec succès</string>
@@ -79,5 +86,6 @@
     <string name="route_delete_success">Itinéraire supprimé avec succès</string>
     <string name="actual_route_success">Itinéraire chargé avec succès</string>
     <string name="visit_updated_success">Validation effectuée avec succès</string>
-    
+    <string name="actual_routes">Parcours</string>
+
 </resources>
