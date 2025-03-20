@@ -129,7 +129,7 @@ public class PlannedRouteService implements IPlannedRouteService {
         ATravelerAlgorithm.checkValidPoints(route.getStartingPoint(), points);
 
         plannedRouteRepository.save(route);
-        
+
         new Thread(new Runnable() {
             @Override
             public void run() {
