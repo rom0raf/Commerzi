@@ -82,7 +82,7 @@ public class ActualRoute {
      *
      * @return the route ID associated with the journey
      */
-    public String getRouteId() {
+    public String getPlannedRouteId() {
         return plannedRouteId;
     }
 
@@ -91,7 +91,7 @@ public class ActualRoute {
      *
      * @param routeId the route ID to set
      */
-    public void setRouteId(String routeId) {
+    public void setPlannedRouteId(String routeId) {
         this.plannedRouteId = routeId;
     }
 
@@ -161,4 +161,5 @@ public class ActualRoute {
                 ", coordinates=" + coordinates +
                 '}';
     }
+
 }

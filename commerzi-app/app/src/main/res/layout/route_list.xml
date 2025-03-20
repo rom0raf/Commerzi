@@ -16,7 +16,8 @@
             android:text="@string/add_route"
             android:backgroundTint="@color/grey"
             android:textColor="@android:color/white"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewRoute"
@@ -25,6 +26,18 @@
             android:clipToPadding="false"
             android:padding="8dp"
             android:layout_marginBottom="32dp"/>
+
+        <TextView
+            android:id="@+id/tvNoPlannedRoute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/no_planned_route"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:padding="16dp"
+            android:visibility="gone"/>
+
         
     </LinearLayout>
 </ScrollView>

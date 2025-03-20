@@ -36,6 +36,10 @@ public class PlannedRouteService implements IPlannedRouteService {
      * @return the ID of the created planned route
      */
     public String createRoute(List<String> customerId, String name, CommerziUser user) throws Exception {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+
         PlannedRoute route = new PlannedRoute();
         route.setName(name);
         route.setUserId(String.valueOf(user.getUserId()));
@@ -53,13 +57,33 @@ public class PlannedRouteService implements IPlannedRouteService {
         route.setEndingPoint(point);
 
         checkPlannedRoute(route);
+        route.setTotalDistance(-1);
 
-        MapsUtils.buildFullRoute(
-                route,
-                ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
-        );
+        MapsUtils.check(route, ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED));
+
+        final List<Coordinates> points = route.getCustomersAndProspects().stream()
+                .map(Customer::getGpsCoordinates)
+                .toList();
+
+        ATravelerAlgorithm.checkValidPoints(route.getStartingPoint(), points);
 
         plannedRouteRepository.save(route);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    MapsUtils.buildFullRoute(
+                            route,
+                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
+                    );
+                    plannedRouteRepository.save(route);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+
         return route.getId();
     }
 
@@ -87,11 +111,41 @@ public class PlannedRouteService implements IPlannedRouteService {
      *
      * @param route the planned route to update
      */
-    public void updateRoute(PlannedRoute route) throws IllegalArgumentException {
+    public PlannedRoute updateRoute(String name, PlannedRoute route) throws Exception {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
 
         checkPlannedRoute(route);
+        route.setName(name);
+        route.setTotalDistance(-1);
+
+        ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED);
+
+        final List<Coordinates> points = route.getCustomersAndProspects().stream()
+                .map(Customer::getGpsCoordinates)
+                .toList();
+
+        ATravelerAlgorithm.checkValidPoints(route.getStartingPoint(), points);
 
         plannedRouteRepository.save(route);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    MapsUtils.buildFullRoute(
+                            route,
+                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
+                    );
+                    plannedRouteRepository.save(route);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+
+        return plannedRouteRepository.save(route);
     }
 
     /**
@@ -108,9 +162,9 @@ public class PlannedRouteService implements IPlannedRouteService {
             throw new IllegalArgumentException("Too many customers");
         }
 
-        if (route.getCustomersAndProspects().size() < 2) {
-            throw new IllegalArgumentException("Too few customers");
-        }
+//        if (route.getCustomersAndProspects().size() < 2) {
+//            throw new IllegalArgumentException("Too few customers");
+//        }
 
         if (route.getCustomersAndProspects().stream().anyMatch(c -> c.getGpsCoordinates() == null)) {
             throw new IllegalArgumentException("Customer coordinates missing");

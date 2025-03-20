@@ -13,7 +13,7 @@ public interface IPlannedRouteService {
 
     PlannedRoute getPlannedRouteById(String id);
 
-    void updateRoute(PlannedRoute route);
+    PlannedRoute updateRoute(String name, PlannedRoute route) throws Exception;
 
     void deleteRouteById(String id);
 

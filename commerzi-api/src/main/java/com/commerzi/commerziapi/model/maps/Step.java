@@ -9,7 +9,7 @@ public class Step {
     private double duration;
     private String name;
     private double weight;
-    private String geometry;
+    private Geometry geometry;
     private String driving_side;
     private List<Intersection> intersections;
     private Maneuver maneuver;
@@ -57,11 +57,11 @@ public class Step {
         this.weight = weight;
     }
 
-    public String getGeometry() {
+    public Geometry getGeometry() {
         return geometry;
     }
 
-    public void setGeometry(String geometry) {
+    public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
     }
 

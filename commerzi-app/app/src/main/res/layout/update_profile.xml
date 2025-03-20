@@ -107,7 +107,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/grey"
-            android:text="@string/validate"
+            android:text="@string/update"
             android:textColor="@android:color/white"
             android:paddingStart="12dp"
             android:layout_marginBottom="32dp"/>

@@ -44,23 +44,7 @@ public abstract class ATravelerAlgorithm {
      * @return an instance of the specified algorithm
      */
     public static ATravelerAlgorithm getAlgorithmWithFlyingDistances(AlgorithmType type) {
-        Function<List<Coordinates>, Double> fullDistanceFunc = MapsUtils::fullFlyingDistanceOverPoints;
-        BiFunction<Coordinates, Coordinates, Double> distanceFunc = MapsUtils::flyingDistanceBetweenTwoPoints;
-
-        switch (type) {
-            case BRUTE_FORCE:
-                return new BruteForce(fullDistanceFunc, distanceFunc);
-            case BRUTE_FORCE_OPTIMIZED:
-                return new BruteForceOptimized(fullDistanceFunc, distanceFunc);
-            case NEAREST_NEIGHBOR_HEURISTIC:
-                return new NearestNeighborHeuristic(fullDistanceFunc, distanceFunc);
-            case BRUTE_FORCE_THREADED:
-                return new BruteForceThreaded(fullDistanceFunc, distanceFunc);
-            case BRUTE_FORCE_OPTIMIZED_THREADED:
-                return new BruteForceOptimizedThreaded(fullDistanceFunc, distanceFunc);
-            default:
-                throw new IllegalArgumentException("Unsupported algorithm type: " + type);
-        }
+        return getAlgorithmWithFuncs(type, MapsUtils::fullFlyingDistanceOverPoints, MapsUtils::flyingDistanceBetweenTwoPoints);
     }
 
     /**
@@ -71,9 +55,27 @@ public abstract class ATravelerAlgorithm {
      * @return an instance of the specified algorithm
      */
     public static ATravelerAlgorithm getAlgorithmWithRealDistances(AlgorithmType type) {
-        Function<List<Coordinates>, Double> fullDistanceFunc = MapsUtils::fullRealDistanceOverPoints;
-        BiFunction<Coordinates, Coordinates, Double> distanceFunc = MapsUtils::realDistanceBetweenPoints;
+        return getAlgorithmWithFuncs(type, MapsUtils::fullRealDistanceOverPoints, MapsUtils::realDistanceBetweenPoints);
+    }
 
+    /**
+     * Retrieves an instance of a specific algorithm based on the provided algorithm type and distance functions.
+     *
+     * This method creates an instance of an algorithm that implements the {@link ATravelerAlgorithm} interface,
+     * depending on the specified {@link AlgorithmType}. The function also takes two distance functions:
+     * <ul>
+     *     <li>fullDistanceFunc: A function that computes the total distance for a list of coordinates.</li>
+     *     <li>distanceFunc: A function that calculates the distance between two specific coordinates.</li>
+     * </ul>
+     *
+     * @param type The type of the algorithm to retrieve. This should be one of the {@link AlgorithmType} values.
+     * @param fullDistanceFunc A function that calculates the total distance for a list of coordinates.
+     * @param distanceFunc A function that calculates the distance between two individual coordinates.
+     * @return An instance of a class that implements the {@link ATravelerAlgorithm} interface,
+     *         specific to the given algorithm type.
+     * @throws IllegalArgumentException if the provided {@code type} does not match a supported algorithm type.
+     */
+    private static ATravelerAlgorithm getAlgorithmWithFuncs(AlgorithmType type, Function<List<Coordinates>, Double> fullDistanceFunc, BiFunction<Coordinates, Coordinates, Double> distanceFunc) {
         switch (type) {
             case BRUTE_FORCE:
                 return new BruteForce(fullDistanceFunc, distanceFunc);
@@ -112,7 +114,7 @@ public abstract class ATravelerAlgorithm {
      * @throws IllegalArgumentException if points is null, has fewer than 2 elements, or if the starting point is null
      *                                  or is contained in the list
      */
-    private static void checkValidPoints(Coordinates startingPoint, List<Coordinates> points) throws IllegalArgumentException {
+    public static void checkValidPoints(Coordinates startingPoint, List<Coordinates> points) throws IllegalArgumentException {
         if (points == null || points.size() < 2) {
             throw new IllegalArgumentException("Points cannot be null and must have at least two elements");
         }

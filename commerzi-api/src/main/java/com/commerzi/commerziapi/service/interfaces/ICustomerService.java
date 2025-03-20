@@ -1,5 +1,7 @@
 package com.commerzi.commerziapi.service.interfaces;
 
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
+import com.commerzi.commerziapi.model.CommerziUser;
 import com.commerzi.commerziapi.model.Customer;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
@@ -22,5 +24,5 @@ public interface ICustomerService {
 
     Customer deleteCustomer(String id);
 
-//    List<Customer> getNearCustomers(String userId, GeoJsonPoint location, double distance);
+    List<Customer> getNearbyClients(Coordinates coordinates, CommerziUser user);
 }

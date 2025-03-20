@@ -3,13 +3,12 @@ package com.commerzi.commerziapi.service.classes;
 import com.commerzi.commerziapi.address.CheckAddress;
 import com.commerzi.commerziapi.dao.CustomerRepository;
 import com.commerzi.commerziapi.dao.PlannedRouteRepository;
-import com.commerzi.commerziapi.model.Contact;
-import com.commerzi.commerziapi.model.Customer;
-import com.commerzi.commerziapi.model.ECustomerType;
-import com.commerzi.commerziapi.model.PlannedRoute;
+import com.commerzi.commerziapi.maps.coordinates.Coordinates;
+import com.commerzi.commerziapi.model.*;
 import com.commerzi.commerziapi.service.interfaces.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,7 @@ public class CustomerService implements ICustomerService {
      * @return a list of all clients
      */
     public List<Customer> getClients(String userId) {
-        return customerRepository.findByTypeAndUserId(ECustomerType.client.toString(), userId);
+        return customerRepository.findByTypeAndUserId(ECustomerType.client, userId);
     }
 
     /**
@@ -49,7 +48,7 @@ public class CustomerService implements ICustomerService {
      * @return a list of all prospects
      */
     public List<Customer> getProspects(String userId) {
-        return customerRepository.findByTypeAndUserId(ECustomerType.prospect.toString(), userId);
+        return customerRepository.findByTypeAndUserId(ECustomerType.prospect, userId);
     }
 
     /**
@@ -117,20 +116,6 @@ public class CustomerService implements ICustomerService {
     }
 
     /**
-     * Retrieves all customers near the user.
-     *
-     * @param userId the ID of the user
-     * @return a list of customers near the user
-     */
-//    public List<Customer> getNearCustomers(String userId, GeoJsonPoint location, double distance) {
-//        return customerRepository.findByLocationNear(
-//                userId,
-//                location,
-//                new Distance(distance)
-//        );
-//    }
-
-    /**
      * Verifies the validity of a customer.
      *
      * @param customer the customer to verify
@@ -188,5 +173,25 @@ public class CustomerService implements ICustomerService {
             throw new IllegalArgumentException("Last name is required");
         }
 
+    }
+
+    public List<Customer> getNearbyClients(Coordinates coordinates, CommerziUser user) {
+
+        Point point = new Point(coordinates.getLatitude(), coordinates.getLongitude());
+
+        Distance customerDistance = new Distance(0.2, Metrics.KILOMETERS);
+        Distance propectDistance = new Distance(1, Metrics.KILOMETERS);
+
+        System.out.println("Coordinates: " + point);
+
+        // get customers that are in a radius from the coordinates
+        List<Customer> customers = customerRepository.findByTypeAndUserIdAndGpsCoordinatesNear(ECustomerType.client, "" + user.getUserId(), new GeoJsonPoint(point), customerDistance);
+
+        // get prospects that are in a radius from the coordinates
+        List<Customer> prospects = customerRepository.findByTypeAndUserIdAndGpsCoordinatesNear(ECustomerType.prospect, "" + user.getUserId(), new GeoJsonPoint(point), propectDistance);
+
+        customers.addAll(prospects);
+
+        return customers;
     }
 }

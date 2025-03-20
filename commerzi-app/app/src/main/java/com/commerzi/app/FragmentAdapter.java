@@ -6,10 +6,11 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.commerzi.app.customers.CustomerFragment;
 import com.commerzi.app.profile.ProfileFragment;
-import com.commerzi.app.route.RouteFragment;
+import com.commerzi.app.route.actualRoute.ActualRouteFragment;
+import com.commerzi.app.route.plannedRoute.PlannedRouteFragment;
 
 public class FragmentAdapter extends FragmentStateAdapter {
-    private static final int NB_FRAGMENT = 3;
+    private static final int NB_FRAGMENT = 4;
     /**
      * Constructor
      * @param activity activity containing the ViewPager2 managing the fragments
@@ -22,10 +23,12 @@ public class FragmentAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch(position) {
             case 0 :
-                return RouteFragment.newInstance();
+                return PlannedRouteFragment.newInstance();
             case 1 :
-                return CustomerFragment.newInstance();
+                return ActualRouteFragment.newInstance();
             case 2 :
+                return CustomerFragment.newInstance();
+            case 3 :
                 return ProfileFragment.newInstance();
             default :
                 return null;

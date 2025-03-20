@@ -5,10 +5,13 @@ package com.commerzi.commerziapi.model;
  */
 public class Visit {
     private String id;
-    private Customer type; // "client" or "prospect"
+    private Customer customer; // "client" or "prospect"
     private EVisitStatus status;
 
-    private static final int idCounter = 0;
+    private static int idCounter = 0;
+
+    public Visit() {
+    }
 
     public Visit(Customer customer) {
         if (customer == null) {
@@ -16,7 +19,8 @@ public class Visit {
         }
 
         this.id = "visit_" + idCounter;
-        this.type = customer;
+        idCounter++;
+        this.customer = customer;
         this.status = EVisitStatus.NOT_VISITED;
     }
 
@@ -43,17 +47,17 @@ public class Visit {
      *
      * @return the type of the visit
      */
-    public Customer getType() {
-        return type;
+    public Customer getCustomer() {
+        return customer;
     }
 
     /**
      * Sets the type of the visit.
      *
-     * @param type the type to set
+     * @param customer the type to set
      */
-    public void setType(Customer type) {
-        this.type = type;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
     /**
@@ -78,7 +82,7 @@ public class Visit {
     public String toString() {
         return "Visit{" +
                 "id='" + id + '\'' +
-                ", type=" + type +
+                ", type=" + customer +
                 ", status=" + status +
                 '}';
     }
