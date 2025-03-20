@@ -58,6 +58,15 @@ public class PlannedRouteService implements IPlannedRouteService {
 
         checkPlannedRoute(route);
         route.setTotalDistance(-1);
+
+        MapsUtils.check(route, ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED));
+
+        final List<Coordinates> points = route.getCustomersAndProspects().stream()
+                .map(Customer::getGpsCoordinates)
+                .toList();
+
+        ATravelerAlgorithm.checkValidPoints(route.getStartingPoint(), points);
+
         plannedRouteRepository.save(route);
 
         new Thread(new Runnable() {
@@ -66,7 +75,7 @@ public class PlannedRouteService implements IPlannedRouteService {
                 try {
                     MapsUtils.buildFullRoute(
                             route,
-                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED)
+                            ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED)
                     );
                     plannedRouteRepository.save(route);
                 } catch (IOException e) {
@@ -111,6 +120,16 @@ public class PlannedRouteService implements IPlannedRouteService {
         route.setName(name);
         route.setTotalDistance(-1);
 
+        ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED);
+
+        final List<Coordinates> points = route.getCustomersAndProspects().stream()
+                .map(Customer::getGpsCoordinates)
+                .toList();
+
+        ATravelerAlgorithm.checkValidPoints(route.getStartingPoint(), points);
+
+        plannedRouteRepository.save(route);
+        
         new Thread(new Runnable() {
             @Override
             public void run() {

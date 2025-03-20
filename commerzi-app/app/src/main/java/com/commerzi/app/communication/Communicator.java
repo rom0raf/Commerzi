@@ -443,8 +443,10 @@ public class Communicator {
             this.request(Request.Method.POST, this.buildPlannedRoutesBaseUrl() + encodedName, jsonBody, true,
                     response -> callback.onSuccess(new GenericMessageResponse(context.getString(R.string.route_creation_success))),
                     error -> {
-                        error.printStackTrace();
-                        callback.onFailure(new GenericMessageResponse(context.getString(R.string.unexpected_error)));
+                        // convert response.networkResponse.data to string
+                        String errorMessage = error.networkResponse != null ? new String(error.networkResponse.data) : context.getString(R.string.error_during_update);
+
+                        callback.onFailure(new GenericMessageResponse(errorMessage));
                     }
             );
         } catch(Exception e) {

@@ -24,27 +24,35 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".HomeActivity">
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".auth.SignupActivity">
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".customers.CreateCustomerActivity">
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".customers.UpdateCustomerActivity">
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".profile.UpdateProfileActivity">
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".route.plannedRoute.CreateRouteActivity">
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".route.actualRoute.NavigationActivity">
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".route.plannedRoute.UpdatePlannedRouteActivity">
         </activity>
     </application>
@@ -53,5 +61,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
 
 </manifest>

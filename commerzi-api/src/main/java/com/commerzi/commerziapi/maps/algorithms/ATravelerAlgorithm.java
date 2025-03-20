@@ -114,7 +114,7 @@ public abstract class ATravelerAlgorithm {
      * @throws IllegalArgumentException if points is null, has fewer than 2 elements, or if the starting point is null
      *                                  or is contained in the list
      */
-    private static void checkValidPoints(Coordinates startingPoint, List<Coordinates> points) throws IllegalArgumentException {
+    public static void checkValidPoints(Coordinates startingPoint, List<Coordinates> points) throws IllegalArgumentException {
         if (points == null || points.size() < 2) {
             throw new IllegalArgumentException("Points cannot be null and must have at least two elements");
         }
