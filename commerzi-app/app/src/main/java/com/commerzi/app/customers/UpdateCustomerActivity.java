@@ -40,7 +40,7 @@ public class UpdateCustomerActivity extends AppCompatActivity {
         radioProspect = findViewById(R.id.radioEditProspect);
         btnSave = findViewById(R.id.btnUpdateCustomer);
 
-        // Récupérer l'objet Company passé par l'intent
+        // Retrieve the Customer object passed by the intent
         customer = (Customer) getIntent().getParcelableExtra("customer");
 
         if (customer != null) {
@@ -62,6 +62,11 @@ public class UpdateCustomerActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> updateCustomer(customer));
     }
 
+    /**
+     * Updates the customer information.
+     *
+     * @param customer The customer to update.
+     */
     private void updateCustomer(Customer customer) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
@@ -82,9 +87,8 @@ public class UpdateCustomerActivity extends AppCompatActivity {
                 null
         );
 
-        // add a popup confirmation if the address changed
+        // Show a confirmation popup if the address has changed
         if (!customer.getAddress().equals(updatedCustomer.getAddress())) {
-            // show a popup
             new AlertDialog.Builder(this)
                     .setTitle(R.string.confirmation)
                     .setMessage(R.string.message_confirmation_modification)
@@ -114,8 +118,5 @@ public class UpdateCustomerActivity extends AppCompatActivity {
                     }
             ));
         }
-
-
     }
 }
-

@@ -13,6 +13,9 @@ import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 
+/**
+ * Activity for handling user signup.
+ */
 public class SignupActivity extends AppCompatActivity {
 
     private final String API_URL = "http://57.128.220.88:8080/api/user/";
@@ -26,6 +29,7 @@ public class SignupActivity extends AppCompatActivity {
     EditText txtAddress;
     EditText txtCity;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup);
@@ -45,6 +49,11 @@ public class SignupActivity extends AppCompatActivity {
         btnSignup.setOnClickListener(this::handleSignupButtonClicked);
     }
 
+    /**
+     * Handles the signup button click event.
+     *
+     * @param view The view that was clicked.
+     */
     public void handleSignupButtonClicked(View view) {
         String email = txtEmail.getText().toString();
         String firstname = txtFirstname.getText().toString();
@@ -70,6 +79,11 @@ public class SignupActivity extends AppCompatActivity {
         signupUser(user);
     }
 
+    /**
+     * Signs up the user with the provided user data.
+     *
+     * @param user The user data to sign up.
+     */
     private void signupUser(User user) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
         communicator.signup(user, new CommunicatorCallback<>(
@@ -84,6 +98,11 @@ public class SignupActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Handles the login button click event.
+     *
+     * @param view The view that was clicked.
+     */
     public void onLoginButtonClicked(View view) {
         Intent intention = new Intent(SignupActivity.this, LoginActivity.class);
         startActivity(intention);

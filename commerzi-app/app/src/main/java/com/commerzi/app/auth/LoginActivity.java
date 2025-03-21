@@ -14,12 +14,14 @@ import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 
+/**
+ * Activity for handling user login.
+ */
 public class LoginActivity extends AppCompatActivity {
     EditText txtEmail;
     EditText txtPassword;
     Button btnValidate;
     Button btnSignup;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,11 @@ public class LoginActivity extends AppCompatActivity {
         btnSignup.setOnClickListener(this::handleSignupButtonClicked);
     }
 
+    /**
+     * Handles the login button click event.
+     *
+     * @param view The view that was clicked.
+     */
     public void handleLoginButtonClicked(View view) {
         String email = txtEmail.getText().toString();
         String password = txtPassword.getText().toString();
@@ -46,6 +53,12 @@ public class LoginActivity extends AppCompatActivity {
         loginUser(email, password);
     }
 
+    /**
+     * Logs in the user with the provided email and password.
+     *
+     * @param email The user's email.
+     * @param password The user's password.
+     */
     private void loginUser(String email, String password) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
         communicator.login(email, password, new CommunicatorCallback<>(
@@ -60,6 +73,11 @@ public class LoginActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Handles the signup button click event.
+     *
+     * @param view The view that was clicked.
+     */
     public void handleSignupButtonClicked(View view) {
         Intent intention = new Intent(LoginActivity.this, SignupActivity.class);
         startActivity(intention);

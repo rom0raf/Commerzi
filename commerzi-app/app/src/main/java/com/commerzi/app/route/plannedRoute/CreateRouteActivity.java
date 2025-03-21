@@ -27,7 +27,6 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +44,7 @@ public class CreateRouteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_route);
-        
+
         routeNameField = findViewById(R.id.routeNameField);
 
         btnValidate = findViewById(R.id.btnValidateCreateRoute);
@@ -62,6 +61,12 @@ public class CreateRouteActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Handles the click event for the validate button.
+     * Validates the input and creates a new route if valid.
+     *
+     * @param view The view that was clicked.
+     */
     private void onValidateButtonClicked(View view) {
         Log.d("CreateRouteActivity", "onValidateButtonClicked");
         ArrayList<Customer> customersList = new ArrayList<>(selectedItems);
@@ -96,6 +101,11 @@ public class CreateRouteActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Creates the list of customers and sets up the AutoCompleteTextView and ChipGroup.
+     *
+     * @param customers The list of customers.
+     */
     private void createCustomersList(ArrayList<Customer> customers){
         autoCompleteTextView = findViewById(R.id.autoCompleteTextView);
         chipGroup = findViewById(R.id.chipGroup);
@@ -132,7 +142,11 @@ public class CreateRouteActivity extends AppCompatActivity {
         });
     }
 
-    // Method to add a chip to the ChipGroup
+    /**
+     * Adds a chip to the ChipGroup for the specified customer.
+     *
+     * @param item The customer to add a chip for.
+     */
     private void addChip(Customer item) {
         Chip chip = new Chip(this);
         chip.setText(item.getName() + "  (" + item.getCity() + ")");
@@ -143,11 +157,14 @@ public class CreateRouteActivity extends AppCompatActivity {
 
         adapter.removeCustomer(item);
 
-
         chipGroup.addView(chip); // Add the chip to the ChipGroup
     }
 
-    // Method to remove an item from the selected items and update the UI
+    /**
+     * Removes the specified customer from the selected items and updates the UI.
+     *
+     * @param item The customer to remove.
+     */
     private void removeItem(Customer item) {
         System.out.println("Remove item: " + item.getName());
         selectedItems.remove(item);
@@ -156,7 +173,11 @@ public class CreateRouteActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    // Method to remove a chip from the ChipGroup based on the text
+    /**
+     * Removes a chip from the ChipGroup based on the customer.
+     *
+     * @param item The customer whose chip should be removed.
+     */
     private void removeChip(Customer item) {
         for (int i = 0; i < chipGroup.getChildCount(); i++) {
             View child = chipGroup.getChildAt(i);
@@ -180,17 +201,26 @@ public class CreateRouteActivity extends AppCompatActivity {
             this.originalData = new ArrayList<>(data);
         }
 
+        /**
+         * Removes the specified customer from the adapter.
+         *
+         * @param customer The customer to remove.
+         */
         void removeCustomer(Customer customer) {
             originalData.remove(customer);
             data.remove(customer);
             notifyDataSetChanged();
         }
 
+        /**
+         * Adds the specified customer to the adapter.
+         *
+         * @param customer The customer to add.
+         */
         void addCustomer(Customer customer) {
             originalData.add(customer);
             notifyDataSetChanged();
         }
-
 
         @Override
         public int getCount() {
@@ -218,6 +248,11 @@ public class CreateRouteActivity extends AppCompatActivity {
             return convertView;
         }
 
+        /**
+         * Removes the specified item from the filtered data.
+         *
+         * @param item The item to remove.
+         */
         void remove(String item) {
             data.remove(item); // Remove a specific item from the filtered data
         }

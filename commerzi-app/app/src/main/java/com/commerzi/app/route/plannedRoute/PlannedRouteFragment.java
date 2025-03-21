@@ -25,10 +25,18 @@ import com.commerzi.app.route.plannedRoute.PlannedRoute;
 
 import java.util.ArrayList;
 
+/**
+ * A fragment representing the list of planned routes.
+ */
 public class PlannedRouteFragment extends Fragment implements View.OnClickListener {
-    
+
     Button btnAddRoute;
 
+    /**
+     * Creates a new instance of PlannedRouteFragment.
+     *
+     * @return A new instance of PlannedRouteFragment.
+     */
     public static PlannedRouteFragment newInstance() {
         PlannedRouteFragment fragment = new PlannedRouteFragment();
         return fragment;
@@ -38,6 +46,7 @@ public class PlannedRouteFragment extends Fragment implements View.OnClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.route_list, container, false);
@@ -62,6 +71,9 @@ public class PlannedRouteFragment extends Fragment implements View.OnClickListen
         }
     }
 
+    /**
+     * Checks if there are any customers and sets the visibility of the add route button accordingly.
+     */
     private void checkCustomerExistence(){
         Communicator communicator = Communicator.getInstance(getActivity());
         communicator.getCustomers(new CommunicatorCallback<>(
@@ -74,6 +86,9 @@ public class PlannedRouteFragment extends Fragment implements View.OnClickListen
         ));
     }
 
+    /**
+     * Loads the planned routes from the server.
+     */
     private void loadRoutes() {
         if (getActivity() == null) return;
 
@@ -89,6 +104,11 @@ public class PlannedRouteFragment extends Fragment implements View.OnClickListen
         ));
     }
 
+    /**
+     * Displays the list of planned routes in the RecyclerView.
+     *
+     * @param routeList The list of planned routes to display.
+     */
     private void displayRoutes(ArrayList<PlannedRoute> routeList) {
         RecyclerView recyclerView = getView().findViewById(R.id.recyclerViewRoute);
         TextView noPlannedRouteMessage = getView().findViewById(R.id.tvNoPlannedRoute);
@@ -116,7 +136,5 @@ public class PlannedRouteFragment extends Fragment implements View.OnClickListen
                 e.printStackTrace();
             }
         }).start();
-
     }
-
 }

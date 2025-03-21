@@ -20,8 +20,16 @@ import com.commerzi.app.communication.responses.CommunicatorCallback;
 
 import java.util.ArrayList;
 
+/**
+ * A fragment representing the list of actual routes.
+ */
 public class ActualRouteFragment extends Fragment {
 
+    /**
+     * Creates a new instance of ActualRouteFragment.
+     *
+     * @return A new instance of ActualRouteFragment.
+     */
     public static ActualRouteFragment newInstance() {
         ActualRouteFragment fragment = new ActualRouteFragment();
         return fragment;
@@ -31,6 +39,7 @@ public class ActualRouteFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.actual_route_list, container, false);
@@ -44,7 +53,9 @@ public class ActualRouteFragment extends Fragment {
         loadRoutes();
     }
 
-
+    /**
+     * Loads the actual routes from the server.
+     */
     private void loadRoutes() {
         if (getActivity() == null) return;
 
@@ -60,24 +71,27 @@ public class ActualRouteFragment extends Fragment {
         ));
     }
 
+    /**
+     * Displays the list of actual routes in the RecyclerView.
+     *
+     * @param routeList The list of actual routes to display.
+     */
     private void displayRoutes(ArrayList<ActualRoute> routeList) {
-    View view = getView();
-    if (view == null) return;
+        View view = getView();
+        if (view == null) return;
 
-    RecyclerView recyclerView = view.findViewById(R.id.recyclerViewActualRoute);
-    TextView noActualRouteMessage = view.findViewById(R.id.tvNoActualRoute);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewActualRoute);
+        TextView noActualRouteMessage = view.findViewById(R.id.tvNoActualRoute);
 
-    if (routeList.isEmpty()) {
-        recyclerView.setVisibility(View.GONE);
-        noActualRouteMessage.setVisibility(View.VISIBLE);
-    } else {
-        recyclerView.setVisibility(View.VISIBLE);
-        noActualRouteMessage.setVisibility(View.GONE);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        ActualRouteAdapter adapter = new ActualRouteAdapter(routeList, this.getContext());
-        recyclerView.setAdapter(adapter);
+        if (routeList.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            noActualRouteMessage.setVisibility(View.VISIBLE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            noActualRouteMessage.setVisibility(View.GONE);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            ActualRouteAdapter adapter = new ActualRouteAdapter(routeList, this.getContext());
+            recyclerView.setAdapter(adapter);
+        }
     }
-}
-
-
 }
