@@ -26,6 +26,12 @@ public class CustomerAdapter extends RecyclerView.Adapter<com.commerzi.app.custo
     private ArrayList<Customer> customerList;
     private Context context;
 
+    /**
+     * Constructor for CustomerAdapter.
+     *
+     * @param customerList The list of customers to display.
+     * @param context The context in which the adapter is used.
+     */
     public CustomerAdapter(ArrayList<Customer> customerList, Context context) {
         this.customerList = customerList;
         this.context = context;
@@ -48,21 +54,21 @@ public class CustomerAdapter extends RecyclerView.Adapter<com.commerzi.app.custo
         holder.tvDescription.setText("Description : " + customer.getDescription());
         holder.tvContact.setText("Contact : " + customer.getContact().getCleanInfos());
 
-        // Logique d'affichage/dépliage
+        // Toggle visibility of details container
         holder.itemView.setOnClickListener(v -> {
             if (holder.detailsContainer.getVisibility() == View.GONE) {
                 holder.detailsContainer.setVisibility(View.VISIBLE);
                 holder.tvCustomerName.setCompoundDrawablesWithIntrinsicBounds(
                         ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_dropdown),
                         null,
-                        null ,
+                        null,
                         null);
             } else {
                 holder.detailsContainer.setVisibility(View.GONE);
                 holder.tvCustomerName.setCompoundDrawablesWithIntrinsicBounds(
                         ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_dropdown_closed),
                         null,
-                        null ,
+                        null,
                         null);
             }
         });
@@ -81,12 +87,20 @@ public class CustomerAdapter extends RecyclerView.Adapter<com.commerzi.app.custo
         return customerList.size();
     }
 
+    /**
+     * ViewHolder class for customer items.
+     */
     static class CustomerViewHolder extends RecyclerView.ViewHolder {
         TextView tvCustomerName, tvAddress, tvCity, tvDescription, tvContact;
         LinearLayout detailsContainer;
         Button btnDelete;
         Button btnEdit;
 
+        /**
+         * Constructor for CustomerViewHolder.
+         *
+         * @param itemView The view of the customer item.
+         */
         public CustomerViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCustomerName = itemView.findViewById(R.id.tvCompanyName);
@@ -100,6 +114,12 @@ public class CustomerAdapter extends RecyclerView.Adapter<com.commerzi.app.custo
         }
     }
 
+    /**
+     * Deletes a customer and updates the RecyclerView.
+     *
+     * @param customer The customer to delete.
+     * @param position The position of the customer in the list.
+     */
     private void deleteCustomer(Customer customer, int position) {
         Communicator communicator = Communicator.getInstance(context);
         communicator.deleteCustomer(customer, new CommunicatorCallback<>(

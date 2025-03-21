@@ -30,6 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Activity for updating a planned route.
+ */
 public class UpdatePlannedRouteActivity extends AppCompatActivity {
 
     private Set<Customer> selectedItems = new HashSet<>();
@@ -64,7 +67,6 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
         communicator.getCustomers(new CommunicatorCallback<>(
                 response -> {
-
                     createCustomersList(response.customers);
                 },
                 error -> {
@@ -73,6 +75,11 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Updates the planned route with the new data.
+     *
+     * @param route The planned route to update.
+     */
     private void updateRoute(PlannedRoute route) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
@@ -91,45 +98,53 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Creates the list of customers for the AutoCompleteTextView.
+     *
+     * @param customers The list of customers.
+     */
     private void createCustomersList(ArrayList<Customer> customers){
         autoCompleteTextView = findViewById(R.id.autoCompleteTextViewUpdateRoute);
         chipGroup = findViewById(R.id.chipGroupUpdateRoute);
         String[] allItems = new String[customers.size()];
 
-
         for(int i = 0; i < customers.size(); i++){
             allItems[i] = customers.get(i).getName();
         }
 
-       dropdownItems = customers;
+        dropdownItems = customers;
 
-       adapter = new CustomAdapter(dropdownItems);
+        adapter = new CustomAdapter(dropdownItems);
 
-       // Populate the AutoCompleteTextView with all items
-       autoCompleteTextView.setAdapter(adapter);
+        // Populate the AutoCompleteTextView with all items
+        autoCompleteTextView.setAdapter(adapter);
 
-       // Listen for item selection in the AutoCompleteTextView
-       autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
-           Customer selectedItem = adapter.getItem(position);
-           if (selectedItems.contains(selectedItem)) {
-               selectedItems.remove(selectedItem);
-               removeChip(selectedItem);
-               adapter.notifyDataSetChanged();
-           } else {
-               selectedItems.add(selectedItem);
-               addChip(selectedItem);
-               autoCompleteTextView.setText("");
-               adapter.notifyDataSetChanged();
-           }
-       });
+        // Listen for item selection in the AutoCompleteTextView
+        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
+            Customer selectedItem = adapter.getItem(position);
+            if (selectedItems.contains(selectedItem)) {
+                selectedItems.remove(selectedItem);
+                removeChip(selectedItem);
+                adapter.notifyDataSetChanged();
+            } else {
+                selectedItems.add(selectedItem);
+                addChip(selectedItem);
+                autoCompleteTextView.setText("");
+                adapter.notifyDataSetChanged();
+            }
+        });
 
-       // Listen for click on AutoCompleteTextView
-       autoCompleteTextView.setOnClickListener(v -> {
-           autoCompleteTextView.showDropDown();
-       });
+        // Listen for click on AutoCompleteTextView
+        autoCompleteTextView.setOnClickListener(v -> {
+            autoCompleteTextView.showDropDown();
+        });
     }
 
-    // Method to add a chip to the ChipGroup
+    /**
+     * Adds a chip to the ChipGroup.
+     *
+     * @param item The customer to add as a chip.
+     */
     private void addChip(Customer item) {
         Chip chip = new Chip(this);
         chip.setText(item.getName());
@@ -143,7 +158,11 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
         chipGroup.addView(chip); // Add the chip to the ChipGroup
     }
 
-    // Method to remove an item from the selected items and update the UI
+    /**
+     * Removes an item from the selected items and updates the UI.
+     *
+     * @param item The customer to remove.
+     */
     private void removeItem(Customer item) {
         selectedItems.remove(item);
         dropdownItems.add(item);
@@ -151,8 +170,11 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
+    /**
+     * Updates the ChipGroup with the selected items.
+     */
     private void updateChipGroup() {
-        chipGroup.removeAllViews(); // Nettoyer les anciens chips
+        chipGroup.removeAllViews(); // Clear the old chips
 
         for (Customer customer : selectedItems) {
             Chip chip = new Chip(this);
@@ -166,7 +188,11 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
         }
     }
 
-    // Method to remove a chip from the ChipGroup based on the text
+    /**
+     * Removes a chip from the ChipGroup based on the text.
+     *
+     * @param item The customer to remove.
+     */
     private void removeChip(Customer item) {
         for (int i = 0; i < chipGroup.getChildCount(); i++) {
             View child = chipGroup.getChildAt(i);
@@ -180,6 +206,9 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Custom adapter for the AutoCompleteTextView.
+     */
     private class CustomAdapter extends BaseAdapter implements Filterable {
         private List<Customer> data; // List to store the filtered data displayed in the AutoCompleteTextView dropdown
         private List<Customer> originalData; // List to store the original data before filtering
@@ -225,6 +254,9 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
             return itemFilter; // Get the custom filter used for filtering data in the AutoCompleteTextView
         }
 
+        /**
+         * Custom filter for filtering data in the AutoCompleteTextView.
+         */
         private class ItemFilter extends Filter {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
@@ -257,4 +289,3 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
         }
     }
 }
-

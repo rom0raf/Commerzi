@@ -14,6 +14,9 @@ import com.commerzi.app.R;
 import com.commerzi.app.auth.Session;
 import com.commerzi.app.auth.User;
 
+/**
+ * A fragment representing the user's profile.
+ */
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     TextView tvUserFullName;
@@ -21,7 +24,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     TextView tvUserAddress;
     Button btnEditProfile;
 
-
+    /**
+     * Creates a new instance of ProfileFragment.
+     *
+     * @return A new instance of ProfileFragment.
+     */
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
         return fragment;
@@ -31,6 +38,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.profile, container, false);
@@ -61,6 +69,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         tvUserAddress.setText("Adresse : " + sessionUser.getAddress() + ", " + sessionUser.getCity());
     }
 
+    /**
+     * Handles the click event for the edit profile button.
+     *
+     * @param v The view that was clicked.
+     */
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btnEditProfile) {

@@ -22,6 +22,11 @@ import java.util.ArrayList;
 public class CustomerFragment extends Fragment implements View.OnClickListener {
     Button btnAddCustomer;
 
+    /**
+     * Creates a new instance of CustomerFragment.
+     *
+     * @return A new instance of CustomerFragment.
+     */
     public static CustomerFragment newInstance() {
         CustomerFragment fragment = new CustomerFragment();
         return fragment;
@@ -31,7 +36,7 @@ public class CustomerFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.customer_list, container, false);
@@ -48,6 +53,11 @@ public class CustomerFragment extends Fragment implements View.OnClickListener {
         loadCustomers();
     }
 
+    /**
+     * Handles the click event for the add customer button.
+     *
+     * @param v The view that was clicked.
+     */
     public void onClick(View v) {
         if (v.getId() == R.id.btnGoToCreateCustomer) {
             Intent intention = new Intent(getActivity(), CreateCustomerActivity.class);
@@ -55,6 +65,9 @@ public class CustomerFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * Loads the list of customers from the server.
+     */
     private void loadCustomers() {
         if (getActivity() == null) return;
 
@@ -69,6 +82,11 @@ public class CustomerFragment extends Fragment implements View.OnClickListener {
         ));
     }
 
+    /**
+     * Displays the list of customers in the RecyclerView.
+     *
+     * @param customerList The list of customers to display.
+     */
     private void displayCustomers(ArrayList<Customer> customerList) {
         RecyclerView recyclerView = getView().findViewById(R.id.recyclerView);
         TextView noCustomerMessage = getView().findViewById(R.id.tvNoCustomer);
@@ -84,6 +102,4 @@ public class CustomerFragment extends Fragment implements View.OnClickListener {
             recyclerView.setAdapter(adapter);
         }
     }
-
 }
-

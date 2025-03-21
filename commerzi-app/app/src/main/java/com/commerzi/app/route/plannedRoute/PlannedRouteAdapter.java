@@ -23,11 +23,20 @@ import com.commerzi.app.route.actualRoute.NavigationActivity;
 
 import java.util.ArrayList;
 
+/**
+ * Adapter class for displaying a list of planned routes in a RecyclerView.
+ */
 public class PlannedRouteAdapter extends RecyclerView.Adapter<PlannedRouteAdapter.RouteViewHolder> {
 
     private ArrayList<PlannedRoute> routeList;
     private Context context;
 
+    /**
+     * Constructor for PlannedRouteAdapter.
+     *
+     * @param routeList The list of planned routes to display.
+     * @param context The context in which the adapter is used.
+     */
     public PlannedRouteAdapter(ArrayList<PlannedRoute> routeList, Context context) {
         this.routeList = routeList;
         this.context = context;
@@ -52,7 +61,6 @@ public class PlannedRouteAdapter extends RecyclerView.Adapter<PlannedRouteAdapte
 
         if (route.getTotalDistance() < 0) {
             holder.tvDistance.setText("Distance : Calculating...");
-
         } else {
             holder.tvDistance.setText("Distance : " + distanceKM + " km");
         }
@@ -65,21 +73,21 @@ public class PlannedRouteAdapter extends RecyclerView.Adapter<PlannedRouteAdapte
 
         holder.tvCustomers.setText(customers.toString());
 
-        // Logique d'affichage/dépliage
+        // Toggle visibility of details container
         holder.itemView.setOnClickListener(v -> {
             if (holder.detailsContainer.getVisibility() == View.GONE) {
                 holder.detailsContainer.setVisibility(View.VISIBLE);
                 holder.tvRouteName.setCompoundDrawablesWithIntrinsicBounds(
                         ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_dropdown),
                         null,
-                        null ,
+                        null,
                         null);
             } else {
                 holder.detailsContainer.setVisibility(View.GONE);
                 holder.tvRouteName.setCompoundDrawablesWithIntrinsicBounds(
                         ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_dropdown_closed),
                         null,
-                        null ,
+                        null,
                         null);
             }
         });
@@ -90,12 +98,12 @@ public class PlannedRouteAdapter extends RecyclerView.Adapter<PlannedRouteAdapte
             context.startActivity(intent);
         });
 
-       holder.btnDelete.setOnClickListener(v -> deleteRoute(position));
-       holder.btnEdit.setOnClickListener(v -> {
-           Intent intent = new Intent(context, UpdatePlannedRouteActivity.class);
-           intent.putExtra("route", route);
-           context.startActivity(intent);
-       });
+        holder.btnDelete.setOnClickListener(v -> deleteRoute(position));
+        holder.btnEdit.setOnClickListener(v -> {
+            Intent intent = new Intent(context, UpdatePlannedRouteActivity.class);
+            intent.putExtra("route", route);
+            context.startActivity(intent);
+        });
     }
 
     @Override
@@ -103,6 +111,9 @@ public class PlannedRouteAdapter extends RecyclerView.Adapter<PlannedRouteAdapte
         return routeList.size();
     }
 
+    /**
+     * ViewHolder class for route items.
+     */
     static class RouteViewHolder extends RecyclerView.ViewHolder {
         TextView tvRouteName, tvCustomers, tvDistance;
         LinearLayout detailsContainer;
@@ -110,6 +121,11 @@ public class PlannedRouteAdapter extends RecyclerView.Adapter<PlannedRouteAdapte
         Button btnEdit;
         Button btnStart;
 
+        /**
+         * Constructor for RouteViewHolder.
+         *
+         * @param itemView The view of the route item.
+         */
         public RouteViewHolder(@NonNull View itemView) {
             super(itemView);
             tvRouteName = itemView.findViewById(R.id.tvRouteName);
@@ -122,29 +138,29 @@ public class PlannedRouteAdapter extends RecyclerView.Adapter<PlannedRouteAdapte
         }
     }
 
-     private void deleteRoute(int position) {
-       Log.d("Planned route", "deleteRoute: " + position);
+    /**
+     * Deletes a route and updates the RecyclerView.
+     *
+     * @param position The position of the route in the list.
+     */
+    private void deleteRoute(int position) {
+        Log.d("Planned route", "deleteRoute: " + position);
 
-       // delete the route from server and local list
+        // delete the route from server and local list
+        PlannedRoute route = routeList.get(position);
 
-       PlannedRoute route = routeList.get(position);
-
-         routeList.remove(position);
+        routeList.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, routeList.size());
 
-
-       Communicator communicator = Communicator.getInstance(context);
-       communicator.deletePlannedRoute(route, new CommunicatorCallback<>(
-               response -> {
-                   Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show();
-
-                   //
-               },
-               error -> {
-                   Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show();
-               }
-               ));
-
+        Communicator communicator = Communicator.getInstance(context);
+        communicator.deletePlannedRoute(route, new CommunicatorCallback<>(
+                response -> {
+                    Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show();
+                },
+                error -> {
+                    Toast.makeText(context, error.message, Toast.LENGTH_SHORT).show();
+                }
+        ));
     }
 }

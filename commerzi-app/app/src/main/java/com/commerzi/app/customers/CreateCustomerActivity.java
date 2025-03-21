@@ -45,6 +45,12 @@ public class CreateCustomerActivity extends AppCompatActivity {
         btnCreateNewClient.setOnClickListener(this::handleCreateClientButtonClicked);
     }
 
+    /**
+     * Handles the click event for the create client button.
+     * Validates the input fields and creates a new customer if valid.
+     *
+     * @param view The view that was clicked.
+     */
     public void handleCreateClientButtonClicked(View view) {
         String name = txtName.getText().toString();
         String address = txtAddress.getText().toString();
@@ -77,6 +83,11 @@ public class CreateCustomerActivity extends AppCompatActivity {
         createClient(customer);
     }
 
+    /**
+     * Creates a new customer using the Communicator.
+     *
+     * @param customer The customer to create.
+     */
     private void createClient(Customer customer) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
         communicator.createCustomer(customer, new CommunicatorCallback<>(

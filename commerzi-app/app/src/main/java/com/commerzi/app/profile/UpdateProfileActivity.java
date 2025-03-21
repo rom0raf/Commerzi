@@ -30,6 +30,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.update_profile);
 
+        // Initialize EditText fields
         etFirstName = findViewById(R.id.lastnameEditField);
         etLastName = findViewById(R.id.firstnameEditField);
         etEmail = findViewById(R.id.emailEditField);
@@ -39,8 +40,10 @@ public class UpdateProfileActivity extends AppCompatActivity {
         etPasswordConfirmation = findViewById(R.id.confirmationEditField);
         btnUpdateProfile = findViewById(R.id.btnValidateEdit);
 
+        // Set click listener for the update profile button
         btnUpdateProfile.setOnClickListener(this::onValidateButtonClicked);
 
+        // Populate fields with current user data
         etFirstName.setText(Session.getUser().getFirstName());
         etLastName.setText(Session.getUser().getLastName());
         etEmail.setText(Session.getUser().getEmail());
@@ -48,6 +51,12 @@ public class UpdateProfileActivity extends AppCompatActivity {
         etCity.setText(Session.getUser().getCity());
     }
 
+    /**
+     * Handles the click event for the validate button.
+     * Updates the user profile locally and remotely.
+     *
+     * @param view The view that was clicked.
+     */
     private void onValidateButtonClicked(View view) {
         String firstname = etFirstName.getText().toString();
         String lastname = etLastName.getText().toString();
@@ -65,10 +74,20 @@ public class UpdateProfileActivity extends AppCompatActivity {
         updateRemoteProfile(user);
     }
 
+    /**
+     * Updates the user profile locally in the session.
+     *
+     * @param user The user object with updated information.
+     */
     private void updateLocalProfile(User user) {
         Session.setUser(user);
     }
 
+    /**
+     * Updates the user profile remotely using the Communicator.
+     *
+     * @param user The user object with updated information.
+     */
     private void updateRemoteProfile(User user) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
         communicator.updateProfile(user, new CommunicatorCallback<>(

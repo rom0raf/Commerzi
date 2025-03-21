@@ -48,6 +48,9 @@ import org.osmdroid.views.overlay.Polyline;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity for navigating an actual route.
+ */
 public class NavigationActivity extends AppCompatActivity {
 
     private static final String TAG = "NavigationActivity";
@@ -72,12 +75,16 @@ public class NavigationActivity extends AppCompatActivity {
     private LocationListener locationListener;
     private Marker userMarker;
 
-
+    /**
+     * Called when the activity is first created.
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down then this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actual_route);
 
+        // Initialize UI components
         mapView = findViewById(R.id.mapview);
         tvCustomerName = findViewById(R.id.tvCustomerNameNavigation);
         tvContactInfo = findViewById(R.id.tvContactInfoNavigation);
@@ -86,7 +93,7 @@ public class NavigationActivity extends AppCompatActivity {
         btn_pause = findViewById(R.id.btn_pause);
         buttons = findViewById(R.id.buttons);
 
-
+        // Set up button click listeners
         btn_valider.setOnClickListener(v -> validateVisit());
         btn_passer.setOnClickListener(v -> skipVisit());
         btn_pause.setOnLongClickListener(v -> {
@@ -96,43 +103,41 @@ public class NavigationActivity extends AppCompatActivity {
 
         coordinatesToSend = new ArrayList<>();
 
+        // Configure map view
         Configuration.getInstance().setUserAgentValue(getPackageName());
-
-        mapView = findViewById(R.id.mapview);
-
         mapView.setTileSource(org.osmdroid.tileprovider.tilesource.TileSourceFactory.MAPNIK);
         mapView.setMultiTouchControls(true);
-        GeoPoint francePoint = new GeoPoint(46.603354, 1.888334);  // Coordonnées géographiques de la France
+        GeoPoint francePoint = new GeoPoint(46.603354, 1.888334);  // Coordinates of France
         mapView.getController().setCenter(francePoint);
         mapView.getController().setZoom(7.0);
 
         Log.d(TAG, "onCreate: MapView set up");
 
+        // Handle route intent
         Intent routeIntent = getIntent();
-
         Parcelable routeParcelable = routeIntent.getParcelableExtra("route");
 
         if (routeParcelable instanceof PlannedRoute) {
-            System.out.println("PlannedRoute reçue");
+            System.out.println("PlannedRoute received");
             plannedRoute = (PlannedRoute) routeParcelable;
             handlePlannedRoute();
         } else if (routeParcelable instanceof ActualRoute) {
-            System.out.println("ActualRoute reçue");
+            System.out.println("ActualRoute received");
             ActualRoute actualRoute = (ActualRoute) routeParcelable;
             routeAndGpsDtoData = new RouteAndGpsDto(actualRoute, null);
             handleActualRoute(actualRoute);
         } else {
-            Toast.makeText(this, "Aucune route valide reçue", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No valid route received", Toast.LENGTH_SHORT).show();
             finish();
         }
 
+        // Initialize location manager and listener
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
             startActivity(intent);
         }
-
 
         // Check permissions and request location updates
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -149,7 +154,6 @@ public class NavigationActivity extends AppCompatActivity {
                     if (routeAndGpsDtoData.getRoute().getStatus() != ERouteStatus.COMPLETED) {
                         updateUserLocation(location);
                     }
-
                 }
 
                 @Override
@@ -174,6 +178,9 @@ public class NavigationActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Handles the planned route.
+     */
     private void handlePlannedRoute() {
         if (routeAndGpsDtoData != null && routeAndGpsDtoData.getRoute().getStatus() == ERouteStatus.IN_PROGRESS) {
             getActualRouteById(routeAndGpsDtoData.getRoute().getId());
@@ -182,16 +189,22 @@ public class NavigationActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Handles the actual route.
+     * @param actualRoute The actual route to handle.
+     */
     private void handleActualRoute(ActualRoute actualRoute) {
         visits = actualRoute.getVisits();
         displayVisit();
-        System.out.println("ActualRoute reçue");
+        System.out.println("ActualRoute received");
         System.out.println(actualRoute);
         displayRoute(actualRoute);
     }
 
+    /**
+     * Validates the current visit.
+     */
     private void validateVisit() {
-
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
         System.out.println("Route: " + routeAndGpsDtoData);
@@ -202,7 +215,7 @@ public class NavigationActivity extends AppCompatActivity {
                     routeAndGpsDtoData.setRoute(route);
                     visits = route.getVisits();
                     visitIndex++;
-                    Toast.makeText(this, "Visite validée", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Visit validated", Toast.LENGTH_SHORT).show();
                     displayVisit();
                 },
                 error -> {
@@ -212,6 +225,9 @@ public class NavigationActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Skips the current visit.
+     */
     private void skipVisit() {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
@@ -223,7 +239,7 @@ public class NavigationActivity extends AppCompatActivity {
                     routeAndGpsDtoData.setRoute(route);
                     visits = route.getVisits();
                     visitIndex++;
-                    Toast.makeText(this, "Visite passée", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Visit skipped", Toast.LENGTH_SHORT).show();
                     displayVisit();
                 },
                 error -> {
@@ -233,12 +249,16 @@ public class NavigationActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Pauses the current route.
+     * @param route The route to pause.
+     */
     private void pauseRoute(ActualRoute route) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
         communicator.pauseRoute(route, new CommunicatorCallback<>(
                 response -> {
-                    Toast.makeText(this, "Itinéraire mis en pause", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Route paused", Toast.LENGTH_SHORT).show();
                     finish();
                 },
                 error -> {
@@ -248,13 +268,17 @@ public class NavigationActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Retrieves the actual route by its ID.
+     * @param actualRouteId The ID of the actual route.
+     */
     private void getActualRouteById(String actualRouteId) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
         communicator.getActualRouteById(actualRouteId, new CommunicatorCallback<>(
                 response -> {
                     routeAndGpsDtoData = response.actualRoute;
-                    System.out.println("Route reçue");
+                    System.out.println("Route received");
                     Log.d(TAG, "getActualRouteById: " + routeAndGpsDtoData);
                     visitIndex = getVisitIndex(routeAndGpsDtoData.getRoute().getVisits());
                     visits = routeAndGpsDtoData.getRoute().getVisits();
@@ -275,6 +299,9 @@ public class NavigationActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Retrieves the actual route.
+     */
     private void getActualRoute() {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
@@ -305,6 +332,11 @@ public class NavigationActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Gets the index of the next visit to be made.
+     * @param visits The list of visits.
+     * @return The index of the next visit.
+     */
     private int getVisitIndex(List<Visit> visits) {
         for (int i = 0; i < visits.size(); i++) {
             if (visits.get(i).getStatus() == EVisitStatus.NOT_VISITED) {
@@ -315,6 +347,9 @@ public class NavigationActivity extends AppCompatActivity {
         return -1;
     }
 
+    /**
+     * Displays the current visit.
+     */
     private void displayVisit() {
         visits.forEach(System.out::println);
 
@@ -344,18 +379,18 @@ public class NavigationActivity extends AppCompatActivity {
         }
 
         if (routeAndGpsDtoData != null && routeAndGpsDtoData.getRoute().getStatus() == ERouteStatus.COMPLETED) {
-            tvCustomerName.setText("Toutes les visites ont été effectuées");
+            tvCustomerName.setText("All visits have been completed");
             tvContactInfo.setText("");
 
-            // bouton pour terminer la route, revenir à la liste des routes
+            // Button to finish the route and return to the list of routes
             Button btnTerminer = new Button(this);
-            btnTerminer.setText("Terminer le parcours");
+            btnTerminer.setText("Finish the route");
 
             btnTerminer.setOnLongClickListener(v -> {
                 Communicator communicator = Communicator.getInstance(getApplicationContext());
                 communicator.finishRoute(routeAndGpsDtoData.getRoute(), new CommunicatorCallback<>(
                         response -> {
-                            Toast.makeText(this, "Parcours terminé", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Route finished", Toast.LENGTH_SHORT).show();
                         },
                         error -> {
                             Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
@@ -373,21 +408,21 @@ public class NavigationActivity extends AppCompatActivity {
 
             buttons.addView(btnTerminer);
 
-            sendNotification("Parcours terminé", "Toutes les visites ont été effectuées.");
-
+            sendNotification("Route finished", "All visits have been completed.");
         }
-
     }
 
+    /**
+     * Displays the route on the map.
+     * @param route The route to display.
+     */
     private void displayRoute(ActualRoute route) {
-
         Marker marker = new Marker(mapView);
         marker.setPosition(new GeoPoint(route.getCoordinates().get(0).getLatitude(), route.getCoordinates().get(0).getLongitude()));
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setTitle(getString(R.string.depart));
         marker.setIcon(getResources().getDrawable(R.drawable.ic_home_scaled, null));
         mapView.getOverlays().add(marker);
-
 
         int visitNumber = route.getVisits().size();
         Visit visit;
@@ -398,7 +433,7 @@ public class NavigationActivity extends AppCompatActivity {
             customer = visit.getCustomer();
             coordinates = customer.getGpsCoordinates();
 
-            // Ajout d'un marqueur pour chaque visite
+            // Add a marker for each visit
             marker = new Marker(mapView);
             marker.setPosition(new GeoPoint(coordinates.getLatitude(), coordinates.getLongitude()));
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
@@ -411,9 +446,11 @@ public class NavigationActivity extends AppCompatActivity {
         }
 
         Log.d(TAG, "displayRoute: added");
-
     }
 
+    /**
+     * Called when the activity is paused.
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -442,10 +479,13 @@ public class NavigationActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Called when the activity is resumed.
+     */
     @Override
     protected void onResume() {
         super.onResume();
-        // Reprise de la carte
+        // Resume the map
         mapView.onResume();
 
         if (routeAndGpsDtoData == null || routeAndGpsDtoData.getRoute() == null) {
@@ -466,11 +506,15 @@ public class NavigationActivity extends AppCompatActivity {
                     displayItinerary(routeAndGpsDtoData.getRoute());
                 },
                 error -> {
-                    Toast.makeText(this, "Erreur: " + error.message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Error: " + error.message, Toast.LENGTH_SHORT).show();
                 }
         ));
     }
 
+    /**
+     * Displays the itinerary on the map.
+     * @param route The route to display.
+     */
     private void displayItinerary(ActualRoute route) {
         if (route == null || route.getCoordinates() == null || route.getCoordinates().isEmpty()) {
             return;
@@ -488,6 +532,10 @@ public class NavigationActivity extends AppCompatActivity {
         mapView.invalidate(); // Redraw the map
     }
 
+    /**
+     * Updates the user's location on the map.
+     * @param location The new location of the user.
+     */
     private void updateUserLocation(Location location) {
         Log.d(TAG, "updateUserLocation: " + location.getLatitude() + ", " + location.getLongitude());
         if (userMarker != null) {
@@ -529,6 +577,10 @@ public class NavigationActivity extends AppCompatActivity {
         mapView.invalidate(); // Redraw the map
     }
 
+    /**
+     * Sends the user's current location to the server.
+     * If the route data is null, the method returns immediately.
+     */
     private void sendUserLocation() {
         if (routeAndGpsDtoData == null) {
             return;
@@ -552,11 +604,15 @@ public class NavigationActivity extends AppCompatActivity {
         ));
     }
 
+    /**
+     * Displays nearby customers on the map.
+     * Customers that are already in the route (visits list) are not displayed.
+     * A marker is added for each customer with a different icon.
+     * A notification is displayed for each customer.
+     *
+     * @param customers The list of nearby customers to display.
+     */
     private void displayNearbyCustomers(List<Customer> customers) {
-        // display customers that are not in the route (visits list)
-        // display a marker for each customer with a different icon
-        // display a notification for each customer
-
         for (Customer customer : customers) {
             if (visits.stream().anyMatch(visit -> visit.getCustomer().getId().equals(customer.getId()))) {
                 continue;
@@ -577,23 +633,25 @@ public class NavigationActivity extends AppCompatActivity {
                     getString(R.string.proche) + customer.getContact().getCleanInfos()
             );
         }
-
     }
 
+    /**
+     * Sends a notification with the given title and message.
+     * Creates a notification channel if necessary (API 26+).
+     *
+     * @param title   The title of the notification.
+     * @param message The message of the notification.
+     */
     private void sendNotification(String title, String message) {
         String channelId = "route_completion_channel";
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             CharSequence name = "Route Completion";
             String description = "Notifications for route completion";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(channelId, name, importance);
             channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
             notificationManager.createNotificationChannel(channel);
         }
 
@@ -604,7 +662,6 @@ public class NavigationActivity extends AppCompatActivity {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true);
 
-        // notificationId is a unique int for each notification that you must define
         int notificationId = 1;
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             return;
