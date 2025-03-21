@@ -22,6 +22,12 @@ Pour ce projet nous avons utilisé un Github Project pour le suivi des tâches: 
 
 ---
 
+## Lien Google Drive Rendu
+
+https://drive.google.com/drive/folders/1UnFpUOZSGe4IPZSJIE9HdH3PyNjmOQ_Y?usp=drive_link
+
+---
+
 ## Contexte du Projet
 
 Ce projet a été demandé par notre école dans le cadre d'une **Situation d'Apprentissage Évaluée** (**SAE**). 
