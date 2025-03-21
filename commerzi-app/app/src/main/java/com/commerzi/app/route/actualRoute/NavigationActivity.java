@@ -32,6 +32,7 @@ import com.commerzi.app.communication.responses.ActualRouteNavigationResponse;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 import com.commerzi.app.customers.Coordinates;
 import com.commerzi.app.customers.Customer;
+import com.commerzi.app.customers.ECustomerType;
 import com.commerzi.app.dto.UpdateLocationDTO;
 import com.commerzi.app.dto.UpdateVisitDTO;
 import com.commerzi.app.route.plannedRoute.PlannedRoute;
@@ -63,6 +64,8 @@ public class NavigationActivity extends AppCompatActivity {
     private Button btn_pause;
     private LinearLayout buttons;
     private List<Visit> visits;
+
+    private List<Customer> notificationSent = new ArrayList<>();
 
     private int visitIndex = 0;
 
@@ -605,33 +608,44 @@ public class NavigationActivity extends AppCompatActivity {
     }
 
     /**
-     * Displays nearby customers on the map.
-     * Customers that are already in the route (visits list) are not displayed.
-     * A marker is added for each customer with a different icon.
-     * A notification is displayed for each customer.
-     *
+     * Displays the list of nearby customers.
+     * Sends a notification if the next customer is nearby.
      * @param customers The list of nearby customers to display.
      */
     private void displayNearbyCustomers(List<Customer> customers) {
+        if (customers == null || customers.isEmpty()) {
+            return;
+        }
+
         for (Customer customer : customers) {
-            if (visits.stream().anyMatch(visit -> visit.getCustomer().getId().equals(customer.getId()))) {
-                continue;
+            if (customer.getType() == ECustomerType.client
+            && visits.get(visitIndex).equals(customer)) {
+                sendNotification(
+                        "Le prochain client est proche",
+                        "Vous êtes à proximité du prochain client"
+                );
             }
 
-            Coordinates coordinates = customer.getGpsCoordinates();
-            Marker marker = new Marker(mapView);
-            marker.setPosition(new GeoPoint(coordinates.getLatitude(), coordinates.getLongitude()));
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            marker.setIcon(getResources().getDrawable(R.drawable.customer, null));
-            marker.setTitle(customer.getName() + "\n" + customer.getType()
-                    + "\n" + customer.getAddress() + " - " + customer.getCity()
-            );
-            mapView.getOverlays().add(marker);
+            if (customer.getType() == ECustomerType.prospect && !visits.contains(customer)
+            && !notificationSent.contains(customer)) {
+                sendNotification(
+                        "Un prospect est proche",
+                        customer.getName()
+                        + "\n" + customer.getContact().getCleanInfos()
+                );
 
-            sendNotification(
-                    getString(R.string.proximite),
-                    getString(R.string.proche) + customer.getContact().getCleanInfos()
-            );
+                notificationSent.add(customer);
+
+                // ajouter un marker
+                Marker marker = new Marker(mapView);
+                marker.setPosition(new GeoPoint(customer.getGpsCoordinates().getLatitude(), customer.getGpsCoordinates().getLongitude()));
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                marker.setTitle(customer.getName() + "\n" + customer.getType()
+                        + "\n" + customer.getAddress() + " - " + customer.getCity()
+                );
+                marker.setIcon(getResources().getDrawable(R.drawable.customer, null));
+                mapView.getOverlays().add(marker);
+            }
         }
     }
 
