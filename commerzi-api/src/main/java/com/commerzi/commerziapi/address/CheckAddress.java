@@ -33,7 +33,7 @@ public class CheckAddress {
     /**
      * A record that holds the full address (address and city) for caching purposes.
      */
-    private record FullAddress(String address, String city) {
+    private record FullAddress(String city, String address) {
         @Override
         public boolean equals(Object o) {
             return o instanceof FullAddress other && address.equals(other.address) && city.equals(other.city);
@@ -41,7 +41,7 @@ public class CheckAddress {
 
         @Override
         public int hashCode() {
-            return Objects.hash(address, city);
+            return Objects.hash(city, address);
         }
     }
 
@@ -57,7 +57,7 @@ public class CheckAddress {
                 public Coordinates load(FullAddress key) throws Exception {
                     // Initialize the geocoder and perform the forward geocoding request
                     JOpenCageGeocoder jOpenCageGeocoder = new JOpenCageGeocoder(apiKey);
-                    JOpenCageForwardRequest request = new JOpenCageForwardRequest(key.address + ", " + key.city);
+                    JOpenCageForwardRequest request = new JOpenCageForwardRequest(key.city + ", " + key.address);
                     request.setRestrictToCountryCode("fr");  // Restrict results to France
 
                     // Perform the geocoding request and convert the response into coordinates
@@ -95,7 +95,7 @@ public class CheckAddress {
 
         try {
             // Check if the coordinates for the address are null
-            return getCoordinates(address, city) == null;
+            return getCoordinates(city, address) == null;
         } catch (Exception e) {
             return false;
         }
@@ -109,7 +109,7 @@ public class CheckAddress {
      * @param city The city for which to fetch coordinates.
      * @return The coordinates corresponding to the address and city, or null if not found.
      */
-    public static Coordinates getCoordinates(String address, String city) {
+    public static Coordinates getCoordinates(String city, String address) {
         if (address == null || address.isEmpty()) {
             return null;
         }
@@ -120,7 +120,7 @@ public class CheckAddress {
 
         try {
             // Fetch coordinates from the cache or from the OpenCage API if not cached
-            return ADDRESS_CACHE.get(getCacheKey(address, city));
+            return ADDRESS_CACHE.get(getCacheKey(city, address));
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }

@@ -6,6 +6,7 @@ import com.commerzi.commerziapi.security.CommerziAuthenticated;
 import com.commerzi.commerziapi.security.Security;
 import com.commerzi.commerziapi.service.interfaces.IAuthentificationService;
 import com.commerzi.commerziapi.service.interfaces.ICustomerService;
+import com.commerzi.commerziapi.service.interfaces.IPlannedRouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
@@ -23,7 +24,7 @@ public class CustomerController {
 
     @Autowired
     private ICustomerService customerService;
-
+    
     @Autowired
     private IAuthentificationService authentificationService;
 
@@ -141,8 +142,6 @@ public class CustomerController {
 
         try {
             customerService.updateCustomer(existingCustomer, customer);
-            System.out.println("Customer updated");
-            System.out.println(existingCustomer.getId());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

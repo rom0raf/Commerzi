@@ -106,7 +106,7 @@ public class PlannedRouteFragment extends Fragment implements View.OnClickListen
 
         new Thread(() -> {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(5000);
                 for (PlannedRoute route : routeList) {
                     if (route.getTotalDistance() < 0) {
                         loadRoutes();

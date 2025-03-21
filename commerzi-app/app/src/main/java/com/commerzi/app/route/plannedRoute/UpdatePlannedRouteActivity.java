@@ -19,11 +19,9 @@ import com.commerzi.app.HomeActivity;
 import com.commerzi.app.R;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
 import com.commerzi.app.customers.Customer;
-import com.commerzi.app.customers.CustomerAdapter;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -56,7 +54,7 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
 
         if (route != null) {
             etName.setText(route.getName());
-            selectedItems = new HashSet<>(route.getCustomersAndProspects());
+            selectedItems = new HashSet<>(route.getCustomers());
 
             updateChipGroup();
         }
@@ -79,7 +77,7 @@ public class UpdatePlannedRouteActivity extends AppCompatActivity {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
         route.setName(etName.getText().toString());
-        route.setCustomersAndProspects(new ArrayList<>(selectedItems));
+        route.setCustomers(new ArrayList<>(selectedItems));
 
         communicator.updateRoute(route, new CommunicatorCallback<>(
                 response -> {

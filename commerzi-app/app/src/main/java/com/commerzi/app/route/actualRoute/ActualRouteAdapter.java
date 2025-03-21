@@ -2,6 +2,7 @@ package com.commerzi.app.route.actualRoute;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.commerzi.app.R;
@@ -39,12 +41,11 @@ public class ActualRouteAdapter extends RecyclerView.Adapter<ActualRouteAdapter.
         return new RouteViewHolder(view);
     }
 
-    @Override
+   @Override
     public void onBindViewHolder(@NonNull RouteViewHolder holder, int position) {
         ActualRoute route = routeList.get(position);
         String status = null;
 
-        // switch on status
         switch (route.getStatus()) {
             case PAUSED:
                 status = "En pause";
@@ -62,59 +63,52 @@ public class ActualRouteAdapter extends RecyclerView.Adapter<ActualRouteAdapter.
 
         holder.tvActualRouteTitle.setText(route.getDate() + " - " + status);
 
-        StringBuilder customers = new StringBuilder();
-        for (Visit visit : route.getVisits()) {
-            switch (visit.getStatus()) {
-                case NOT_VISITED:
-                    status = "Non visité";
-                    break;
-                case VISITED:
-                    status = "Visité";
-                    break;
-                case SKIPPED:
-                    status = "Passé";
-                    break;
-            }
-            customers.append(status + " - " + visit.getCustomer().getName()).append(", ").append(visit.getCustomer().getContact().getCleanInfos()).append("\n");
-        }
+        VisitAdapter visitAdapter = new VisitAdapter(route.getVisits());
+        holder.rvVisits.setLayoutManager(new LinearLayoutManager(context));
+        holder.rvVisits.setAdapter(visitAdapter);
 
-        holder.tvCustomers.setText(customers.toString());
-
-        // Logique d'affichage / depliage
         holder.itemView.setOnClickListener(v -> {
             if (holder.detailsContainer.getVisibility() == View.GONE) {
                 holder.detailsContainer.setVisibility(View.VISIBLE);
                 holder.tvActualRouteTitle.setCompoundDrawablesWithIntrinsicBounds(
                         ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_dropdown),
                         null,
-                        null ,
+                        null,
                         null);
             } else {
                 holder.detailsContainer.setVisibility(View.GONE);
                 holder.tvActualRouteTitle.setCompoundDrawablesWithIntrinsicBounds(
                         ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_dropdown_closed),
                         null,
-                        null ,
+                        null,
                         null);
             }
         });
 
-        holder.btnRestart.setOnClickListener(v -> {
+        holder.btnRestart.setOnLongClickListener(v -> {
+            Communicator communicator = Communicator.getInstance(context);
+            communicator.resumeRoute(route, new CommunicatorCallback<>(
+                    response -> {
+                        Log.d("Unpause", "onBindViewHolder: ");
+                    },
+                    error -> {
+                        Toast.makeText(context, "Erreur inatendue: " + error.message, Toast.LENGTH_SHORT).show();
+                        Log.d("Unpause", "onBindViewHolder: " + error.message);
+                    }
+            ));
+
             Intent intent = new Intent(context, NavigationActivity.class);
             intent.putExtra("route", route);
             context.startActivity(intent);
+            return true;
         });
 
         holder.btnDelete.setOnClickListener(v -> deleteRoute(position));
     }
 
-    @Override
-    public int getItemCount() {
-        return routeList.size();
-    }
-
     static class RouteViewHolder extends RecyclerView.ViewHolder {
-        TextView tvActualRouteTitle, tvCustomers;
+        TextView tvActualRouteTitle;
+        RecyclerView rvVisits;
         LinearLayout detailsContainer;
         Button btnDelete;
         Button btnRestart;
@@ -122,11 +116,15 @@ public class ActualRouteAdapter extends RecyclerView.Adapter<ActualRouteAdapter.
         public RouteViewHolder(@NonNull View itemView) {
             super(itemView);
             tvActualRouteTitle = itemView.findViewById(R.id.tvActualRouteTitle);
-            tvCustomers = itemView.findViewById(R.id.tvCustomers);
+            rvVisits = itemView.findViewById(R.id.rvVisits);
             detailsContainer = itemView.findViewById(R.id.detailsContainer);
             btnDelete = itemView.findViewById(R.id.btnDeleteActualRoute);
             btnRestart = itemView.findViewById(R.id.btnRestartActualRoute);
         }
+    }
+    @Override
+    public int getItemCount() {
+        return routeList.size();
     }
 
      private void deleteRoute(int position) {

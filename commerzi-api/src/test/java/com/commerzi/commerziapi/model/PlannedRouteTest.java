@@ -19,21 +19,21 @@ public class PlannedRouteTest {
         // invalid customers with setter
 
         // empty customers
-        assertThrows(IllegalArgumentException.class, () -> route.setCustomersAndProspects(new ArrayList<>()));
+        assertThrows(IllegalArgumentException.class, () -> route.setCustomers(new ArrayList<>()));
 
         // null customers
-        assertThrows(IllegalArgumentException.class, () -> route.setCustomersAndProspects(null));
+        assertThrows(IllegalArgumentException.class, () -> route.setCustomers(null));
 
         // less than 2 customers
         List<Customer> customers = new ArrayList<>();
         customers.add(new Customer());
-        assertThrows(IllegalArgumentException.class, () -> route.setCustomersAndProspects(customers));
+        assertThrows(IllegalArgumentException.class, () -> route.setCustomers(customers));
 
         // more than 8 customers
         for (int i = 0; i < 9; i++) {
             customers.add(new Customer());
         }
-        assertThrows(IllegalArgumentException.class, () -> route.setCustomersAndProspects(customers));
+        assertThrows(IllegalArgumentException.class, () -> route.setCustomers(customers));
     }
 
     @Test
@@ -53,16 +53,16 @@ public class PlannedRouteTest {
         customers.add(customer1);
         customers.add(customer2);
 
-        route.setCustomersAndProspects(customers);
+        route.setCustomers(customers);
 
         assertEquals("1", route.getId());
         assertEquals("user1", route.getUserId());
         assertEquals(new Coordinates(40.7128, -74.0060), route.getStartingPoint());
         assertEquals(new Coordinates(34.0522, 118.2437), route.getEndingPoint());
         assertEquals(3940.0, route.getTotalDistance());
-        assertEquals(2, route.getCustomersAndProspects().size());
-        assertEquals("John Doe", route.getCustomersAndProspects().get(0).getName());
-        assertEquals("Jane Doe", route.getCustomersAndProspects().get(1).getName());
+        assertEquals(2, route.getCustomers().size());
+        assertEquals("John Doe", route.getCustomers().get(0).getName());
+        assertEquals("Jane Doe", route.getCustomers().get(1).getName());
     }
 
     @Test

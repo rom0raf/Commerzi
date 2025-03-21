@@ -18,11 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.commerzi.app.R;
 import com.commerzi.app.communication.Communicator;
 import com.commerzi.app.communication.responses.CommunicatorCallback;
-import com.commerzi.app.communication.responses.PlannedRouteResponse;
 import com.commerzi.app.customers.Customer;
 import com.commerzi.app.route.actualRoute.NavigationActivity;
-import com.commerzi.app.route.plannedRoute.PlannedRoute;
-import com.commerzi.app.route.plannedRoute.UpdatePlannedRouteActivity;
 
 import java.util.ArrayList;
 
@@ -62,7 +59,7 @@ public class PlannedRouteAdapter extends RecyclerView.Adapter<PlannedRouteAdapte
 
         // add a list of customers to the route view
         StringBuilder customers = new StringBuilder();
-        for (Customer customer : route.getCustomersAndProspects()) {
+        for (Customer customer : route.getCustomers()) {
             customers.append(customer.getName()).append(", ").append(customer.getContact().getCleanInfos()).append("\n");
         }
 

@@ -1,6 +1,7 @@
 package com.commerzi.commerziapi.service.interfaces;
 
 import com.commerzi.commerziapi.model.ActualRoute;
+import com.commerzi.commerziapi.model.ERouteStatus;
 import com.commerzi.commerziapi.model.PlannedRoute;
 import com.commerzi.commerziapi.model.maps.GPSRoute;
 
@@ -25,4 +26,6 @@ public interface IActualRouteService {
     ActualRoute skipVisit(ActualRoute route);
 
     ActualRoute confirmVisit(ActualRoute route);
+
+    ActualRoute changeStatus(ActualRoute route, ERouteStatus status);
 }

@@ -18,14 +18,14 @@ public class PlannedRoute implements Parcelable {
     private String id;
     private String userId;
     private String name;
-    private List<Customer> customersAndProspects;
+    private List<Customer> customers;
     private Coordinates startingPoint;
     private Coordinates endingPoint;
     private double totalDistance;
     
-    public PlannedRoute(String name, List<Customer> customersAndProspects){
+    public PlannedRoute(String name, List<Customer> customers){
         this.name = name;
-        this.customersAndProspects = customersAndProspects;
+        this.customers = customers;
     }
 
     /**
@@ -69,17 +69,17 @@ public class PlannedRoute implements Parcelable {
      *
      * @return the list of customers and prospects
      */
-    public List<Customer> getCustomersAndProspects() {
-        return customersAndProspects;
+    public List<Customer> getCustomers() {
+        return customers;
     }
 
     /**
      * Sets the list of customers and prospects associated with the route.
      *
-     * @param customersAndProspects the list of customers and prospects to set
+     * @param customers the list of customers and prospects to set
      */
-    public void setCustomersAndProspects(List<Customer> customersAndProspects) {
-        this.customersAndProspects = customersAndProspects;
+    public void setCustomers(List<Customer> customers) {
+        this.customers = customers;
     }
 
     /**
@@ -149,7 +149,7 @@ public class PlannedRoute implements Parcelable {
         return "PlannedRoute{" +
                 "id='" + id + '\'' +
                 ", userId='" + userId + '\'' +
-                ", customersAndProspects=" + customersAndProspects +
+                ", customersAndProspects=" + customers +
                 ", startingPoint=" + startingPoint +
                 ", endingPoint=" + endingPoint +
                 ", totalDistance=" + totalDistance +
@@ -160,7 +160,7 @@ public class PlannedRoute implements Parcelable {
         id = in.readString();
         userId = in.readString();
         name = in.readString();
-        customersAndProspects = in.createTypedArrayList(Customer.CREATOR);
+        customers = in.createTypedArrayList(Customer.CREATOR);
         startingPoint = in.readParcelable(Coordinates.class.getClassLoader());
         endingPoint = in.readParcelable(Coordinates.class.getClassLoader());
         totalDistance = in.readDouble();
@@ -188,7 +188,7 @@ public class PlannedRoute implements Parcelable {
         dest.writeString(id);
         dest.writeString(userId);
         dest.writeString(name);
-        dest.writeTypedList(customersAndProspects);
+        dest.writeTypedList(customers);
         dest.writeParcelable(startingPoint, flags);
         dest.writeParcelable(endingPoint, flags);
         dest.writeDouble(totalDistance);

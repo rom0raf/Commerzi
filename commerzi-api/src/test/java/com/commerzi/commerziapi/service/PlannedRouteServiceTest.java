@@ -76,7 +76,7 @@ class PlannedRouteServiceTest {
     void testCreateRoute() throws Exception {
         PlannedRoute route = new PlannedRoute();
         route.setId("1");
-        route.setCustomersAndProspects(customers);
+        route.setCustomers(customers);
         route.setStartingPoint(new Coordinates(40.7128, -74.0060));
         route.setEndingPoint(new Coordinates(40.7128, -74.0060));
         route.setTotalDistance(0.0);
@@ -92,7 +92,7 @@ class PlannedRouteServiceTest {
     void testGetPlannedRouteById() {
         PlannedRoute route = new PlannedRoute();
         route.setId("1");
-        route.setCustomersAndProspects(customers);
+        route.setCustomers(customers);
         route.setStartingPoint(new Coordinates(40.7128, -74.0060));
         route.setEndingPoint(new Coordinates(40.7128, -74.0060));
         route.setTotalDistance(0.0);
@@ -109,7 +109,7 @@ class PlannedRouteServiceTest {
     void testGetAll() {
         PlannedRoute route1 = new PlannedRoute();
         route1.setId("1");
-        route1.setCustomersAndProspects(customers);
+        route1.setCustomers(customers);
         route1.setStartingPoint(new Coordinates(40.7128, -74.0060));
         route1.setEndingPoint(new Coordinates(40.7128, -74.0060));
         route1.setTotalDistance(0.0);
@@ -117,7 +117,7 @@ class PlannedRouteServiceTest {
 
         PlannedRoute route2 = new PlannedRoute();
         route2.setId("2");
-        route2.setCustomersAndProspects(customers);
+        route2.setCustomers(customers);
         route2.setStartingPoint(new Coordinates(40.7128, -74.0060));
         route2.setEndingPoint(new Coordinates(40.7128, -74.0060));
         route2.setTotalDistance(0.0);
@@ -136,7 +136,7 @@ class PlannedRouteServiceTest {
     void testUpdateRoute() throws Exception {
         PlannedRoute route = new PlannedRoute();
         route.setId("1");
-        route.setCustomersAndProspects(customers);
+        route.setCustomers(customers);
         route.setStartingPoint(new Coordinates(40.71028, -74.00060));
         route.setEndingPoint(new Coordinates(40.71128, -74.00160));
         route.setTotalDistance(0.0);

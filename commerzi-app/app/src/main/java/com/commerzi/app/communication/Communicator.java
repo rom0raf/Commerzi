@@ -22,7 +22,6 @@ import com.commerzi.app.communication.responses.ActualRouteNavigationResponse;
 import com.commerzi.app.communication.responses.ActualRouteResponse;
 import com.commerzi.app.communication.responses.NearbyCustomersResponse;
 import com.commerzi.app.communication.responses.PlannedRouteResponse;
-import com.commerzi.app.customers.Coordinates;
 import com.commerzi.app.customers.Customer;
 import com.commerzi.app.R;
 import com.commerzi.app.auth.User;
@@ -32,11 +31,9 @@ import com.commerzi.app.communication.responses.CommunicatorCallback;
 import com.commerzi.app.communication.responses.GenericMessageResponse;
 import com.commerzi.app.dto.NearbyCustomersDTO;
 import com.commerzi.app.dto.UpdateLocationDTO;
-import com.commerzi.app.dto.UpdateVisitDTO;
 import com.commerzi.app.route.actualRoute.ActualRoute;
 import com.commerzi.app.route.actualRoute.RouteAndGpsDto;
 import com.commerzi.app.route.plannedRoute.PlannedRoute;
-import com.commerzi.app.route.visit.Visit;
 import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
@@ -46,9 +43,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Communicator {
@@ -407,7 +402,6 @@ public class Communicator {
 
                         for (int i = 0; i < jsonResponse.length(); i++) {
                             JSONObject routesJson = jsonResponse.getJSONObject(i);
-
                             GsonBuilder gsonBuilder = new GsonBuilder();
                             PlannedRoute route = gsonBuilder.create().fromJson(routesJson.toString(), PlannedRoute.class);
 
@@ -432,7 +426,7 @@ public class Communicator {
         try {
             JSONObject jsonBody = new JSONObject();
             JSONArray ids = new JSONArray();
-            route.getCustomersAndProspects().forEach(
+            route.getCustomers().forEach(
                     customer -> ids.put(customer.getId())
             );
 
@@ -699,4 +693,75 @@ public class Communicator {
         );
     }
 
+    public void pauseRoute(ActualRoute route, CommunicatorCallback<ActualRouteResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        this.request(Request.Method.POST, this.buildActualRoutesbaseUrl() + "pause/" + route.getId(), null, true,
+            response -> {
+                try {
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    ActualRoute actualRoute = gsonBuilder.create().fromJson(response, ActualRoute.class);
+
+                    ArrayList<ActualRoute> routes = new ArrayList<>();
+                    routes.add(actualRoute);
+
+                    callback.onSuccess(new ActualRouteResponse(routes, null));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.data_processing_error)));
+                }
+            },
+            error -> callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.error_during_update)))
+        );
+    }
+
+    public void resumeRoute(ActualRoute route, CommunicatorCallback<ActualRouteResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        this.request(Request.Method.POST, this.buildActualRoutesbaseUrl() + "resume/" + route.getId(), null, true,
+            response -> {
+                try {
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    ActualRoute actualRoute = gsonBuilder.create().fromJson(response, ActualRoute.class);
+
+                    ArrayList<ActualRoute> routes = new ArrayList<>();
+                    routes.add(actualRoute);
+
+                    callback.onSuccess(new ActualRouteResponse(routes, null));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.data_processing_error)));
+                }
+            },
+            error -> callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.error_during_update)))
+        );
+    }
+
+    public void finishRoute(ActualRoute route, CommunicatorCallback<ActualRouteResponse> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+
+        this.request(Request.Method.POST, this.buildActualRoutesbaseUrl() + "finish/" + route.getId(), null, true,
+            response -> {
+                try {
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    ActualRoute actualRoute = gsonBuilder.create().fromJson(response, ActualRoute.class);
+
+                    ArrayList<ActualRoute> routes = new ArrayList<>();
+                    routes.add(actualRoute);
+
+                    callback.onSuccess(new ActualRouteResponse(routes, null));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.data_processing_error)));
+                }
+            },
+            error -> callback.onFailure(new ActualRouteResponse(null, context.getString(R.string.error_during_update)))
+        );
+    }
 }

@@ -7,6 +7,9 @@
     <string name="login">Se connecter</string>
     <string name="signup">S\'inscrire</string>
     <string name="update">Mettre à jour</string>
+    <string name="pause">Pause</string>
+    <string name="skip">Passer</string>
+    <string name="delete">Supprimer</string>
 
     <string name="add_customer">Ajouter un client</string>
     <string name="edit_customer">Modifier un client</string>
@@ -87,5 +90,13 @@
     <string name="actual_route_success">Itinéraire chargé avec succès</string>
     <string name="visit_updated_success">Validation effectuée avec succès</string>
     <string name="actual_routes">Parcours</string>
+    <string name="message_confirmation_modification">Vous avez changé l\'adresse du client. \nLes itinéraires contenant ce client / propect seront supprimés. \nVoulez-vous vraiment continuer ?</string>
+    <string name="oui">Oui</string>
+    <string name="non">Non</string>
+    <string name="depart">Départ</string>
+    <string name="paused">Itinéraire mis en pause</string>
+    <string name="proximite">Client ou Prospect à proximité</string>
+    <string name="proche">Vous êtes proche de :\n</string>
+    <string name="reprise">Itinéraire repris avec succes</string>
 
 </resources>

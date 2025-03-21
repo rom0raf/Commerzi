@@ -1,5 +1,6 @@
 package com.commerzi.app.customers;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -81,15 +82,40 @@ public class UpdateCustomerActivity extends AppCompatActivity {
                 null
         );
 
-        communicator.updateCustomer(updatedCustomer, new CommunicatorCallback<>(
-                response -> {
-                    Toast.makeText(UpdateCustomerActivity.this, response.message, Toast.LENGTH_SHORT).show();
-                    finish();
-                },
-                error -> {
-                    Toast.makeText(UpdateCustomerActivity.this, error.message, Toast.LENGTH_SHORT).show();
-                }
-        ));
+        // add a popup confirmation if the address changed
+        if (!customer.getAddress().equals(updatedCustomer.getAddress())) {
+            // show a popup
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.confirmation)
+                    .setMessage(R.string.message_confirmation_modification)
+                    .setPositiveButton(R.string.oui, (dialog, which) -> {
+                        communicator.updateCustomer(updatedCustomer, new CommunicatorCallback<>(
+                                response -> {
+                                    Toast.makeText(UpdateCustomerActivity.this, response.message, Toast.LENGTH_SHORT).show();
+                                    finish();
+                                },
+                                error -> {
+                                    Toast.makeText(UpdateCustomerActivity.this, error.message, Toast.LENGTH_SHORT).show();
+                                }
+                        ));
+                    })
+                    .setNegativeButton(R.string.non, (dialog, which) -> {
+                        dialog.dismiss();
+                    })
+                    .show();
+        } else {
+            communicator.updateCustomer(updatedCustomer, new CommunicatorCallback<>(
+                    response -> {
+                        Toast.makeText(UpdateCustomerActivity.this, response.message, Toast.LENGTH_SHORT).show();
+                        finish();
+                    },
+                    error -> {
+                        Toast.makeText(UpdateCustomerActivity.this, error.message, Toast.LENGTH_SHORT).show();
+                    }
+            ));
+        }
+
+
     }
 }
 

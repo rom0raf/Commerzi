@@ -49,7 +49,7 @@ public class PlannedRouteService implements IPlannedRouteService {
             customers.add(customerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Customer not found")));
         }
 
-        route.setCustomersAndProspects(customers);
+        route.setCustomers(customers);
 
         Coordinates point = CheckAddress.getCoordinates(user.getAddress(), user.getCity());
 
@@ -61,7 +61,7 @@ public class PlannedRouteService implements IPlannedRouteService {
 
         MapsUtils.check(route, ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED));
 
-        final List<Coordinates> points = route.getCustomersAndProspects().stream()
+        final List<Coordinates> points = route.getCustomers().stream()
                 .map(Customer::getGpsCoordinates)
                 .toList();
 
@@ -122,7 +122,7 @@ public class PlannedRouteService implements IPlannedRouteService {
 
         ATravelerAlgorithm.getAlgorithmWithRealDistances(AlgorithmType.BRUTE_FORCE_OPTIMIZED_THREADED);
 
-        final List<Coordinates> points = route.getCustomersAndProspects().stream()
+        final List<Coordinates> points = route.getCustomers().stream()
                 .map(Customer::getGpsCoordinates)
                 .toList();
 
@@ -158,7 +158,7 @@ public class PlannedRouteService implements IPlannedRouteService {
     }
 
     public static void checkPlannedRoute(PlannedRoute route) throws IllegalArgumentException {
-        if (route.getCustomersAndProspects().size() > 8) {
+        if (route.getCustomers().size() > 8) {
             throw new IllegalArgumentException("Too many customers");
         }
 
@@ -166,7 +166,7 @@ public class PlannedRouteService implements IPlannedRouteService {
 //            throw new IllegalArgumentException("Too few customers");
 //        }
 
-        if (route.getCustomersAndProspects().stream().anyMatch(c -> c.getGpsCoordinates() == null)) {
+        if (route.getCustomers().stream().anyMatch(c -> c.getGpsCoordinates() == null)) {
             throw new IllegalArgumentException("Customer coordinates missing");
         }
 
