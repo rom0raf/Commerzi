@@ -9,4 +9,5 @@ public interface PlannedRouteRepository extends MongoRepository<PlannedRoute, St
 
     List<PlannedRoute> findByUserId(String userId);
 
+    List<PlannedRoute> findByCustomersId(String customerId);
 }

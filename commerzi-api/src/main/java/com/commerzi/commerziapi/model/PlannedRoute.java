@@ -17,13 +17,13 @@ public class PlannedRoute {
     private String id;
     private String name;
     private String userId;
-    private List<Customer> customersAndProspects;
+    private List<Customer> customers;
     private Coordinates startingPoint;
     private Coordinates endingPoint;
     private double totalDistance;
 
     public PlannedRoute() {
-        this.customersAndProspects = new ArrayList<>();
+        this.customers = new ArrayList<>();
     }
 
     /**
@@ -83,29 +83,29 @@ public class PlannedRoute {
      *
      * @return the list of customers and prospects
      */
-    public List<Customer> getCustomersAndProspects() {
-        return customersAndProspects;
+    public List<Customer> getCustomers() {
+        return customers;
     }
 
     /**
      * Sets the list of customers and prospects associated with the route.
      *
-     * @param customersAndProspects the list of customers and prospects to set
+     * @param customers the list of customers and prospects to set
      */
-    public void setCustomersAndProspects(List<Customer> customersAndProspects) {
-        if (customersAndProspects == null || customersAndProspects.isEmpty()) {
+    public void setCustomers(List<Customer> customers) {
+        if (customers == null || customers.isEmpty()) {
             throw new IllegalArgumentException("The list of customers and prospects cannot be null or empty.");
         }
 
-        if (customersAndProspects.size() < 2) {
+        if (customers.size() < 2) {
             throw new IllegalArgumentException("The list of customers and prospects must contain at least two elements.");
         }
 
-        if (customersAndProspects.size() > 8) {
+        if (customers.size() > 8) {
             throw new IllegalArgumentException("The list of customers and prospects must contain at most eight elements.");
         }
 
-        this.customersAndProspects = customersAndProspects;
+        this.customers = customers;
     }
 
     /**
@@ -170,7 +170,7 @@ public class PlannedRoute {
 
 
                 ", userId='" + userId + '\'' +
-                ", customersAndProspects=" + customersAndProspects +
+                ", customersAndProspects=" + customers +
                 ", startingPoint=" + startingPoint +
                 ", endingPoint=" + endingPoint +
                 ", totalDistance=" + totalDistance +

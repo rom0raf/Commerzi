@@ -4,10 +4,7 @@ import com.commerzi.commerziapi.dto.NearbyCustomersDTO;
 import com.commerzi.commerziapi.dto.RouteAndGpsDto;
 import com.commerzi.commerziapi.dto.UpdateLocationDTO;
 import com.commerzi.commerziapi.maps.coordinates.Coordinates;
-import com.commerzi.commerziapi.model.ActualRoute;
-import com.commerzi.commerziapi.model.CommerziUser;
-import com.commerzi.commerziapi.model.Customer;
-import com.commerzi.commerziapi.model.PlannedRoute;
+import com.commerzi.commerziapi.model.*;
 import com.commerzi.commerziapi.model.maps.GPSRoute;
 import com.commerzi.commerziapi.security.CommerziAuthenticated;
 import com.commerzi.commerziapi.security.Security;
@@ -135,7 +132,11 @@ public class ActualRouteController {
             return ResponseEntity.notFound().build();
         }
 
+        System.out.println("Size: " + actualRoute.getCoordinates().size());
         actualRoute.getCoordinates().addAll(newCoordinates.getCoordinates());
+        System.out.println("Size: " + actualRoute.getCoordinates().size());
+        System.out.println();
+        System.out.println();
         CommerziUser user = authentificationService.getUserBySession(Security.getSessionFromSpring());
         List<Customer> customers = new ArrayList<>();
         try {
@@ -197,6 +198,49 @@ public class ActualRouteController {
         }
 
         actualRouteService.delete(actualRoute);
+
+        return ResponseEntity.ok(actualRoute);
+    }
+
+
+    @CommerziAuthenticated
+    @PostMapping("/pause/{id}")
+    public ResponseEntity pauseActualRoute(@PathVariable String id) {
+        ActualRoute actualRoute = actualRouteService.getActualRouteById(id);
+
+        if (actualRoute == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        actualRouteService.changeStatus(actualRoute, ERouteStatus.PAUSED);
+
+        return ResponseEntity.ok(actualRoute);
+    }
+
+    @CommerziAuthenticated
+    @PostMapping("/resume/{id}")
+    public ResponseEntity resumeActualRoute(@PathVariable String id) {
+        ActualRoute actualRoute = actualRouteService.getActualRouteById(id);
+
+        if (actualRoute == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        actualRouteService.changeStatus(actualRoute, ERouteStatus.IN_PROGRESS);
+
+        return ResponseEntity.ok(actualRoute);
+    }
+
+    @CommerziAuthenticated
+    @PostMapping("/finish/{id}")
+    public ResponseEntity finishActualRoute(@PathVariable String id) {
+        ActualRoute actualRoute = actualRouteService.getActualRouteById(id);
+
+        if (actualRoute == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        actualRouteService.changeStatus(actualRoute, ERouteStatus.COMPLETED);
 
         return ResponseEntity.ok(actualRoute);
     }

@@ -1,11 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp"
-    android:background="?attr/selectableItemBackground">
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/tvActualRouteTitle"
@@ -18,45 +15,38 @@
         android:drawableStart="@drawable/ic_dropdown_closed"
         android:drawablePadding="8dp"/>
 
-    <!-- Section dépliable (détails) -->
     <LinearLayout
         android:id="@+id/detailsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:padding="8dp">
+        android:visibility="gone">
 
-        <TextView
-            android:id="@+id/tvCustomers"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvVisits"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:padding="4dp"
-            android:maxLines="8"
-            android:scrollbars="vertical"/>
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:gravity="center">
-
-            <Button
-                android:id="@+id/btnRestartActualRoute"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/restart_route" />
-
-            <!-- Bouton Supprimer -->
+            android:layout_height="wrap_content">
+            
             <Button
                 android:id="@+id/btnDeleteActualRoute"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Supprimer"
+                android:layout_marginEnd="16dp"
                 android:backgroundTint="@color/red"
-                android:textColor="@android:color/white" />
+                android:text="@string/delete" />
+    
+            <Button
+                android:id="@+id/btnRestartActualRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/blue"
+                android:text="@string/restart_route" />
+            
         </LinearLayout>
+            
     </LinearLayout>
 </LinearLayout>

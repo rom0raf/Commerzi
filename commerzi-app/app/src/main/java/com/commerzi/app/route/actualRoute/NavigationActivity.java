@@ -15,6 +15,7 @@ import android.os.Parcelable;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,6 +57,8 @@ public class NavigationActivity extends AppCompatActivity {
     private TextView tvContactInfo;
     private Button btn_valider;
     private Button btn_passer;
+    private Button btn_pause;
+    private LinearLayout buttons;
     private List<Visit> visits;
 
     private int visitIndex = 0;
@@ -80,9 +83,16 @@ public class NavigationActivity extends AppCompatActivity {
         tvContactInfo = findViewById(R.id.tvContactInfoNavigation);
         btn_valider = findViewById(R.id.btn_valider);
         btn_passer = findViewById(R.id.btn_passer);
+        btn_pause = findViewById(R.id.btn_pause);
+        buttons = findViewById(R.id.buttons);
+
 
         btn_valider.setOnClickListener(v -> validateVisit());
         btn_passer.setOnClickListener(v -> skipVisit());
+        btn_pause.setOnLongClickListener(v -> {
+            pauseRoute(routeAndGpsDtoData.getRoute());
+            return true;
+        });
 
         coordinatesToSend = new ArrayList<>();
 
@@ -131,7 +141,15 @@ public class NavigationActivity extends AppCompatActivity {
                 @Override
                 public void onLocationChanged(@NonNull Location location) {
                     Log.d(TAG, "Location: " + location.getLatitude() + ", " + location.getLongitude() + " Accuracy: " + location.getAccuracy());
-                    updateUserLocation(location);
+
+                    if (routeAndGpsDtoData == null || routeAndGpsDtoData.getRoute() == null) {
+                        return;
+                    }
+
+                    if (routeAndGpsDtoData.getRoute().getStatus() != ERouteStatus.COMPLETED) {
+                        updateUserLocation(location);
+                    }
+
                 }
 
                 @Override
@@ -215,6 +233,21 @@ public class NavigationActivity extends AppCompatActivity {
         ));
     }
 
+    private void pauseRoute(ActualRoute route) {
+        Communicator communicator = Communicator.getInstance(getApplicationContext());
+
+        communicator.pauseRoute(route, new CommunicatorCallback<>(
+                response -> {
+                    Toast.makeText(this, "Itinéraire mis en pause", Toast.LENGTH_SHORT).show();
+                    finish();
+                },
+                error -> {
+                    Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "pauseRoute: " + error.message);
+                }
+        ));
+    }
+
     private void getActualRouteById(String actualRouteId) {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
@@ -227,12 +260,17 @@ public class NavigationActivity extends AppCompatActivity {
                     visits = routeAndGpsDtoData.getRoute().getVisits();
                     displayVisit();
                     ActualRoute route = routeAndGpsDtoData.getRoute();
+                    btn_pause.setOnLongClickListener(v -> {
+                        pauseRoute(route);
+                        return true;
+                    });
                     displayRoute(route);
                 },
                 error -> {
                     Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "getActualRouteById: " + error.message);
                     Log.d(TAG, "getActualRouteById: " + error.actualRoute);
+                    finish();
                 }
         ));
     }
@@ -240,7 +278,7 @@ public class NavigationActivity extends AppCompatActivity {
     private void getActualRoute() {
         Communicator communicator = Communicator.getInstance(getApplicationContext());
 
-        PlannedRoute clone = new PlannedRoute(plannedRoute.getName(), plannedRoute.getCustomersAndProspects());
+        PlannedRoute clone = new PlannedRoute(plannedRoute.getName(), plannedRoute.getCustomers());
         clone.setId(plannedRoute.getId());
         clone.setStartingPoint(plannedRoute.getStartingPoint());
         clone.setEndingPoint(plannedRoute.getEndingPoint());
@@ -253,6 +291,10 @@ public class NavigationActivity extends AppCompatActivity {
                     visits = routeAndGpsDtoData.getRoute().getVisits();
                     displayVisit();
                     ActualRoute route = routeAndGpsDtoData.getRoute();
+                    btn_pause.setOnLongClickListener(v -> {
+                        pauseRoute(route);
+                        return true;
+                    });
                     displayRoute(route);
                 },
                 error -> {
@@ -260,8 +302,7 @@ public class NavigationActivity extends AppCompatActivity {
                     Log.e(TAG, "getActualRoute: " + error.message);
                     Log.d(TAG, "getActualRoute: " + error.actualRoute);
                 }
-                )
-        );
+        ));
     }
 
     private int getVisitIndex(List<Visit> visits) {
@@ -277,10 +318,10 @@ public class NavigationActivity extends AppCompatActivity {
     private void displayVisit() {
         visits.forEach(System.out::println);
 
+        visitIndex = getVisitIndex(visits);
+
         Visit current;
         Customer customer;
-
-        System.out.println("Visit index: " + visitIndex);
 
         for (int i = 0; i < visits.size(); i++) {
             if (i == visitIndex) {
@@ -288,6 +329,8 @@ public class NavigationActivity extends AppCompatActivity {
                 customer = current.getCustomer();
                 tvCustomerName.setText(customer.getName());
                 tvContactInfo.setText(
+                        customer.getType()
+                                + "\n" +
                         customer.getAddress() + " - " + customer.getCity()
                                 + "\n" +
                                 customer.getContact().getCleanInfos()
@@ -296,6 +339,9 @@ public class NavigationActivity extends AppCompatActivity {
             }
         }
 
+        if (visitIndex == visits.size()) {
+            routeAndGpsDtoData.getRoute().setStatus(ERouteStatus.COMPLETED);
+        }
 
         if (routeAndGpsDtoData != null && routeAndGpsDtoData.getRoute().getStatus() == ERouteStatus.COMPLETED) {
             tvCustomerName.setText("Toutes les visites ont été effectuées");
@@ -303,19 +349,45 @@ public class NavigationActivity extends AppCompatActivity {
 
             // bouton pour terminer la route, revenir à la liste des routes
             Button btnTerminer = new Button(this);
-            btnTerminer.setText("Terminer la route");
+            btnTerminer.setText("Terminer le parcours");
 
-            btnTerminer.setOnClickListener(v -> {
+            btnTerminer.setOnLongClickListener(v -> {
+                Communicator communicator = Communicator.getInstance(getApplicationContext());
+                communicator.finishRoute(routeAndGpsDtoData.getRoute(), new CommunicatorCallback<>(
+                        response -> {
+                            Toast.makeText(this, "Parcours terminé", Toast.LENGTH_SHORT).show();
+                        },
+                        error -> {
+                            Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "finishRoute: " + error.message);
+                        }
+                ));
+
                 finish();
+                return true;
             });
 
-            sendNotification("Route Completed", "All visits have been completed.");
+            buttons.removeView(btn_valider);
+            buttons.removeView(btn_passer);
+            buttons.removeView(btn_pause);
+
+            buttons.addView(btnTerminer);
+
+            sendNotification("Parcours terminé", "Toutes les visites ont été effectuées.");
 
         }
 
     }
 
     private void displayRoute(ActualRoute route) {
+
+        Marker marker = new Marker(mapView);
+        marker.setPosition(new GeoPoint(route.getCoordinates().get(0).getLatitude(), route.getCoordinates().get(0).getLongitude()));
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setTitle(getString(R.string.depart));
+        marker.setIcon(getResources().getDrawable(R.drawable.ic_home_scaled, null));
+        mapView.getOverlays().add(marker);
+
 
         int visitNumber = route.getVisits().size();
         Visit visit;
@@ -327,7 +399,7 @@ public class NavigationActivity extends AppCompatActivity {
             coordinates = customer.getGpsCoordinates();
 
             // Ajout d'un marqueur pour chaque visite
-            Marker marker = new Marker(mapView);
+            marker = new Marker(mapView);
             marker.setPosition(new GeoPoint(coordinates.getLatitude(), coordinates.getLongitude()));
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             marker.setTitle(customer.getName() + "\n" + customer.getType()
@@ -349,14 +421,71 @@ public class NavigationActivity extends AppCompatActivity {
             locationManager.removeUpdates(locationListener);
         }
         mapView.onPause();
-    }
 
+        if (routeAndGpsDtoData == null || routeAndGpsDtoData.getRoute() == null) {
+            return;
+        }
+
+        if (routeAndGpsDtoData.getRoute().getStatus() == ERouteStatus.COMPLETED) {
+            return;
+        }
+
+        Communicator communicator = Communicator.getInstance(getApplicationContext());
+        communicator.pauseRoute(routeAndGpsDtoData.getRoute(), new CommunicatorCallback<>(
+                response -> {
+                    Toast.makeText(this, R.string.paused, Toast.LENGTH_SHORT).show();
+                },
+                error -> {
+                    Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "pauseRoute: " + error.message);
+                }
+        ));
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
         // Reprise de la carte
         mapView.onResume();
+
+        if (routeAndGpsDtoData == null || routeAndGpsDtoData.getRoute() == null) {
+            return;
+        }
+
+        if (routeAndGpsDtoData.getRoute().getStatus() == ERouteStatus.COMPLETED) {
+            return;
+        }
+
+        Communicator communicator = Communicator.getInstance(getApplicationContext());
+        communicator.resumeRoute(routeAndGpsDtoData.getRoute(), new CommunicatorCallback<>(
+                response -> {
+                    Toast.makeText(this, R.string.reprise, Toast.LENGTH_SHORT).show();
+                    routeAndGpsDtoData.setRoute(response.routes.get(0));
+                    displayRoute(routeAndGpsDtoData.getRoute());
+                    displayVisit();
+                    displayItinerary(routeAndGpsDtoData.getRoute());
+                },
+                error -> {
+                    Toast.makeText(this, "Erreur: " + error.message, Toast.LENGTH_SHORT).show();
+                }
+        ));
+    }
+
+    private void displayItinerary(ActualRoute route) {
+        if (route == null || route.getCoordinates() == null || route.getCoordinates().isEmpty()) {
+            return;
+        }
+
+        Polyline polyline = new Polyline();
+        polyline.setTitle("Itinerary");
+
+        for (Coordinates coordinates : route.getCoordinates()) {
+            GeoPoint geoPoint = new GeoPoint(coordinates.getLatitude(), coordinates.getLongitude());
+            polyline.addPoint(geoPoint);
+        }
+
+        mapView.getOverlays().add(polyline);
+        mapView.invalidate(); // Redraw the map
     }
 
     private void updateUserLocation(Location location) {
@@ -366,6 +495,15 @@ public class NavigationActivity extends AppCompatActivity {
         }
 
         coordinatesToSend.add(new Coordinates(location.getLatitude(), location.getLongitude()));
+
+        if (routeAndGpsDtoData != null) {
+            routeAndGpsDtoData.getRoute().getCoordinates().addAll(coordinatesToSend);
+        }
+
+        if (routeAndGpsDtoData!= null) {
+            displayItinerary(routeAndGpsDtoData.getRoute());
+        }
+
         sendUserLocation();
 
         // Create a new marker at the user's location
@@ -435,8 +573,8 @@ public class NavigationActivity extends AppCompatActivity {
             mapView.getOverlays().add(marker);
 
             sendNotification(
-                    "Nearby Customer",
-                    "You are near " + customer.getContact().getCleanInfos()
+                    getString(R.string.proximite),
+                    getString(R.string.proche) + customer.getContact().getCleanInfos()
             );
         }
 
@@ -459,18 +597,11 @@ public class NavigationActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
 
-        // Create an explicit intent for an Activity in your app
-        Intent intent = new Intent(this, NavigationActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_route)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 
         // notificationId is a unique int for each notification that you must define

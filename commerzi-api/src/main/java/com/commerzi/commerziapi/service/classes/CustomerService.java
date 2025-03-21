@@ -24,6 +24,9 @@ public class CustomerService implements ICustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private PlannedRouteRepository plannedRouteRepository;
+
     /**
      * Retrieves all customers.
      *
@@ -91,11 +94,26 @@ public class CustomerService implements ICustomerService {
 
         existingCustomer.merge(customer);
 
+        List<PlannedRoute> plannedRoutes = plannedRouteRepository.findByCustomersId(existingCustomer.getId());
+
         if (existingCustomer.getAddress() != null && existingCustomer.getCity() != null) {
             existingCustomer.setGpsCoordinates(
                     CheckAddress.getCoordinates(existingCustomer.getAddress(), existingCustomer.getCity())
             );
+
+            for (PlannedRoute plannedRoute : plannedRoutes) {
+                plannedRouteRepository.deleteById(plannedRoute.getId());
+            }
         }
+
+        plannedRoutes.forEach(plannedRoute -> {
+            plannedRoute.getCustomers().forEach(c -> {
+                if (c.getId().equals(existingCustomer.getId())) {
+                    c.merge(existingCustomer);
+                }
+            });
+            plannedRouteRepository.save(plannedRoute);
+        });
 
         return customerRepository.save(existingCustomer);
     }
@@ -111,6 +129,13 @@ public class CustomerService implements ICustomerService {
         if (existingCustomer == null) {
             return null;
         }
+
+        List<PlannedRoute> plannedRoutes = plannedRouteRepository.findByCustomersId(existingCustomer.getId());
+        plannedRoutes.forEach(plannedRoute -> {
+            plannedRoute.getCustomers().removeIf(c -> c.getId().equals(existingCustomer.getId()));
+            plannedRouteRepository.save(plannedRoute);
+        });
+
         customerRepository.delete(existingCustomer);
         return existingCustomer;
     }

@@ -275,7 +275,7 @@ public class MapsUtils {
     public static void buildFullRoute(PlannedRoute initialRoute, ATravelerAlgorithm algorithm) throws IOException {
         check(initialRoute, algorithm);
 
-        final List<Coordinates> points = initialRoute.getCustomersAndProspects().stream()
+        final List<Coordinates> points = initialRoute.getCustomers().stream()
             .map(Customer::getGpsCoordinates)
             .toList();
 
@@ -283,12 +283,12 @@ public class MapsUtils {
 
         List<Customer> orderedCustomers = new ArrayList<>();
         for (Coordinates point : newPoints) {
-            initialRoute.getCustomersAndProspects().stream()
+            initialRoute.getCustomers().stream()
                     .filter(c -> c.getGpsCoordinates().equals(point))
                     .findFirst().ifPresent(orderedCustomers::add);
         }
 
-        initialRoute.setCustomersAndProspects(orderedCustomers);
+        initialRoute.setCustomers(orderedCustomers);
 
         newPoints.add(initialRoute.getEndingPoint());
         newPoints.add(0, initialRoute.getStartingPoint());
@@ -298,7 +298,7 @@ public class MapsUtils {
     }
 
     public static void check(PlannedRoute initialRoute, ATravelerAlgorithm algorithm) {
-        if (initialRoute.getCustomersAndProspects() == null || initialRoute.getCustomersAndProspects().isEmpty()) {
+        if (initialRoute.getCustomers() == null || initialRoute.getCustomers().isEmpty()) {
             throw new IllegalArgumentException("Customer list cannot be null or empty.");
         }
 

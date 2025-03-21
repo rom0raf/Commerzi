@@ -30,12 +30,6 @@ public class ActualRouteService implements IActualRouteService {
      * @return the ID of the saved actual route
      */
     public String saveActualRoute(ActualRoute actualRoute) throws Exception {
-        ActualRoute existingRoute = actualRouteRepository.findByPlannedRouteId(actualRoute.getPlannedRouteId());
-
-        if (existingRoute != null) {
-            return existingRoute.getId();
-        }
-
         checkActualRoute(actualRoute);
         actualRouteRepository.save(actualRoute);
         return actualRoute.getId();
@@ -76,16 +70,11 @@ public class ActualRouteService implements IActualRouteService {
         );
 
 
-        List<Coordinates> coordinates = new ArrayList<>();
-        coordinates.add(plannedRoute.getStartingPoint());
-
-        plannedRoute.getCustomersAndProspects().forEach(customer -> {
-            coordinates.add(customer.getGpsCoordinates());
-        });
-
-        coordinates.add(plannedRoute.getStartingPoint());
-
-        actualRoute.setCoordinates(coordinates);
+        actualRoute.setCoordinates(
+                new ArrayList<>(plannedRoute.getCustomers().size()) {{
+                    add(plannedRoute.getStartingPoint());
+                }}
+        );
 
         actualRoute.setStatus(ERouteStatus.IN_PROGRESS);
 
@@ -114,7 +103,7 @@ public class ActualRouteService implements IActualRouteService {
 
     private static List<Visit> getVisitFromPlannedRoute(PlannedRoute plannedRoute) {
         List<Visit> visits = new ArrayList<>();
-        for (Customer customer : plannedRoute.getCustomersAndProspects()) {
+        for (Customer customer : plannedRoute.getCustomers()) {
             visits.add(new Visit(customer));
         }
         return visits;
@@ -197,6 +186,11 @@ public class ActualRouteService implements IActualRouteService {
             route.setStatus(ERouteStatus.COMPLETED);
         }
 
+        return actualRouteRepository.save(route);
+    }
+
+    public ActualRoute changeStatus(ActualRoute route, ERouteStatus status) {
+        route.setStatus(status);
         return actualRouteRepository.save(route);
     }
 }
