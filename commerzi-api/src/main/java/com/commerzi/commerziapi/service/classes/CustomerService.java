@@ -186,8 +186,14 @@ public class CustomerService implements ICustomerService {
         if (contact == null) {
             throw new IllegalArgumentException("Contact information is required");
         }
+
         if (contact.getPhoneNumber() == null || contact.getPhoneNumber().isEmpty()) {
             throw new IllegalArgumentException("Phone number is required");
+        }
+
+        String phoneNumber = contact.getPhoneNumber();
+        if (!phoneNumber.matches("(\\+\\d{1,3})?\\d{6,15}")) {
+            throw new IllegalArgumentException("Invalid phone number format. Must contain only numbers and may start with '+'.");
         }
 
         if (contact.getFirstName() == null || contact.getFirstName().isEmpty()) {
@@ -197,7 +203,6 @@ public class CustomerService implements ICustomerService {
         if (contact.getLastName() == null || contact.getLastName().isEmpty()) {
             throw new IllegalArgumentException("Last name is required");
         }
-
     }
 
     public List<Customer> getNearbyClients(Coordinates coordinates, CommerziUser user) {
